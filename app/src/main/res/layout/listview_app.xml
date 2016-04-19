@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright Car Connectivity Consortium
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  ~
+  ~ You may decide to give the Car Connectivity Consortium input, suggestions
+  ~ or feedback of a technical nature which may be implemented on the
+  ~ Car Connectivity Consortium products ("Feedback").
+  ~
+  ~ You agrees that any such Feedback is given on non-confidential
+  ~ basis and Licensee hereby waives any confidentiality restrictions
+  ~ for such Feedback. In addition, Licensee grants to the Car Connectivity Consortium
+  ~ and its affiliates a worldwide, non-exclusive, perpetual, irrevocable,
+  ~ sub-licensable, royalty-free right and license under Licensee's copyrights to copy,
+  ~ reproduce, modify, create derivative works and directly or indirectly
+  ~ distribute, make available and communicate to public the Feedback
+  ~ in or in connection to any CCC products, software and/or services.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <FrameLayout
+        android:layout_width="72dp"
+        android:layout_height="72dp">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/app_icon_background"
+            android:src="@drawable/c4_launcher_icon_background"
+            android:scaleType="centerCrop"
+            android:tint="@color/c4_list_header_background"
+            android:padding="0dp" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/app_icon"
+            android:scaleType="centerCrop"
+            android:padding="0dp" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/app_icon_mask"
+            android:src="@drawable/c4_navigator_icon_mask"
+            android:scaleType="fitCenter"
+            android:tintMode="multiply"
+            android:tint="@color/c4_list_background"
+            android:padding="0dp" />
+
+    </FrameLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical|left"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textSize="32dp"
+        android:id="@+id/app_name"
+        android:padding="12dp"
+        />
+
+</LinearLayout>
+

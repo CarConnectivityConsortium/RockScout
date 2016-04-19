@@ -1,0 +1,193 @@
+<!--
+  ~ Copyright Car Connectivity Consortium
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  ~
+  ~ You may decide to give the Car Connectivity Consortium input, suggestions
+  ~ or feedback of a technical nature which may be implemented on the
+  ~ Car Connectivity Consortium products ("Feedback").
+  ~
+  ~ You agrees that any such Feedback is given on non-confidential
+  ~ basis and Licensee hereby waives any confidentiality restrictions
+  ~ for such Feedback. In addition, Licensee grants to the Car Connectivity Consortium
+  ~ and its affiliates a worldwide, non-exclusive, perpetual, irrevocable,
+  ~ sub-licensable, royalty-free right and license under Licensee's copyrights to copy,
+  ~ reproduce, modify, create derivative works and directly or indirectly
+  ~ distribute, make available and communicate to public the Feedback
+  ~ in or in connection to any CCC products, software and/or services.
+  -->
+
+<com.carconnectivity.mlmediaplayer.ui.TransitionFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.carconnectivity.mlmediaplayer.ui.launcher.LauncherFragment">
+
+    <LinearLayout
+        android:id="@+id/drawer"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <RelativeLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1.5"
+            android:background="@color/c4_list_header_background"
+            android:baselineAligned="false" >
+
+            <ImageButton
+                android:layout_width="104dp"
+                android:layout_height="match_parent"
+                android:id="@+id/launcher_back_button"
+                android:background="@xml/action_bar_btn_selector"
+                android:src="@drawable/ic_btn_back"
+                android:scaleType="fitCenter"
+                />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:id="@+id/buttonLauncher"
+                android:text="@string/now_playing"
+                android:textColor="#fff"
+                android:textSize="32dp"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:background="@xml/action_bar_btn_selector"
+                android:layout_alignParentRight="true"
+                android:padding="8dp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:id="@+id/text_select_hint"
+                android:text="@string/select_source_hint"
+                android:textSize="32dp"
+                android:layout_weight="3"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:gravity="center_vertical|left"
+                android:layout_toRightOf="@id/launcher_back_button"
+                android:layout_toLeftOf="@id/buttonLauncher"
+                />
+        </RelativeLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="7"
+            >
+
+            <!-- The linear layout is a hack to have proper look of the scrollbar
+                 with margins on both sides -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                >
+                <!-- The TextView is just a placeholder to position the ListView -->
+                <TextView
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/c4_list_background"
+                    />
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/scrollview"
+                    android:verticalScrollbarPosition="left"
+                    android:fadeScrollbars="false"
+                    android:paddingLeft="54dp"
+                    android:scrollbarThumbVertical="@drawable/c4_list_scrollbar"
+                    android:scrollbarStyle="insideInset"
+                    android:background="@color/c4_list_background"
+                    >
+
+                    <LinearLayout
+                        android:layout_marginLeft="0dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:id="@+id/launcher_list"
+                        android:divider="@drawable/c4_launcher_divider"
+                        android:showDividers="middle">
+
+                        <com.carconnectivity.mlmediaplayer.ui.widgets.NonScrollableGridView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/grid_active"
+                            android:listSelector="@drawable/grid_selector"
+                            android:numColumns="2"
+                            android:smoothScrollbar="false"
+                            class = "com.carconnectivity.mlmediaplayer.ui.widgets.NonScrollableGridView"/>
+
+                        <com.carconnectivity.mlmediaplayer.ui.widgets.NonScrollableGridView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/grid_inactive"
+                            android:numColumns="2"
+                            android:smoothScrollbar="false"
+                            class = "com.carconnectivity.mlmediaplayer.ui.widgets.NonScrollableGridView"/>
+
+                    </LinearLayout>
+                </ScrollView>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/no_auto_compatible_app"
+                android:textSize="27dp"
+                android:paddingLeft="104dp"
+                android:paddingRight="20dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp"
+                android:textAlignment="center"
+                android:textColor="#fff"
+                android:id="@+id/no_auto_apps_warning"
+                />
+
+            <LinearLayout
+                android:layout_width="104dp"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:id="@+id/launcher_pagination"
+                android:background="@color/c4_list_background"
+                >
+                <view
+                    class="com.carconnectivity.mlmediaplayer.ui.widgets.PageButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:id="@+id/page_button_previous"
+                    />
+                <view
+                    class="com.carconnectivity.mlmediaplayer.ui.widgets.PageButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:id="@+id/page_button_current"
+                    />
+                <view
+                    class="com.carconnectivity.mlmediaplayer.ui.widgets.PageButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:id="@+id/page_button_next"
+                    />
+            </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
+</com.carconnectivity.mlmediaplayer.ui.TransitionFrameLayout>

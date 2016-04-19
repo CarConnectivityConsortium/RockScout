@@ -1,0 +1,66 @@
+<!--
+  ~ Copyright Car Connectivity Consortium
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  ~
+  ~ You may decide to give the Car Connectivity Consortium input, suggestions
+  ~ or feedback of a technical nature which may be implemented on the
+  ~ Car Connectivity Consortium products ("Feedback").
+  ~
+  ~ You agrees that any such Feedback is given on non-confidential
+  ~ basis and Licensee hereby waives any confidentiality restrictions
+  ~ for such Feedback. In addition, Licensee grants to the Car Connectivity Consortium
+  ~ and its affiliates a worldwide, non-exclusive, perpetual, irrevocable,
+  ~ sub-licensable, royalty-free right and license under Licensee's copyrights to copy,
+  ~ reproduce, modify, create derivative works and directly or indirectly
+  ~ distribute, make available and communicate to public the Feedback
+  ~ in or in connection to any CCC products, software and/or services.
+  -->
+
+<resources>
+    <string name="app_name" translatable="false">RockScout</string>
+    <string name="title_activity_main" translatable="false">RockScout</string>
+
+    <string name="ml_unsupported">Your phone must be compatible with MirrorLink in order to use the application. Please visit www.mirrorlink.com to learn more.</string>
+    <string name="ml_not_connected">Your phone must be connected to a MirrorLink head unit in order to use the application.</string>
+    <string name="notification_access">Notification access setting must be enabled for this application to work properly. Would you like to do that now?</string>
+    <string name="items_missing">Couldn\'t find any media item.</string>
+    <string name="play">Play</string>
+    <string name="pause">Pause</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+    <string name="playlist">Playlist</string>
+    <string name="more">More</string>
+    <string name="menu">Menu</string>
+    <string name="listenNow">Listen now</string>
+    <string name="active">Active</string>
+    <string name="inactive">Inactive</string>
+    <string name="disabled">Disabled</string>
+    <string name="track">Track</string>
+    <string name="artist">Artist</string>
+    <string name="album">Album</string>
+    <string name="browse">Browse</string>
+    <string name="back">Go back</string>
+    <string name="providers_list">Media providers list</string>
+    <string name="open_navigator">Open navigator</string>
+    <string name="now_playing">Now Playing</string>
+    <string name="mirrorlink_dialog_title">Important</string>
+    <string name="mirrorlink_dialog_message">Your phone does not support MirrorLink technology.\n\nYou can use %s on your phone but not on the head unit of your car.</string>
+    <string name="no_auto_compatible_app">You have no MediaBrowser compatible media application on your phone.\n\nTo use RockScout, please install one of the supported media applications.</string>
+    <string name="press_play_to_start">Press play to start</string>
+    <string name="launcher">Launcher</string>
+    <string name="top_level">Top Level</string>
+    <!-- not sent: -->
+    <string name="select_source_hint">Select a source to play from:</string>
+    <string name="splash_subtitle">powered by MirrorLink</string>
+</resources>

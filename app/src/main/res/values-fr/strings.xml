@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ Copyright Car Connectivity Consortium
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  ~
+  ~ You may decide to give the Car Connectivity Consortium input, suggestions
+  ~ or feedback of a technical nature which may be implemented on the
+  ~ Car Connectivity Consortium products ("Feedback").
+  ~
+  ~ You agrees that any such Feedback is given on non-confidential
+  ~ basis and Licensee hereby waives any confidentiality restrictions
+  ~ for such Feedback. In addition, Licensee grants to the Car Connectivity Consortium
+  ~ and its affiliates a worldwide, non-exclusive, perpetual, irrevocable,
+  ~ sub-licensable, royalty-free right and license under Licensee's copyrights to copy,
+  ~ reproduce, modify, create derivative works and directly or indirectly
+  ~ distribute, make available and communicate to public the Feedback
+  ~ in or in connection to any CCC products, software and/or services.
+  -->
+
+<resources>
+  <string name="ml_unsupported">Votre mobile n\'est pas compatible avec la technologie MirrorLink. Veuillez consulter www.mirrorlink.com pour en savoir plus.</string>
+  <string name="ml_not_connected">Votre mobile n\'est pas connecté à un autoradio compatible MirrorLink.</string>
+  <string name="notification_access">Cette application nécessite l\'accès aux notifications. Désirez-vous l\'activer maintenant?</string>
+  <string name="items_missing">Aucun contenu trouvé</string>
+  <string name="play">Lecture</string>
+  <string name="pause">Pause</string>
+  <string name="next">Suivant</string>
+  <string name="previous">Précédent</string>
+  <string name="playlist">Liste de lecture</string>
+  <string name="more">Plus</string>
+  <string name="menu">Menu</string>
+  <string name="listenNow">Écouter maintenant</string>
+  <string name="active">Actif</string>
+  <string name="inactive">Inactif</string>
+  <string name="disabled">Désactivé</string>
+  <string name="track">Titre</string>
+  <string name="artist">Artiste</string>
+  <string name="album">Album</string>
+  <string name="browse">Explorer</string>
+  <string name="back">Retour</string>
+  <string name="providers_list">Liste des fournisseurs de contenu</string>
+  <string name="open_navigator">Accéder au navigateur</string>
+  <string name="now_playing">En cours de Lecture</string>
+  <string name="mirrorlink_dialog_title">Avertissement</string>
+  <string name="mirrorlink_dialog_message">Votre mobile n\'est pas compatible avec la technologie MirrorLink. Vous pouvez utiliser %s avec votre mobile mais vous ne pourrez pas le connecter à l\'autoradio de votre voiture</string>
+  <string name="no_auto_compatible_app">Aucune application multimédia compatible n\'est installée sur votre mobile. Pour utiliser %s, veuillez installer une application multimédia compatible \'Android Media Browse Service\'.</string>
+  <string name="press_play_to_start">Appuyer sur Play pour démarrer la lecture</string>
+  <string name="launcher">Lanceur</string>
+  <string name="top_level">Acceuil</string>
+  <string name="select_source_hint">Choisissez une source:</string>
+  <string name="splash_subtitle">powered by MirrorLink</string>
+</resources>

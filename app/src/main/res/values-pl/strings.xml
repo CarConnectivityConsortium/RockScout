@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ Copyright Car Connectivity Consortium
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  ~
+  ~ You may decide to give the Car Connectivity Consortium input, suggestions
+  ~ or feedback of a technical nature which may be implemented on the
+  ~ Car Connectivity Consortium products ("Feedback").
+  ~
+  ~ You agrees that any such Feedback is given on non-confidential
+  ~ basis and Licensee hereby waives any confidentiality restrictions
+  ~ for such Feedback. In addition, Licensee grants to the Car Connectivity Consortium
+  ~ and its affiliates a worldwide, non-exclusive, perpetual, irrevocable,
+  ~ sub-licensable, royalty-free right and license under Licensee's copyrights to copy,
+  ~ reproduce, modify, create derivative works and directly or indirectly
+  ~ distribute, make available and communicate to public the Feedback
+  ~ in or in connection to any CCC products, software and/or services.
+  -->
+
+<resources>
+    <string name="ml_unsupported">Twój telefon nie jest kompatybilny z technologią MirrorLink, odwiedź stronę www.mirrorlink.com, aby dowiedzieć się więcej.</string>
+    <string name="ml_not_connected">Twój telefon nie jest podłączony do urządzenia obsługującego połączenie MirrorLink.</string>
+    <string name="notification_access">Włączony dostęp do notyfikacji jest wymagany dla poprawnego działania tej aplikacji. Czy chcesz to zrobić teraz?</string>
+    <string name="items_missing">Nie znaleziono żadnych wpisów.</string>
+    <string name="play">Odtwarzaj</string>
+    <string name="pause">Pauza</string>
+    <string name="next">Następny</string>
+    <string name="previous">Poprzedni</string>
+    <string name="playlist">Listy odtwarzania</string>
+    <string name="more">Więcej</string>
+    <string name="menu">Menu</string>
+    <string name="listenNow">Słuchaj teraz</string>
+    <string name="active">Aktywne</string>
+    <string name="inactive">Nieaktywne</string>
+    <string name="disabled">Zablokowane</string>
+    <string name="track">Utwór</string>
+    <string name="artist">Artysta</string>
+    <string name="album">Album</string>
+    <string name="browse">Przeglądaj</string>
+    <string name="back">Wstecz</string>
+    <string name="providers_list">Lista serwisów muzycznych</string>
+    <string name="open_navigator">Otwórz nawigację</string>
+    <string name="now_playing">Teraz odtwarzane</string>
+    <string name="mirrorlink_dialog_title">Ostrzeżenie</string>
+    <string name="mirrorlink_dialog_message">Twój telefon nie obsługuje technologii MirrorLink.\n\nMożesz używać RockScout na swoim telefonie, ale połączenie z Twoim samochodem za pomocą technologii MirrorLink jest niemożliwe.</string>
+    <string name="no_auto_compatible_app">Nie posiadasz aplikacji kompatybilnych z \'Android Media Browse Service\' na swoim telefonie.\n\nAby używać RockScout, zainstaluj jedną z obsługiwanych aplikacji multimedialnych.</string>
+    <string name="press_play_to_start">Naciśnij "odtwarzaj" aby rozpocząć.</string>
+    <string name="launcher">Launcher</string>
+    <string name="top_level">Poziom początkowy</string>
+    <string name="select_source_hint">Wybierz źródło muzyki:</string>
+    <string name="splash_subtitle">powered by MirrorLink</string>
+</resources>

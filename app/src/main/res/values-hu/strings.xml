@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ Copyright Car Connectivity Consortium
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  ~
+  ~ You may decide to give the Car Connectivity Consortium input, suggestions
+  ~ or feedback of a technical nature which may be implemented on the
+  ~ Car Connectivity Consortium products ("Feedback").
+  ~
+  ~ You agrees that any such Feedback is given on non-confidential
+  ~ basis and Licensee hereby waives any confidentiality restrictions
+  ~ for such Feedback. In addition, Licensee grants to the Car Connectivity Consortium
+  ~ and its affiliates a worldwide, non-exclusive, perpetual, irrevocable,
+  ~ sub-licensable, royalty-free right and license under Licensee's copyrights to copy,
+  ~ reproduce, modify, create derivative works and directly or indirectly
+  ~ distribute, make available and communicate to public the Feedback
+  ~ in or in connection to any CCC products, software and/or services.
+  -->
+
+<resources>
+  <string name="ml_unsupported">A telefon és MirrorLink nem kompatibilis. A részletekért kérjuk látogassa meg a www.mirrorlink.com weblapot.</string>
+  <string name="ml_not_connected">A telefon nincs a MirrorLink fejkészülékhez csatlakoztatva.</string>
+  <string name="notification_access">Az alkalmazás helyes működéséhez kérem engedélyezze a Notification Access beállítást. Szeretné most megtenni?</string>
+  <string name="items_missing">Média nem található.</string>
+  <string name="play">Lejátszás</string>
+  <string name="pause">Megállítás</string>
+  <string name="next">Következő</string>
+  <string name="previous">Előző</string>
+  <string name="playlist">Lejátszási lista</string>
+  <string name="more">Több</string>
+  <string name="menu">Menü</string>
+  <string name="listenNow">Lehallgatás most</string>
+  <string name="active">Aktív</string>
+  <string name="inactive">Elérhetetlen</string>
+  <string name="disabled">Elérhetetlen</string>
+  <string name="track">Zeneszám</string>
+  <string name="artist">Előadó</string>
+  <string name="album">Album</string>
+  <string name="browse">Böngészés</string>
+  <string name="back">Vissza</string>
+  <string name="providers_list">Média ellátók listája</string>
+  <string name="open_navigator">Navigácio megnyitása</string>
+  <string name="now_playing">Most játszódik</string>
+  <string name="mirrorlink_dialog_title">Figyelem</string>
+  <string name="mirrorlink_dialog_message">A MirrorLink teknológia ezen a telefonon nem támogatott.\n\nA RockScout a telefonon használható de az autó fejkészüléken nem.</string>
+  <string name="no_auto_compatible_app">A telefonján nincs \'Android Media Browse Service\' kompatibilis média lejátszó.\n\n Kérem telepítsen egy támogatott média lejátszót, hogy a RockScout használható legyen.</string>
+  <string name="press_play_to_start">Nyomja meg a lejátszás gombot </string>
+  <string name="launcher">Indító</string>
+  <string name="top_level">Felső szint</string>
+  <string name="select_source_hint"></string>
+  <string name="splash_subtitle">powered by MirrorLink</string>
+</resources>
