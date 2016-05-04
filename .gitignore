@@ -8,3 +8,5 @@
 /app/app-release.apk
 app/app-devcert.apk
 app/app-tmp.apk
+app/certificategenerator-windows-64.jar
+app/make-ml-aware.sh
