@@ -36,6 +36,7 @@ import android.media.session.MediaController;
 import android.media.session.PlaybackState;
 import android.os.Bundle;
 import android.util.Log;
+import android.graphics.Bitmap;
 
 import com.carconnectivity.mlmediaplayer.commonapi.events.AudioStartBlockingEvent;
 import com.carconnectivity.mlmediaplayer.commonapi.events.AudioStopBlockingEvent;
@@ -121,9 +122,11 @@ public final class ProviderMediaController extends MediaController.Callback {
     }
 
     public void forcePause() {
+        Log.d(TAG, "ForcePause");
         if (mIsListening == false) return;
         final MediaController.TransportControls controls
                 = mMediaController.getTransportControls();
+        Log.d(TAG, "Force Pauseing");
         controls.pause();
     }
 
@@ -193,11 +196,18 @@ public final class ProviderMediaController extends MediaController.Callback {
         final String title = metadata.containsKey(MediaMetadata.METADATA_KEY_TITLE)
                 ? metadata.getString(MediaMetadata.METADATA_KEY_TITLE)
                 : metadata.getString(MediaMetadata.METADATA_KEY_DISPLAY_TITLE);
+
         final String artist = getArtistString(metadata);
         final Long duration = metadata.getLong(MediaMetadata.METADATA_KEY_DURATION);
-        final String artUri = metadata.getString(MediaMetadata.METADATA_KEY_ALBUM_ART_URI);
+        String artUri = metadata.getString(MediaMetadata.METADATA_KEY_ALBUM_ART_URI);
+        Bitmap artBmp = metadata.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART);
 
-        final TrackMetadata newMetadata = new TrackMetadata(title, artist, duration, artUri);
+        if (artUri == null && artBmp == null) {
+            artUri = metadata.getString(MediaMetadata.METADATA_KEY_ART_URI);
+            artBmp = metadata.getBitmap(MediaMetadata.METADATA_KEY_ART);
+        }
+
+        final TrackMetadata newMetadata = new TrackMetadata(title, artist, duration, artUri, artBmp);
         if (newMetadata.sameAsOther(mCurrentMetadata) == false) {
             mBus.post(new MediaMetadataChangedEvent(view, newMetadata));
         }
@@ -269,8 +279,9 @@ public final class ProviderMediaController extends MediaController.Callback {
         }
     }
 
-    @SuppressWarnings("unused")
-    public void onEvent(TerminateEvent event) {
+    @SuppressWarnings("unused") 
+   public void onEvent(TerminateEvent event) {
+        Log.d(TAG, "handle TerminateEvent event: " + event.toString());
         forcePause();
     }
 

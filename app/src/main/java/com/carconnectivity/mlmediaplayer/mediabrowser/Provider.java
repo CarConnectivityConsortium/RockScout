@@ -63,13 +63,14 @@ final class Provider {
 
     private boolean mConnected;
     private boolean mCanConnect;
+    private boolean mCanPlayOffline; /* offline = without ML session */
 
     private ConnectionCallback mActiveConnectionCallback;
     private final ProviderMediaController mMediaController;
 
     private EventBus mBus = EventBus.getDefault();
 
-    public Provider(ProvidersManager manager, ResolveInfo packageInfo) {
+    public Provider(ProvidersManager manager, ResolveInfo packageInfo, boolean canPlayOffline) {
         if (manager == null) {
             throw new IllegalArgumentException("Manager cannot be null.");
         }
@@ -82,12 +83,14 @@ final class Provider {
         mName = new ComponentName(serviceInfo.applicationInfo.packageName, serviceInfo.name);
         mConnected = false;
         mCanConnect = false;
+        mCanPlayOffline = canPlayOffline;
 
         mMediaController = new ProviderMediaController(this);
     }
 
     public boolean isConnected() { return mConnected; }
     public boolean canConnect() { return mCanConnect; }
+    public boolean canPlayOffline() { return mCanPlayOffline; }
     public ComponentName getName() { return mName; }
 
     public boolean isNameEqual(ComponentName name) {
@@ -133,13 +136,13 @@ final class Provider {
         connectWithCallback(mActiveConnectionCallback);
     }
 
-    public void disconnect() {
+    public void disconnect(boolean cleanProvider) {
         if (mActiveConnectionCallback == null) {
             throw new NullPointerException("Unexpected state: active connection callback is null.");
         }
 
         mActiveConnectionCallback.disconnect();
-        mBus.post(new ProviderConnectedEvent(null, false));
+        mBus.post(new ProviderConnectedEvent(null, false, cleanProvider));
         mActiveConnectionCallback = null;
         mConnected = false;
     }
@@ -171,12 +174,12 @@ final class Provider {
         public void onConnected() {
             mCanConnect = true;
             mConnected = true;
+            final ProviderView view = mManager.getProviderView(mName);
             final boolean isPlaying = checkIsPlaying();
             /* possibility to make connection has been tested, disconnect */
             getBrowser().disconnect();
             mConnected = false;
-            final ProviderView view = mManager.getProviderView(mName);
-            mBus.post(new ProviderDiscoveredEvent(view, isPlaying));
+            mManager.addConnectedProvider(view.getUniqueName(), isPlaying);
         }
 
         private boolean checkIsPlaying() {
@@ -199,7 +202,7 @@ final class Provider {
 
         @Override
         public void onConnectionSuspended() {
-            mBus.post(new ProviderConnectedEvent(null, false));
+            mBus.post(new ProviderConnectedEvent(null, false, false));
             mBus.post(new DisconnectFromCurrentProviderEvent());
         }
     }
@@ -261,12 +264,12 @@ final class Provider {
                 mBus.register(this);
 
                 final ProviderView view = mManager.getProviderView(mName);
-                mBus.postSticky(new ProviderConnectedEvent(view, mShowPlayer));
+                mBus.postSticky(new ProviderConnectedEvent(view, mShowPlayer, false));
 
                 mConnected = true;
             } else {
                 Log.d(TAG, "Connection failed to acquire token: " + mName.toString());
-                Provider.this.disconnect();
+                Provider.this.disconnect(false);
                 Provider.this.connect(mShowPlayer);
                 mBus.postSticky(new ProviderConnectErrorEvent(mName.toString()));
             }
@@ -298,7 +301,7 @@ final class Provider {
         @Override
         public void onConnectionSuspended() {
             mMediaController.stopListening();
-            mBus.post(new ProviderConnectedEvent(null, false));
+            mBus.post(new ProviderConnectedEvent(null, false, false));
             mBus.post(new DisconnectFromCurrentProviderEvent());
         }
     }

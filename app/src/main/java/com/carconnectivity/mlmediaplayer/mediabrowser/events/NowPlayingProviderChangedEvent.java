@@ -38,9 +38,6 @@ public class NowPlayingProviderChangedEvent {
     public final ProviderView provider;
 
     public NowPlayingProviderChangedEvent(ProviderView provider) {
-        if (provider == null) {
-            throw new IllegalArgumentException("Provider cannot be null.");
-        }
         this.provider = provider;
     }
 }

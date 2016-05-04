@@ -57,6 +57,7 @@ import com.carconnectivity.mlmediaplayer.mediabrowser.events.CurrentlyBrowsedPro
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.DisconnectFromCurrentProviderEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.NowPlayingProviderChangedEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.PlayMediaItemEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderBrowseCancelEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderBrowseErrorEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderConnectErrorEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderBrowseSuccessfulEvent;
@@ -186,6 +187,12 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
     }
 
     @SuppressWarnings("unused")
+    public void onEvent(ProviderBrowseCancelEvent event) {
+        Log.d(TAG, "handle ProviderBrowseCancel");
+        ((MainActivity) getActivity()).openLauncher(null);
+    }
+
+    @SuppressWarnings("unused")
     public void onEvent(ProviderBrowseErrorEvent event) {
         Log.d(TAG, "handle ProviderBrowseErrorEvent: " + event.toString());
         changeState(State.FAILED);
@@ -208,6 +215,10 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
     public void onEvent(NowPlayingProviderChangedEvent event) {
         mNowPlayingProvider = event.provider;
         initializeNowPlayingProviderDisplay(getView());
+
+        if(event.provider == null) {
+            ((MainActivity) getActivity()).openLauncher(null);
+        }
     }
 
     @Override

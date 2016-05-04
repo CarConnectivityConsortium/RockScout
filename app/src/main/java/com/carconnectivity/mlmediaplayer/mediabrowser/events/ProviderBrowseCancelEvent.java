@@ -29,19 +29,5 @@
 
 package com.carconnectivity.mlmediaplayer.mediabrowser.events;
 
-import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
-
-/**
- * Created by belickim on 08/05/15.
- */
-public final class ProviderConnectedEvent {
-    public final ProviderView provider;
-    public final boolean showPlayer;
-    public final boolean cleanPlayingProvider;
-
-    public ProviderConnectedEvent(ProviderView provider, boolean showPlayer ,boolean cleanProvider) {
-        this.provider = provider;
-        this.showPlayer = showPlayer;
-        this.cleanPlayingProvider = cleanProvider;
-    }
+public final class ProviderBrowseCancelEvent {
 }

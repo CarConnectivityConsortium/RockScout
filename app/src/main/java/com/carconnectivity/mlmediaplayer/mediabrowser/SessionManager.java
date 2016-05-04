@@ -55,6 +55,7 @@ public class SessionManager {
      */
     private Provider mPlayingProvider;
 
+
     public SessionManager(Context context, PackageManager packageManager) {
         mManger = new ProvidersManager(context, packageManager);
 
@@ -94,6 +95,15 @@ public class SessionManager {
     }
 
     @SuppressWarnings("unused")
+    public void onEvent(ProviderConnectedEvent event) {
+        if(event.provider != null) return;
+        if(!event.cleanPlayingProvider) return;
+
+        mBus.postSticky(new NowPlayingProviderChangedEvent(null));
+        mPlayingProvider = null;
+    }
+
+    @SuppressWarnings("unused")
     public void onEvent(StartBrowsingEvent event) {
         final ComponentName name = event.provider.getUniqueName();
         final boolean wasConnectedBefore = mManger.isConnected(name);
@@ -110,6 +120,7 @@ public class SessionManager {
     @SuppressWarnings("unused")
     public void onEvent(ProviderDiscoveredEvent event) {
         if (event.isPlaying && mPlayingProvider == null) {
+            Log.d(TAG,"ProviderDiscoveredEvent");
             changeBrowsedProvider(event.provider.getUniqueName(), true);
         }
     }
@@ -128,6 +139,8 @@ public class SessionManager {
     public void onEvent(PlaybackStateChangedEvent event) {
         final Provider provider = mManger.getProvider(event.provider.getUniqueName());
         changePlayingProviderIfPlaying(provider);
+        Log.d(TAG, "PlaybackStateChangedEvent");
+
     }
 
     private void changePlayingProvider(Provider maybePlayingProvider) {
@@ -146,6 +159,7 @@ public class SessionManager {
         if (maybePlayingProvider == null) return;
         if (!maybePlayingProvider.isPlaying()) return;
         if (mPlayingProvider != null && mPlayingProvider.isPlayingOrPreparing()) return;
+        Log.d(TAG,"changePlayingProviderIfPlaying");
         changePlayingProvider(maybePlayingProvider);
     }
 
@@ -159,6 +173,7 @@ public class SessionManager {
         }
 
         if (mPlayingProvider == null || !mPlayingProvider.isPlayingOrPreparing()) {
+            Log.d(TAG,"changeBrowsedProvider");
             changePlayingProvider(mBrowsedProvider);
         }
     }
@@ -168,9 +183,10 @@ public class SessionManager {
         if (!mBrowsedProvider.isConnected()) return;
 
         if (mBrowsedProvider.isPlaying()) {
+            Log.d(TAG, "disconnectBrowsedProvider");
             changePlayingProviderIfPlaying(mBrowsedProvider);
         } else {
-            mBrowsedProvider.disconnect();
+            mBrowsedProvider.disconnect(false);
         }
     }
 
@@ -178,7 +194,7 @@ public class SessionManager {
         if (mPlayingProvider == null) return;
         if (!mPlayingProvider.isConnected()) return;
 
-        mPlayingProvider.disconnect();
+        mPlayingProvider.disconnect(false);
     }
 
     public void disconnect() {
@@ -192,7 +208,7 @@ public class SessionManager {
             return;
         }
         if (provider.isConnected()) {
-            provider.disconnect();
+            provider.disconnect(false);
         }
         provider.connect(false);
     }
@@ -200,5 +216,27 @@ public class SessionManager {
     public void tryReconnect() {
         tryReconnectProvider(mPlayingProvider);
         tryReconnectProvider(mBrowsedProvider);
+    }
+
+    public void changeModePlayer(boolean mPlayerModeOnline) {
+        mManger.changeModePlayer(mPlayerModeOnline);
+
+        //playing provider
+        if(mPlayingProvider != null) {
+            if(!mPlayerModeOnline && !mPlayingProvider.canPlayOffline()) {
+                //pause playing and disconnect
+                if (mPlayingProvider.isPlaying()) mPlayingProvider.forcePause();
+                mPlayingProvider.disconnect(true);
+            }
+        }
+
+        //browsing provider
+        if(mBrowsedProvider != null) {
+            if(mPlayingProvider.getName().equals(mBrowsedProvider.getName())) return;
+            if(!mPlayerModeOnline && !mBrowsedProvider.canPlayOffline()) {
+                mBus.post(new ProviderBrowseCancelEvent());
+                mBrowsedProvider = null;
+            }
+        }
     }
 }

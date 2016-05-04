@@ -44,6 +44,7 @@ import android.view.animation.RotateAnimation;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.graphics.Bitmap;
 
 import com.carconnectivity.mlmediaplayer.R;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderPlaybackState;
@@ -223,7 +224,7 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
     @SuppressWarnings("unused")
     public void onEvent(ProviderConnectErrorEvent event) {
         final String title = getResources().getString(R.string.items_missing);
-        final TrackMetadata metadata = new TrackMetadata(title, "", 0L, null);
+        final TrackMetadata metadata = new TrackMetadata(title, "", 0L, null, null);
         updateMetadata(metadata);
     }
 
@@ -231,6 +232,10 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
     public void onEvent(NowPlayingProviderChangedEvent event) {
         mNowPlayingProvider = event.provider;
         customizeTheme(mNowPlayingProvider);
+
+        if(event.provider == null) {
+            ((MainActivity) getActivity()).openLauncher(null);
+        }
     }
 
     @SuppressWarnings("unused")
@@ -256,7 +261,11 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
         } else {
             title = metadata.title;
             artist = metadata.artist;
-            loadNewBitmap(metadata.artUri);
+            if(metadata.artBmp != null) {
+                loadNewBitmap(metadata.artBmp);
+            } else {
+                loadNewBitmap(metadata.artUri);
+            }
             duration = metadata.duration;
         }
 
@@ -382,12 +391,18 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
 
     private void loadNewBitmap(String uri) {
         if (uri == null || uri.equals("") || mAlbumArt == null) return;
-
+        Log.d(TAG, "Updating Bitmap to: " + uri);
         Picasso.with(getActivity().getApplicationContext())
                 .load(uri)
                 .placeholder(R.drawable.c4_player_background)
                 .error(R.drawable.c4_player_background)
                 .into(mAlbumArt);
+    }
+
+    private void loadNewBitmap(Bitmap bitmap) {
+        if (bitmap == null) return;
+        Log.d(TAG, "Updating Bitmap to: " + bitmap);
+        mAlbumArt.setImageBitmap(bitmap);
     }
 
     private void enablePrimaryToolbar() {

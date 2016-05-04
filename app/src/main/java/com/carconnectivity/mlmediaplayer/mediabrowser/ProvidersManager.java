@@ -56,16 +56,20 @@ import de.greenrobot.event.EventBus;
  */
 public final class ProvidersManager {
     public static final String TAG = ProvidersManager.class.getSimpleName();
+    public static final String ML_OFFLINE_PLAYBACK = "com.mirrorlink.android.rockscout.allow-offline-access";
     public static final int DEFAULT_COLOR = 0x041424; /* TODO: fetch this from resources */
     public static final int TIMER_PERIOD = 120;
 
     private final Context mContext;
     private final PackageManager mManager;
+    private final EventBus mBus;
 
     private final HashMap<ComponentName, ProviderRecord> mRecords;
+    private final HashMap<ComponentName, Boolean> mConnectedProviders;
 
     private HashMap<ComponentName, ProviderDiscoveryData> mProvidersTestStatus;
     private Timer mDiscoveryCompletedCheckTimer;
+    private boolean mPlayerModeOnline;
 
     public Context getContext() {
         return mContext;
@@ -75,12 +79,15 @@ public final class ProvidersManager {
         mContext = context;
         mManager = manager;
         mRecords = new HashMap<>();
-        EventBus.getDefault().register(this);
+        mConnectedProviders = new HashMap<>();
+        mBus = EventBus.getDefault();
+        mBus.register(this);
+        mPlayerModeOnline = false;
     }
 
     @SuppressWarnings("unused")
     public void onEvent(DisableEventsEvent event) {
-        EventBus.getDefault().unregister(this);
+        mBus.unregister(this);
     }
 
     @SuppressWarnings("unused")
@@ -122,8 +129,25 @@ public final class ProvidersManager {
         return mManager.queryIntentServices(intent, 0);
     }
 
+    private boolean checkIfCanPlayOffline(ResolveInfo packageInfo) {
+        ApplicationInfo appInfo = null;
+        try {
+            appInfo = mManager.getApplicationInfo(packageInfo.serviceInfo.packageName, PackageManager.GET_META_DATA);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
+        if(appInfo.metaData != null) {
+            return appInfo.metaData.getBoolean(ML_OFFLINE_PLAYBACK, false);
+        }
+        else{
+            return false;
+        }
+    }
+
     private Provider addNewProvider(ResolveInfo packageInfo) {
-        final Provider provider = new Provider(this, packageInfo);
+        final boolean canPlayOffline = checkIfCanPlayOffline(packageInfo);
+        final Provider provider = new Provider(this, packageInfo, canPlayOffline);
         final ProviderView view = createView(provider, packageInfo);
         final ComponentName name = provider.getName();
 
@@ -145,6 +169,7 @@ public final class ProvidersManager {
 
     public void findProviders() {
         mRecords.clear();
+        mConnectedProviders.clear();
         mProvidersTestStatus = new HashMap<>();
         final List<ResolveInfo> packages = getMediaBrowserPackages();
         for (ResolveInfo packageInfo : packages) {
@@ -173,6 +198,7 @@ public final class ProvidersManager {
         for (ComponentName name : mRecords.keySet()) {
             if (currentNames.contains(name) == false) {
                 mRecords.remove(name);
+                mConnectedProviders.remove(name);
                 /* TODO: send an event here to notify launcher view */
             }
         }
@@ -283,6 +309,29 @@ public final class ProvidersManager {
 
     public boolean isConnected(ComponentName name) {
         return getProvider(name).isConnected();
+    }
+
+    public void addConnectedProvider(ComponentName componentName, boolean isPlaying) {
+        mConnectedProviders.put(componentName, isPlaying);
+    }
+
+    public void changeModePlayer(boolean mPlayerModeOnline) {
+        this.mPlayerModeOnline = mPlayerModeOnline;
+        for (HashMap.Entry<ComponentName, Boolean> entry: mConnectedProviders.entrySet()
+             ) {
+            Provider provider = getProvider(entry.getKey());
+            boolean isPlaying = entry.getValue();
+
+            ProviderView view = getProviderView(entry.getKey());
+            if(!mPlayerModeOnline && provider.canPlayOffline() ||
+                    mPlayerModeOnline) {
+                mBus.post(new ProviderDiscoveredEvent(view, isPlaying));
+            }
+
+            entry.setValue(false);
+        }
+
+
     }
 
     private class ProviderRecord {

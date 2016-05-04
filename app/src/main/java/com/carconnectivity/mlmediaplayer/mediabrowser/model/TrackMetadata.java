@@ -29,6 +29,8 @@
 
 package com.carconnectivity.mlmediaplayer.mediabrowser.model;
 
+import android.graphics.Bitmap;
+
 /**
  * Created by belickim on 06/06/15.
  */
@@ -37,17 +39,19 @@ public class TrackMetadata {
     public final String artist;
     public final Long duration;
     public final String artUri;
+    public final Bitmap artBmp;
 
     public TrackMetadata
-            (String title, String artist, Long duration, String artUri) {
+            (String title, String artist, Long duration, String artUri, Bitmap artBmp) {
         this.title = title;
         this.artist = artist;
         this.duration = duration;
         this.artUri = artUri;
+        this.artBmp = artBmp;
     }
 
     public static TrackMetadata createEmpty() {
-        return new TrackMetadata(null, null, 0L, null);
+        return new TrackMetadata(null, null, 0L, null, null);
     }
 
     public boolean sameAsOther(TrackMetadata other) {
@@ -57,8 +61,9 @@ public class TrackMetadata {
         final boolean artistMatch = artist != null && artist.equals(other.artist);
         final boolean durationMatch = duration != null && duration.equals(other.duration);
         final boolean artUriMatch = artUri != null && artUri.equals(other.artUri);
+        final boolean artBmpMatch = artBmp != null && artBmp.equals(other.artBmp);
 
-        return titleMatch && artistMatch && durationMatch && artUriMatch;
+        return titleMatch && artistMatch && durationMatch && artUriMatch && artBmpMatch;
     }
 
     public boolean isTitleEmpty() {
@@ -72,6 +77,7 @@ public class TrackMetadata {
                 ", artist='" + artist + '\'' +
                 ", duration=" + duration +
                 ", artUri=" + artUri +
+                ", artBmp=" + artBmp +
                 '}';
     }
 }

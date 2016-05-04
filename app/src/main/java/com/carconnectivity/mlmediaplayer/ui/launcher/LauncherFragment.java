@@ -198,7 +198,7 @@ public class LauncherFragment extends Fragment {
         mActiveGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                EventBus.getDefault().postSticky(new ProviderConnectedEvent(null, false));
+                EventBus.getDefault().postSticky(new ProviderConnectedEvent(null, false, false));
                 ProviderView providerView = (ProviderView) mActiveAdapter.getItem(i);
 
                 final boolean noCurrentProvider = mNowPlayingProvider == null;

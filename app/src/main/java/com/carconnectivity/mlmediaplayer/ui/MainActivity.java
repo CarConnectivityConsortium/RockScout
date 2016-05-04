@@ -96,8 +96,11 @@ public class MainActivity extends Activity implements InteractionListener {
 
     private boolean mInstaceStateSaved = false;
 
+    private boolean mPlayerModeOnline = false;
+
     private Timer mTerminationTimer;
     private Dialog mDialog;
+
 
     public MirrorLinkApplicationContext getMirrorLinkApplicationContext() {
         return (MirrorLinkApplicationContext) getApplicationContext();
@@ -155,11 +158,12 @@ public class MainActivity extends Activity implements InteractionListener {
 
         mFindProviders = false;
         if (mirrorLinkLaunch == false && mTerminateReceived == false) {
-            showNotSupportedDialog();
+            mPlayerModeOnline = false;
         }
     }
 
-    private void forceExit() {
+    private void forceExit(){
+        Log.d(TAG, "forceExit()");
         Intent homeIntent = new Intent(Intent.ACTION_MAIN);
         homeIntent.addCategory(Intent.CATEGORY_HOME);
         homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -170,6 +174,7 @@ public class MainActivity extends Activity implements InteractionListener {
 
     @SuppressWarnings("unused")
     public void onEvent(PlaybackStateChangedEvent event) {
+        Log.d(TAG, "PlaybackStateChangedEvent " + event.toString());
         if (mTerminateReceived) {
             final ProviderPlaybackState state = event.state;
             if (state.state == PlaybackState.STATE_PLAYING) {
@@ -183,8 +188,13 @@ public class MainActivity extends Activity implements InteractionListener {
 
     @SuppressWarnings("unused")
     public void onEvent(ProviderDiscoveryFinished event) {
+        Log.d(TAG, "ProviderDiscoveryFinished "+event.toString());
+
+        refreshAppList();
+
         if (mTerminateReceived) {
             mTerminationTimer = new Timer();
+
             mTerminationTimer.schedule(new TimerTask() {
                 @Override
                 public void run() {
@@ -226,10 +236,17 @@ public class MainActivity extends Activity implements InteractionListener {
     @SuppressWarnings("unused")
     public void onEvent(MirrorLinkSessionChangedEvent event) {
         if (event.headUnitIsConnected) {
-            hideNotSupportedDialog();
+            mPlayerModeOnline = true;
         } else {
-            showNotSupportedDialog();
+            mPlayerModeOnline = false;
         }
+
+        refreshAppList();
+    }
+
+    private void refreshAppList() {
+        mLauncherFragment.clearList();
+        mManager.changeModePlayer(mPlayerModeOnline);
     }
 
     @Override
@@ -239,6 +256,7 @@ public class MainActivity extends Activity implements InteractionListener {
 
     @Override
     protected void onResume() {
+        Log.d(TAG, "onResume");
         super.onResume();
         mInstaceStateSaved = false;
         if ((getFragmentManager().getBackStackEntryCount() == 0) && !mSplashFragment.isAdded()) {
@@ -254,12 +272,14 @@ public class MainActivity extends Activity implements InteractionListener {
 
     @Override
     public void onPause() {
+        Log.d(TAG, "onPause");
         super.onPause();
         mManager.disconnect();
     }
 
     @Override
     public void onStop() {
+        Log.d(TAG, "onStop");
         super.onStop();
         mFindProviders = true;
         mManager.disconnect();
@@ -267,6 +287,7 @@ public class MainActivity extends Activity implements InteractionListener {
 
     @Override
     protected void onDestroy() {
+        Log.d(TAG, "onDestroy");
         super.onDestroy();
         mFindProviders = true;
         mManager.disconnect();
