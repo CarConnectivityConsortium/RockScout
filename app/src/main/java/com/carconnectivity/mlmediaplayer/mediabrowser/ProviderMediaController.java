@@ -265,7 +265,7 @@ public final class ProviderMediaController extends MediaController.Callback {
 
         if (mMediaController != null && !event.mediaId.isEmpty()) {
             mBus.post(new PrepareForPlaybackEvent());
-            mMediaController.getTransportControls().playFromMediaId(event.mediaId, null);
+            mMediaController.getTransportControls().playFromMediaId(event.mediaId, event.bundle);
         }
     }
 

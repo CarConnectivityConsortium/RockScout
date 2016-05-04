@@ -382,7 +382,7 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
                 if (mediaItem.isBrowsable()) {
                     pushNewLevel(mediaItem.getDisplayLabel(), mediaItem.getId());
                 } else if (mediaItem.isPlayable()) {
-                    playMediaItem(mediaItem.getId());
+                    playMediaItem(mediaItem.getId(), mediaItem.getExtras());
                 }
             }
         });
@@ -415,9 +415,9 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
         adapter.setOwner(list);
     }
 
-    private void playMediaItem(String mediaId) {
+    private void playMediaItem(String mediaId, Bundle bundle) {
         final PlayMediaItemEvent event
-                = new PlayMediaItemEvent(mCurrentlyBrowsedProvider, mediaId);
+                = new PlayMediaItemEvent(mCurrentlyBrowsedProvider, mediaId, bundle);
         EventBus.getDefault().post(event);
         /* todo: define interface or send event */
         ((MainActivity) getActivity()).openMediaPlayer(null);

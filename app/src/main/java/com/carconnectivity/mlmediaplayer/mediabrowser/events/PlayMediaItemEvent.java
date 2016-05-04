@@ -29,6 +29,8 @@
 
 package com.carconnectivity.mlmediaplayer.mediabrowser.events;
 
+import android.os.Bundle;
+
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
 
 /**
@@ -37,8 +39,9 @@ import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
 public final class PlayMediaItemEvent {
     public final ProviderView provider;
     public final String mediaId;
+    public final Bundle bundle;
 
-    public PlayMediaItemEvent(ProviderView provider, String mediaId) {
+    public PlayMediaItemEvent(ProviderView provider, String mediaId, Bundle extras) {
         if (provider == null) {
             throw new IllegalArgumentException("Provider cannot be null.");
         }
@@ -48,6 +51,7 @@ public final class PlayMediaItemEvent {
 
         this.provider = provider;
         this.mediaId = mediaId;
+        this.bundle = extras;
     }
 
     @Override

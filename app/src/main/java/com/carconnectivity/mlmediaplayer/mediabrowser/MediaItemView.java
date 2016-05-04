@@ -31,6 +31,7 @@ package com.carconnectivity.mlmediaplayer.mediabrowser;
 
 import android.media.browse.MediaBrowser;
 import android.net.Uri;
+import android.os.Bundle;
 
 import com.carconnectivity.mlmediaplayer.utils.UiUtilities;
 
@@ -48,6 +49,7 @@ public class MediaItemView {
     public boolean isBrowsable() { return mItem.isBrowsable(); }
     public boolean isPlayable() { return mItem.isPlayable(); }
     public Uri getDisplayIconUri() { return mItem.getDescription().getIconUri(); }
+    public Bundle getExtras() { return mItem.getDescription().getExtras(); }
 
     public String getDisplayLabel() {
         final String rawTitle = mItem.getDescription().getTitle().toString();
