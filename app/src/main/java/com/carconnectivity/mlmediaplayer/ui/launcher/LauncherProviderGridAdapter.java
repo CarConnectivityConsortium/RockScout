@@ -43,8 +43,8 @@ import android.widget.TextView;
 
 import com.carconnectivity.mlmediaplayer.R;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
-import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewInactive;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewActive;
+import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewInactive;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewToDownload;
 import com.carconnectivity.mlmediaplayer.utils.pagination.PaginatedAdapter;
 import com.carconnectivity.mlmediaplayer.utils.pagination.PaginatedCollection;
@@ -223,8 +223,8 @@ public class LauncherProviderGridAdapter extends BaseAdapter implements Paginate
             ProviderViewToDownload viewToDownload = (ProviderViewToDownload) provider;
 
             Picasso.with(mParentFragment.getActivity()).load(viewToDownload.getIconURL().toString()).into(viewHolder.appIcon);
-            Picasso.with(mParentFragment.getActivity()).load(R.drawable.ic_shopping_cart).into(viewHolder.appIconAdditional);
-            setActiveStyle(viewHolder);
+            Picasso.with(mParentFragment.getActivity()).load(R.drawable.ic_download).into(viewHolder.appIconAdditional);
+            setInactiveStyle(viewHolder);
 
             Drawable color = mParentFragment.getResources().getDrawable(R.drawable.c4_launcher_icon_background, null);
             color.setTint(viewToDownload.getColorPrimaryDark());
