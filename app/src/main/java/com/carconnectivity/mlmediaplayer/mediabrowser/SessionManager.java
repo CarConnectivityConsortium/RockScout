@@ -33,6 +33,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.util.Log;
+
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.*;
 import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
 
@@ -212,8 +213,9 @@ public class SessionManager {
         mManger.changeModePlayer(mPlayerModeOnline);
 
         //playing provider
-        if(mPlayingProvider != null) {
-            if(!mPlayerModeOnline && !mPlayingProvider.canPlayOffline()) {
+        if (mPlayingProvider != null) {
+            if (!mPlayerModeOnline && !mPlayingProvider.canPlayOffline()
+                    || !mManger.isRecordsContainsProvider(mPlayingProvider.getName())) {
                 //pause playing and disconnect
                 if (mPlayingProvider.isPlaying()) mPlayingProvider.forcePause();
                 mPlayingProvider.disconnect(true);
@@ -221,9 +223,10 @@ public class SessionManager {
         }
 
         //browsing provider
-        if(mBrowsedProvider != null) {
-            if(mPlayingProvider.getName().equals(mBrowsedProvider.getName())) return;
-            if(!mPlayerModeOnline && !mBrowsedProvider.canPlayOffline()) {
+        if (mBrowsedProvider != null) {
+            if (mPlayingProvider.getName().equals(mBrowsedProvider.getName())) return;
+            if (!mPlayerModeOnline && !mBrowsedProvider.canPlayOffline()
+                    || !mManger.isRecordsContainsProvider(mBrowsedProvider.getName())) {
                 RsEventBus.post(new ProviderBrowseCancelEvent());
                 mBrowsedProvider = null;
             }

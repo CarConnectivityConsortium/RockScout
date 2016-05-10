@@ -190,13 +190,23 @@ public final class ProvidersManager {
     }
 
     private void removeObsoleteProviders(List<ResolveInfo> currentPackages) {
+        boolean removed = false;
         Set<ComponentName> currentNames = getNames(currentPackages);
-        for (ComponentName name : mRecords.keySet()) {
+
+        for (Iterator<Map.Entry<ComponentName, ProviderRecord>> it = mRecords.entrySet().iterator(); it.hasNext(); ) {
+            ComponentName name = it.next().getKey();
             if (currentNames.contains(name) == false) {
-                mRecords.remove(name);
+                it.remove();
                 mConnectedProviders.remove(name);
+                removed = true;
                 /* TODO: send an event here to notify launcher view */
             }
+        }
+
+        if(removed) {
+            final ProviderDiscoveryFinished finishedEvent
+                    = new ProviderDiscoveryFinished(mRecords.size());
+            RsEventBus.postSticky(finishedEvent);
         }
     }
 
@@ -343,6 +353,10 @@ public final class ProvidersManager {
                 }
             }).start();
         }
+    }
+
+    public boolean isRecordsContainsProvider(ComponentName componentName){
+        return mRecords.containsKey(componentName);
     }
 
     private class ProviderRecord {

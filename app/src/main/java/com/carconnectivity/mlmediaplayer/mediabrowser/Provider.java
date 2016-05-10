@@ -129,12 +129,12 @@ final class Provider {
     }
 
     public void disconnect(boolean cleanProvider) {
+        RsEventBus.post(new ProviderConnectedEvent(null, false, cleanProvider));
         if (mActiveConnectionCallback == null) {
             throw new NullPointerException("Unexpected state: active connection callback is null.");
         }
 
         mActiveConnectionCallback.disconnect();
-        RsEventBus.post(new ProviderConnectedEvent(null, false, cleanProvider));
         mActiveConnectionCallback = null;
         mConnected = false;
     }

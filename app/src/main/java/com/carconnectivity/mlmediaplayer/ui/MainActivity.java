@@ -29,10 +29,14 @@
 
 package com.carconnectivity.mlmediaplayer.ui;
 
-import android.app.*;
+import android.app.Activity;
+import android.app.Dialog;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.app.Instrumentation;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.media.session.PlaybackState;
 import android.os.Bundle;
 import android.util.Log;
@@ -40,15 +44,19 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+
 import com.carconnectivity.mlmediaplayer.R;
 import com.carconnectivity.mlmediaplayer.commonapi.MirrorLinkApplicationContext;
 import com.carconnectivity.mlmediaplayer.commonapi.MirrorLinkConnectionManager;
-import com.carconnectivity.mlmediaplayer.commonapi.events.MirrorLinkNotSupportedEvent;
 import com.carconnectivity.mlmediaplayer.commonapi.events.MirrorLinkSessionChangedEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderPlaybackState;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewActive;
 import com.carconnectivity.mlmediaplayer.mediabrowser.SessionManager;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.*;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.DisableEventsEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.MediaButtonClickedEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.PlaybackStateChangedEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderDiscoveryFinished;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.TerminateEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.model.MediaButtonData;
 import com.carconnectivity.mlmediaplayer.ui.launcher.LauncherFragment;
 import com.carconnectivity.mlmediaplayer.ui.navigator.NavigatorFragment;
@@ -56,7 +64,6 @@ import com.carconnectivity.mlmediaplayer.ui.player.MediaPlayerFragment;
 import com.carconnectivity.mlmediaplayer.ui.splash.SplashScreenFragment;
 import com.carconnectivity.mlmediaplayer.utils.FontOverride;
 import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
-import com.carconnectivity.mlmediaplayer.utils.UiUtilities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -173,7 +180,7 @@ public class MainActivity extends Activity implements InteractionListener {
     }
 
     @SuppressWarnings("unused")
-    public void onEvent(ProviderDiscoveryFinished event) {
+    public void onEventMainThread(ProviderDiscoveryFinished event) {
         Log.d(TAG, "ProviderDiscoveryFinished "+event.toString());
 
         refreshAppList();
@@ -195,32 +202,8 @@ public class MainActivity extends Activity implements InteractionListener {
         }
     }
 
-    private void showNotSupportedDialog() {
-        if (mDialog != null) return;
-        if (mTerminateReceived) return;
-
-        final Resources resources = getResources();
-        final String appName = resources.getString(R.string.app_name);
-        final String rawMessage = resources.getString(R.string.ml_not_connected);
-        final String message = String.format(rawMessage, appName);
-
-        mDialog = UiUtilities.showDialog(this, message);
-    }
-
-    private void hideNotSupportedDialog() {
-        if (mDialog == null) return;
-
-        mDialog.hide();
-        mDialog = null;
-    }
-
     @SuppressWarnings("unused")
-    public void onEvent(MirrorLinkNotSupportedEvent event) {
-        showNotSupportedDialog();
-    }
-
-    @SuppressWarnings("unused")
-    public void onEvent(MirrorLinkSessionChangedEvent event) {
+    public void onEventMainThread(MirrorLinkSessionChangedEvent event) {
         if (event.headUnitIsConnected) {
             mHeadUnitIsConnected = true;
         } else {
