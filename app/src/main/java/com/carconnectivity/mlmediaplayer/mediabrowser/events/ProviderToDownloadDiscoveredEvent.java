@@ -29,23 +29,23 @@
 
 package com.carconnectivity.mlmediaplayer.mediabrowser.events;
 
-import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderToDownloadView;
+import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewToDownload;
 import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
 
 /**
  * Created by sebastian.sokolowski on 17/02/16.
  */
 public final class ProviderToDownloadDiscoveredEvent implements RockScoutEvent {
-    public final ProviderToDownloadView provider;
+    public final ProviderViewToDownload provider;
 
-    public ProviderToDownloadDiscoveredEvent(ProviderToDownloadView provider) {
+    public ProviderToDownloadDiscoveredEvent(ProviderViewToDownload provider) {
         this.provider = provider;
     }
 
     @Override
     public String toString() {
         return "ProviderToDownloadDiscoveredEvent{" +
-                "provider.getUniqueName()=" + (provider != null ? provider.getUniqueName() : "null") +
+                "provider=" + provider +
                 '}';
     }
 }

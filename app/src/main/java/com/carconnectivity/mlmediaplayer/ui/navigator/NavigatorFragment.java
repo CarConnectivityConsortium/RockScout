@@ -30,7 +30,6 @@
 package com.carconnectivity.mlmediaplayer.ui.navigator;
 
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.content.ComponentName;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -51,7 +50,7 @@ import android.widget.TextView;
 import com.carconnectivity.mlmediaplayer.R;
 import com.carconnectivity.mlmediaplayer.commonapi.events.MirrorLinkSessionChangedEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.MediaItemView;
-import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
+import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewActive;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.BrowseDirectoryEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.CurrentlyBrowsedProviderChanged;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.DisconnectFromCurrentProviderEvent;
@@ -87,8 +86,8 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
     }
     private State mState;
 
-    private ProviderView mNowPlayingProvider;
-    private ProviderView mCurrentlyBrowsedProvider;
+    private ProviderViewActive mNowPlayingProvider;
+    private ProviderViewActive mCurrentlyBrowsedProvider;
     private String mRestoredProviderName;
 
     private BreadCrumbs mCrumbs;
@@ -170,7 +169,7 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
         mPaginationController.setNumbers();
     }
 
-    private void changeBrowsedProvider(ProviderView provider) {
+    private void changeBrowsedProvider(ProviderViewActive provider) {
         mCurrentlyBrowsedProvider = provider;
 
         /* if the same name was loaded form the saved instance
@@ -409,7 +408,7 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
         mPaginationController.initializePagination(root, mFocusListener);
 
         if (mNowPlayingProvider != null) {
-            final int color = mNowPlayingProvider.getDisplayInfo().colorAccent;
+            final int color = mNowPlayingProvider.getColorAccent();
             final Drawable selector = mList.getSelector();
             selector.setTint(color);
             selector.setTintMode(PorterDuff.Mode.MULTIPLY);
@@ -460,8 +459,8 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
         View.OnClickListener listener = null;
 
         if (mNowPlayingProvider != null) {
-            ProviderView.ProviderDisplayInfo info = mNowPlayingProvider.getDisplayInfo();
-            providerIcon = info.notificationDrawable != null ? info.notificationDrawable : info.icon;
+            providerIcon = mNowPlayingProvider.getNotificationDrawable() != null ?
+                    mNowPlayingProvider.getNotificationDrawable() : mNowPlayingProvider.getIconDrawable();
             listener = new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -481,7 +480,7 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
         /* update list highlight to match current provider */
         if (mNowPlayingProvider != null && mList != null) {
             final Drawable selector = mList.getSelector();
-            selector.setTint(mNowPlayingProvider.getDisplayInfo().colorAccent);
+            selector.setTint(mNowPlayingProvider.getColorAccent());
             selector.setTintMode(PorterDuff.Mode.MULTIPLY);
         }
     }

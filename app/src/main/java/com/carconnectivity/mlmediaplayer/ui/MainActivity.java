@@ -46,7 +46,7 @@ import com.carconnectivity.mlmediaplayer.commonapi.MirrorLinkConnectionManager;
 import com.carconnectivity.mlmediaplayer.commonapi.events.MirrorLinkNotSupportedEvent;
 import com.carconnectivity.mlmediaplayer.commonapi.events.MirrorLinkSessionChangedEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderPlaybackState;
-import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
+import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewActive;
 import com.carconnectivity.mlmediaplayer.mediabrowser.SessionManager;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.*;
 import com.carconnectivity.mlmediaplayer.mediabrowser.model.MediaButtonData;
@@ -83,7 +83,7 @@ public class MainActivity extends Activity implements InteractionListener {
 
     private boolean mInstanceStateSaved = false;
 
-    private boolean mPlayerModeOnline = false;
+    private boolean mHeadUnitIsConnected = false;
 
     private Timer mTerminationTimer;
     private Dialog mDialog;
@@ -144,7 +144,7 @@ public class MainActivity extends Activity implements InteractionListener {
 
         mFindProviders = false;
         if (mirrorLinkLaunch == false && mTerminateReceived == false) {
-            mPlayerModeOnline = false;
+            mHeadUnitIsConnected = false;
         }
     }
 
@@ -222,9 +222,9 @@ public class MainActivity extends Activity implements InteractionListener {
     @SuppressWarnings("unused")
     public void onEvent(MirrorLinkSessionChangedEvent event) {
         if (event.headUnitIsConnected) {
-            mPlayerModeOnline = true;
+            mHeadUnitIsConnected = true;
         } else {
-            mPlayerModeOnline = false;
+            mHeadUnitIsConnected = false;
         }
 
         refreshAppList();
@@ -232,7 +232,7 @@ public class MainActivity extends Activity implements InteractionListener {
 
     private void refreshAppList() {
         mLauncherFragment.clearList();
-        mManager.changeModePlayer(mPlayerModeOnline);
+        mManager.changeModePlayer(mHeadUnitIsConnected);
     }
 
     @Override
@@ -406,7 +406,7 @@ public class MainActivity extends Activity implements InteractionListener {
         switchFragment(mPlayerFragment);
     }
 
-    public ProviderView getNowPlayingProvider() {
+    public ProviderViewActive getNowPlayingProvider() {
         return mManager.getNowPlayingProviderView();
     }
 
@@ -484,7 +484,7 @@ public class MainActivity extends Activity implements InteractionListener {
         mTerminateReceived = action.equals(ML_TERMINATE_INTENT);
 
         if (mirrorLinkLaunch == false && mTerminateReceived == false) {
-            mPlayerModeOnline = false;
+            mHeadUnitIsConnected = false;
         }
     }
 
@@ -594,7 +594,7 @@ public class MainActivity extends Activity implements InteractionListener {
 
         final MediaButtonData.Type buttonType = buttonTypeFromKey(keycode);
         if (buttonType != null) {
-            final ProviderView provider = mManager.getNowPlayingProviderView();
+            final ProviderViewActive provider = mManager.getNowPlayingProviderView();
             final MediaButtonData mediaButtonData
                     = new MediaButtonData(provider, buttonType, null, null, null);
             RsEventBus.post(new MediaButtonClickedEvent(mediaButtonData));

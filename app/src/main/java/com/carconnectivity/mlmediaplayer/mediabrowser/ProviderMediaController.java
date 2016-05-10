@@ -171,7 +171,7 @@ public final class ProviderMediaController extends MediaController.Callback {
 
     @Override
     public void onMetadataChanged(MediaMetadata metadata) {
-        final ProviderView view = mOwner.getView();
+        final ProviderViewActive view = mOwner.getView();
         if (metadata == null) {
             Log.w(TAG, "Received null metadata from provider.");
             RsEventBus.post(new MediaMetadataChangedEvent(view, TrackMetadata.createEmpty()));
@@ -239,7 +239,7 @@ public final class ProviderMediaController extends MediaController.Callback {
         mHelper.reset();
     }
 
-    private boolean isOwner(ProviderView other) {
+    private boolean isOwner(ProviderViewActive other) {
         if (other == null) return false;
         final ComponentName otherName = other.getUniqueName();
         final ComponentName ownerName = mOwner.getName();

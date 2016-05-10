@@ -68,7 +68,7 @@ public class SessionManager {
         return mBrowsedProvider != null && mBrowsedProvider.isConnected();
     }
 
-    public ProviderView getNowPlayingProviderView() {
+    public ProviderViewActive getNowPlayingProviderView() {
         if (mPlayingProvider == null) return null;
         return mManger.getProviderView(mPlayingProvider.getName());
     }

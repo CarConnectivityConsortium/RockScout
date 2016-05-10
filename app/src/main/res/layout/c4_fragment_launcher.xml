@@ -133,16 +133,6 @@
                             android:smoothScrollbar="false"
                             class = "com.carconnectivity.mlmediaplayer.ui.widgets.NonScrollableGridView"/>
 
-                        <com.carconnectivity.mlmediaplayer.ui.widgets.NonScrollableGridView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:id="@+id/grid_inactive"
-                            android:listSelector="@drawable/grid_selector"
-                            android:numColumns="2"
-                            android:smoothScrollbar="false"
-                            android:visibility="gone"
-                            class = "com.carconnectivity.mlmediaplayer.ui.widgets.NonScrollableGridView"/>
-
                     </LinearLayout>
                 </ScrollView>
             </LinearLayout>

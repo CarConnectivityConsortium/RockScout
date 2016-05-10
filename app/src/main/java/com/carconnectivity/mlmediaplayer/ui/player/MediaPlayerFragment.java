@@ -47,7 +47,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.carconnectivity.mlmediaplayer.R;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderPlaybackState;
-import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
+import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewActive;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.*;
 import com.carconnectivity.mlmediaplayer.mediabrowser.model.MediaButtonData;
 import com.carconnectivity.mlmediaplayer.mediabrowser.model.TrackMetadata;
@@ -103,7 +103,7 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
     private boolean mSecondaryToolbarShown;
     private View mRootView;
 
-    private ProviderView mNowPlayingProvider;
+    private ProviderViewActive mNowPlayingProvider;
 
     public MediaPlayerFragment() { }
 
@@ -232,7 +232,7 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
             mNowPlayingProvider = event.provider;
         }
 
-        if (mNowPlayingProvider.hasSameNameAs(event.provider)) {
+        if (mNowPlayingProvider.hasSameIdAs(event.provider)) {
             updateMetadata(event.metadata);
         }
     }
@@ -287,7 +287,7 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
         }
 
         /* React only to events from current player. */
-        if (mNowPlayingProvider.hasSameNameAs(event.provider) == false) return;
+        if (mNowPlayingProvider.hasSameIdAs(event.provider) == false) return;
 
         mCurrentPlaybackState = event.state;
         switch (mCurrentPlaybackState.state) {
@@ -323,7 +323,7 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
 
     @SuppressWarnings("unused")
     public void onEventMainThread(ProgressUpdateEvent event) {
-        if (mNowPlayingProvider.hasSameNameAs(event.provider)) {
+        if (mNowPlayingProvider.hasSameIdAs(event.provider)) {
             setProgress(event.progress);
         }
     }
@@ -345,7 +345,7 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
         }
     }
 
-    private void customizeTheme(ProviderView providerView) {
+    private void customizeTheme(ProviderViewActive providerView) {
         if (providerView == null) {
             Log.w(TAG, "Provider view is null, cannot customize theme.");
             return;
@@ -356,27 +356,26 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
         }
 
         final Resources resources = getResources();
-        final ProviderView.ProviderDisplayInfo info = providerView.getDisplayInfo();
 
         final int defaultButtonColor = resources.getColor(R.color.player_background);
-        Log.d(TAG, "Updating color to: " + Integer.toHexString(info.colorAccent));
+        Log.d(TAG, "Updating color to: " + Integer.toHexString(providerView.getColorAccent()));
         mMediaButton1.setHighlightColor(defaultButtonColor);
         mMediaButton2.setHighlightColor(defaultButtonColor);
-        mMediaButton3.setHighlightColor(info.colorAccent);
+        mMediaButton3.setHighlightColor(providerView.getColorAccent());
         mMediaButton3Sec.setHighlightColor(defaultButtonColor);
         mMediaButton4.setHighlightColor(defaultButtonColor);
         mMediaButton5.setHighlightColor(defaultButtonColor);
-        mMediaButton5.setSwitchModeHighlightColor(info.colorAccent);
+        mMediaButton5.setSwitchModeHighlightColor(providerView.getColorAccent());
 
-        mWaitIndicatorFront.setImageTintList(ColorStateList.valueOf(info.colorAccent));
-        mWaitIndicatorSpin.setImageTintList(ColorStateList.valueOf(info.colorAccent));
+        mWaitIndicatorFront.setImageTintList(ColorStateList.valueOf(providerView.getColorAccent()));
+        mWaitIndicatorSpin.setImageTintList(ColorStateList.valueOf(providerView.getColorAccent()));
 
-        mProgressBar.setImageTintList(ColorStateList.valueOf(info.colorAccent));
-        mSecondaryToolbarColor = ColorStateList.valueOf(info.colorPrimaryDark);
+        mProgressBar.setImageTintList(ColorStateList.valueOf(providerView.getColorAccent()));
+        mSecondaryToolbarColor = ColorStateList.valueOf(providerView.getColorPrimaryDark());
 
-        Drawable providerDrawable = info.notificationDrawable;
+        Drawable providerDrawable = providerView.getNotificationDrawable();
         if (providerDrawable == null) {
-            providerDrawable = info.icon;
+            providerDrawable = providerView.getIconDrawable();
         }
         mNavigatorButton.setImageDrawable(providerDrawable);
     }
@@ -490,7 +489,7 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
         mWaitIndicatorBack.setVisibility(visibility);
     }
 
-    private void scheduleProgressTimer(ProviderView currentProvider, long pos, long lastUpdateTime) {
+    private void scheduleProgressTimer(ProviderViewActive currentProvider, long pos, long lastUpdateTime) {
         cancelProgressTimer();
         mProgressTimer = new ProgressTimer();
 

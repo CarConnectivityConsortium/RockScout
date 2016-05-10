@@ -29,23 +29,23 @@
 
 package com.carconnectivity.mlmediaplayer.mediabrowser.events;
 
-import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewActive;
+import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewInactive;
 import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
 
 /**
- * Created by belickim on 20/04/15.
+ * Created by sebastian.sokolowski on 18/03/16.
  */
-public final class StartBrowsingEvent implements RockScoutEvent {
-    public final ProviderViewActive provider;
+public final class ProviderInactiveDiscoveredEvent implements RockScoutEvent {
+    public final ProviderViewInactive provider;
 
-    public StartBrowsingEvent(ProviderViewActive providerView) {
-        this.provider = providerView;
+    public ProviderInactiveDiscoveredEvent(ProviderViewInactive provider) {
+        this.provider = provider;
     }
 
     @Override
     public String toString() {
-        return "StartBrowsingEvent{" +
-                "provider.getUniqueName()=" + (provider != null ? provider.getUniqueName() : "null") +
+        return "ProviderInactiveDiscoveredEvent{" +
+                "provider=" + provider +
                 '}';
     }
 }

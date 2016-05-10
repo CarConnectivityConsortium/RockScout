@@ -29,7 +29,6 @@
 
 package com.carconnectivity.mlmediaplayer.utils.pagination;
 
-import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderToDownloadView;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
 
 import java.util.ArrayList;
@@ -48,16 +47,17 @@ public class PaginatedCollection<T> {
 
     /**
      * Creates new instance obviously.
-     * @param items initial set of items.
+     *
+     * @param items    initial set of items.
      * @param pageSize maximum count of items on a single page.
-     * @param order comparator to order the items, if null the order is preserved as given.
+     * @param order    comparator to order the items, if null the order is preserved as given.
      */
     public PaginatedCollection(Collection<T> items, int pageSize, Comparator<T> order) {
         if (pageSize < 1)
             throw new IllegalArgumentException("Page size must be positive integer.");
 
         mItems = new ArrayList<>();
-        for (T item : items )
+        for (T item : items)
             if (contains(item) == false)
                 mItems.add(item);
 
@@ -72,7 +72,9 @@ public class PaginatedCollection<T> {
         Collections.sort(mItems, mOrder);
     }
 
-    public int getCurrentItemsCount() { return mModel.getCountOfItemsOnCurrentPage(); }
+    public int getCurrentItemsCount() {
+        return mModel.getCountOfItemsOnCurrentPage();
+    }
 
     public List<T> getCurrentItems() {
         int[] indices = mModel.getVisibleItemIndices();
@@ -113,12 +115,7 @@ public class PaginatedCollection<T> {
             if (owned instanceof ProviderView && item instanceof ProviderView) {
                 ProviderView ownedView = (ProviderView) owned;
                 ProviderView itemView = (ProviderView) item;
-                if (itemView.hasSameNameAs(ownedView))
-                    return true;
-            } else if (owned instanceof ProviderToDownloadView && item instanceof ProviderToDownloadView) {
-                ProviderToDownloadView ownedView = (ProviderToDownloadView) owned;
-                ProviderToDownloadView itemView = (ProviderToDownloadView) item;
-                if (itemView.hasSameNameAs(ownedView))
+                if (itemView.hasSameIdAs(ownedView))
                     return true;
             } else if (owned.equals(item)) {
                 return true;

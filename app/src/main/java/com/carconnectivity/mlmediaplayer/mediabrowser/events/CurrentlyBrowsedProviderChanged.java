@@ -29,16 +29,16 @@
 
 package com.carconnectivity.mlmediaplayer.mediabrowser.events;
 
-import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
+import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewActive;
 import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
 
 /**
  * Created by belickim on 12/06/15.
  */
 public class CurrentlyBrowsedProviderChanged implements RockScoutEvent {
-    public final ProviderView provider;
+    public final ProviderViewActive provider;
 
-    public CurrentlyBrowsedProviderChanged(ProviderView provider) {
+    public CurrentlyBrowsedProviderChanged(ProviderViewActive provider) {
         if (provider == null) {
             throw new IllegalArgumentException("Provider cannot be null.");
         }

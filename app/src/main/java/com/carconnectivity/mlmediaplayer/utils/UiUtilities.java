@@ -31,7 +31,6 @@ package com.carconnectivity.mlmediaplayer.utils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -46,10 +45,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.ScrollView;
-import android.widget.TextView;
 
 import com.carconnectivity.mlmediaplayer.R;
-import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
+import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewActive;
 import com.carconnectivity.mlmediaplayer.ui.MainActivity;
 
 import java.lang.reflect.Field;
@@ -156,10 +154,10 @@ public class UiUtilities {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
-                    ProviderView providerView = activity.getNowPlayingProvider();
+                    ProviderViewActive providerView = activity.getNowPlayingProvider();
                     if (providerView != null && v.getBackground() != null) {
                         v.getBackground().setTintMode(PorterDuff.Mode.MULTIPLY);
-                        v.getBackground().setTintList(ColorStateList.valueOf(providerView.getDisplayInfo().colorAccent));
+                        v.getBackground().setTintList(ColorStateList.valueOf(providerView.getColorAccent()));
                     }
                 } else if (v.getBackground() != null) {
                     v.getBackground().setTintMode(PorterDuff.Mode.MULTIPLY);

@@ -63,13 +63,13 @@ public final class ProviderMediaControllerHelper {
     private Resources mProviderResources;
     private final Context mContext;
     private final String mProviderPackage;
-    private final ProviderView mBoundProvider;
+    private final ProviderViewActive mBoundProvider;
 
     private final IconCache mIconCache;
 
-    public ProviderMediaControllerHelper(Context context, ProviderView provider) {
+    public ProviderMediaControllerHelper(Context context, ProviderViewActive provider) {
         this.mContext = context;
-        this.mProviderPackage = provider.getUniqueName().getPackageName();
+        this.mProviderPackage = provider.getId();
         this.mBoundProvider = provider;
         this.mIconCache = new IconCache();
         Log.d(TAG, "ProviderMediaControllerHelper instantiated with provider: " + mProviderPackage);

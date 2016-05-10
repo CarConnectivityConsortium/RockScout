@@ -105,7 +105,7 @@ public class ProviderPlaybackState {
         this.mediaButtons = Collections.unmodifiableList(new ArrayList<>(mediaButtons));
     }
 
-    public static ProviderPlaybackState createEmpty(ProviderView view) {
+    public static ProviderPlaybackState createEmpty(ProviderViewActive view) {
         final MediaButtonData playButtonData
                 = new MediaButtonData
                 (view, MediaButtonData.Type.PLAY, "play", null, null);

@@ -1,6 +1,5 @@
 package com.carconnectivity.mlmediaplayer.mediabrowser;
 
-import android.net.Uri;
 import android.util.Log;
 import android.util.Xml;
 
@@ -22,7 +21,7 @@ import java.net.URLConnection;
 public class ProviderToDownloadParser {
     private static final String TAG = ProviderToDownloadParser.class.getSimpleName();
 
-    private static final String URL_ADDRESS_XML = "www.mirrorlink.com/RockScout/compatibleapps.xml";
+    private static final String URL_ADDRESS_XML = "http://www.mirrorlink.com/img/mirrorlink/upload/documents/mirror_link_compatible_apps.xml";
 
     private static final String TAG_APP = "app";
     private static final String TAG_LABEL = "label";
@@ -103,10 +102,9 @@ public class ProviderToDownloadParser {
         if(id == null || id.isEmpty()) return;
 
         URL url = new URL(iconUrl);
-        Uri uri = Uri.parse("market://details?id="+id);
 
-        ProviderToDownloadView providerToDownloadView = new ProviderToDownloadView(label, url, uri);
-        RsEventBus.post(new ProviderToDownloadDiscoveredEvent(providerToDownloadView));
+        ProviderViewToDownload providerViewToDownload = new ProviderViewToDownload(label, id, url);
+        RsEventBus.post(new ProviderToDownloadDiscoveredEvent(providerViewToDownload));
     }
 
     private String read(XmlPullParser parser, String toParse) throws IOException, XmlPullParserException {

@@ -30,18 +30,19 @@
 package com.carconnectivity.mlmediaplayer.mediabrowser.events;
 
 import android.os.Bundle;
-import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
+
+import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewActive;
 import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
 
 /**
  * Event requesting to launch specific playable media item
  */
 public final class PlayMediaItemEvent implements RockScoutEvent {
-    public final ProviderView provider;
+    public final ProviderViewActive provider;
     public final String mediaId;
     public final Bundle bundle;
 
-    public PlayMediaItemEvent(ProviderView provider, String mediaId, Bundle extras) {
+    public PlayMediaItemEvent(ProviderViewActive provider, String mediaId, Bundle extras) {
         if (provider == null) {
             throw new IllegalArgumentException("Provider cannot be null.");
         }

@@ -29,7 +29,7 @@
 
 package com.carconnectivity.mlmediaplayer.ui.player;
 
-import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
+import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewActive;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProgressUpdateEvent;
 import com.carconnectivity.mlmediaplayer.utils.PlaybackUtils;
 import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
@@ -60,7 +60,7 @@ public class ProgressTimer extends Timer {
         this.mLastUpdateTime = lastUpdateTime;
     }
 
-    public void start(final ProviderView provider) {
+    public void start(final ProviderViewActive provider) {
         scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {

@@ -30,7 +30,7 @@
 package com.carconnectivity.mlmediaplayer.mediabrowser.events;
 
 import com.carconnectivity.mlmediaplayer.mediabrowser.MediaItemView;
-import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
+import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewActive;
 import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
 
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ public final class ProviderBrowseSuccessfulEvent implements RockScoutEvent {
     /**
      * Currently browsed provider
      */
-    public final ProviderView provider;
+    public final ProviderViewActive provider;
 
     /**
      * Parent id of the successfully browsed directory, cannot be null.
@@ -58,7 +58,7 @@ public final class ProviderBrowseSuccessfulEvent implements RockScoutEvent {
     public final List<MediaItemView> items;
 
     public ProviderBrowseSuccessfulEvent
-            (ProviderView provider, String parentId
+            (ProviderViewActive provider, String parentId
                     , Collection<MediaItemView> items
             ) {
         if (provider == null) {

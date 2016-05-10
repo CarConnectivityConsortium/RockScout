@@ -33,7 +33,7 @@ import android.graphics.drawable.Drawable;
 import android.media.session.PlaybackState;
 import android.os.Bundle;
 
-import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
+import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewActive;
 
 /**
  * Holds information about media button specific data, like type of button and, custom action.
@@ -85,14 +85,14 @@ public class MediaButtonData {
         }
     }
 
-    public final ProviderView provider;
+    public final ProviderViewActive provider;
     public final Type type;
     public final String action;
     public final Drawable icon;
     public final Bundle extras;
 
     public MediaButtonData
-            ( ProviderView provider
+            ( ProviderViewActive provider
             , Type type
             , String action
             , Drawable icon

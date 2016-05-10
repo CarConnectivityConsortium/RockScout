@@ -29,23 +29,24 @@
 
 package com.carconnectivity.mlmediaplayer.mediabrowser.events;
 
-import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewActive;
 import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
 
 /**
- * Created by belickim on 20/04/15.
+ * Created by sebastian.sokolowski on 16.03.16.
  */
-public final class StartBrowsingEvent implements RockScoutEvent {
-    public final ProviderViewActive provider;
+public final class MainActivityCallbackEvent implements RockScoutEvent {
+    public enum CALLBACK {onCreate, onResume, onPause, onStop, onDestroy}
 
-    public StartBrowsingEvent(ProviderViewActive providerView) {
-        this.provider = providerView;
+    public final CALLBACK callback;
+
+    public MainActivityCallbackEvent(CALLBACK callback) {
+        this.callback = callback;
     }
 
     @Override
     public String toString() {
-        return "StartBrowsingEvent{" +
-                "provider.getUniqueName()=" + (provider != null ? provider.getUniqueName() : "null") +
+        return "MainActivityCallbackEvent{" +
+                "callback=" + callback +
                 '}';
     }
 }

@@ -30,7 +30,7 @@
 package com.carconnectivity.mlmediaplayer.mediabrowser.events;
 
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderPlaybackState;
-import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
+import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewActive;
 import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
 
 /**
@@ -39,12 +39,12 @@ import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
  */
 public final class PlaybackStateChangedEvent implements RockScoutEvent {
     /** Immutable view of provider who originated the playback change. */
-    public final ProviderView provider;
+    public final ProviderViewActive provider;
     /** Latest playback state */
     public final ProviderPlaybackState state;
 
     public PlaybackStateChangedEvent
-            ( ProviderView provider, ProviderPlaybackState state
+            ( ProviderViewActive provider, ProviderPlaybackState state
             ) {
         if (provider == null) {
             throw new IllegalArgumentException("Provider cannot be null.");

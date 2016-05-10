@@ -105,7 +105,7 @@ final class Provider {
         return mMediaController.getPlaybackState();
     }
 
-    public ProviderView getView() {
+    public ProviderViewActive getView() {
         return mManager.getProviderView(mName);
     }
 
@@ -187,7 +187,7 @@ final class Provider {
             if(token != null) {
                 mCanConnect = true;
                 mConnected = true;
-                final ProviderView view = mManager.getProviderView(mName);
+                final ProviderViewActive view = mManager.getProviderView(mName);
                 final boolean isPlaying = checkIsPlaying();
             /* possibility to make connection has been tested, disconnect */
                 getBrowser().disconnect();
@@ -230,8 +230,8 @@ final class Provider {
             mConnected = false;
             if (mRetryConnect) {
                 if (mCountRetryConnect >= MAX_RETRY_CONNECT) {
-                    final ProviderView view = mManager.getProviderView(mName);
-                    RsEventBus.post(new ProviderDiscoveredEvent(view, false));
+                    final ProviderViewActive viewOnline = mManager.getProviderView(mName);
+                    RsEventBus.post(new ProviderDiscoveredEvent(viewOnline, false));
                 } else {
                     Log.d(TAG, "Retry provider test connection, count retry:" + mCountRetryConnect);
                     new Handler().postDelayed(new Runnable() {
@@ -320,7 +320,7 @@ final class Provider {
                 browser.subscribe(root, mSubscriptionCallback);
                 RsEventBus.register(this);
 
-                final ProviderView view = mManager.getProviderView(mName);
+                final ProviderViewActive view = mManager.getProviderView(mName);
                 RsEventBus.postSticky(new ProviderConnectedEvent(view, mShowPlayer, false));
 
                 mConnected = true;

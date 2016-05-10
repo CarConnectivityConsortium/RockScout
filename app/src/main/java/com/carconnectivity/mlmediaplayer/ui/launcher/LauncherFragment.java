@@ -51,12 +51,15 @@ import android.widget.TextView;
 import com.carconnectivity.mlmediaplayer.R;
 import com.carconnectivity.mlmediaplayer.commonapi.events.DriveModeStatusChangedEvent;
 import com.carconnectivity.mlmediaplayer.commonapi.events.MirrorLinkSessionChangedEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderToDownloadView;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
+import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewActive;
+import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewInactive;
+import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewToDownload;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.DisableEventsEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.NowPlayingProviderChangedEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderConnectedEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderDiscoveredEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderInactiveDiscoveredEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderToDownloadDiscoveredEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.StartBrowsingEvent;
 import com.carconnectivity.mlmediaplayer.ui.InteractionListener;
@@ -75,14 +78,12 @@ public class LauncherFragment extends Fragment {
     private PaginationController mPaginationController;
 
     private LauncherProviderGridAdapter mProviderAdapter;
-    private LauncherProviderToDownloadGridAdapter mProviderToDownloadAdapter;
     private WeakReference<InteractionListener> mListener;
 
     private List<ProviderView> mListProviders;
-    private List<ProviderToDownloadView> mListProvidersToDownload;
+
     private GridView mProviderGrid;
-    private GridView mProviderToDownloadGrid;
-    private ProviderView mNowPlayingProvider;
+    private ProviderViewActive mNowPlayingProvider;
 
     private TextView mSelectAppHint;
     private TextView mNoAppsWarning;
@@ -93,10 +94,10 @@ public class LauncherFragment extends Fragment {
     private View.OnFocusChangeListener mFocusListener;
     private ImageButton mBackButton;
 
+
     public static LauncherFragment newInstance() {
         LauncherFragment fragment = new LauncherFragment();
         fragment.mListProviders = new ArrayList<>();
-        fragment.mListProvidersToDownload = new ArrayList<>();
         fragment.mIgnoreGoToPlayerOnConnection = true;
         fragment.mHeadUnitIsConnected = false;
 
@@ -117,10 +118,8 @@ public class LauncherFragment extends Fragment {
 
     public void clearList() {
         mListProviders.clear();
-        mListProvidersToDownload.clear();
-        if (mProviderAdapter != null && mProviderToDownloadAdapter != null) {
+        if (mProviderAdapter != null) {
             mProviderAdapter.removeItems();
-            mProviderToDownloadAdapter.removeItems();
         }
     }
 
@@ -138,16 +137,14 @@ public class LauncherFragment extends Fragment {
     }
 
     @SuppressWarnings("unused")
-    public void onEvent(ProviderDiscoveredEvent event) {
+    public void onEventMainThread(ProviderDiscoveredEvent event) {
         Log.d(TAG, "Received ProviderDiscoveredEvent: " + event.provider.getUniqueName() + " " + event.isPlaying);
-        final ProviderView provider = event.provider;
+        final ProviderViewActive provider = event.provider;
         mListProviders.add(provider);
-        if (mProviderAdapter != null && provider.canConnect()) {
-            mProviderAdapter.addItem(provider);
-        }
 
         if (mProviderAdapter != null) {
             handleGridsVisibility(mProviderAdapter.getCount());
+            mProviderAdapter.addItem(provider);
         }
 
         if (event.isPlaying) {
@@ -156,16 +153,26 @@ public class LauncherFragment extends Fragment {
     }
 
     @SuppressWarnings("unused")
-    public void onEvent(ProviderToDownloadDiscoveredEvent event) {
-        Log.d(TAG, "Received ProviderToDownloadDiscoveredEvent: " + event.provider.getUniqueName());
-        final ProviderToDownloadView provider = event.provider;
-        mListProvidersToDownload.add(provider);
-        if (mProviderToDownloadAdapter != null) {
-            mProviderToDownloadAdapter.addItem(provider);
-        }
+    public void onEventMainThread(ProviderToDownloadDiscoveredEvent event) {
+        Log.d(TAG, "Received ProviderToDownloadDiscoveredEvent: " + event.provider.getId());
+        final ProviderViewToDownload provider = event.provider;
+        mListProviders.add(provider);
 
         if (mProviderAdapter != null) {
             handleGridsVisibility(mProviderAdapter.getCount());
+            mProviderAdapter.addItem(provider);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public void onEventMainThread(ProviderInactiveDiscoveredEvent event) {
+        Log.d(TAG, "Received ProviderInactiveDiscoveredEvent: " + event.provider.getId());
+        final ProviderViewInactive provider = event.provider;
+        mListProviders.add(provider);
+
+        if (mProviderAdapter != null) {
+            handleGridsVisibility(mProviderAdapter.getCount());
+            mProviderAdapter.addItem(provider);
         }
     }
 
@@ -202,7 +209,6 @@ public class LauncherFragment extends Fragment {
         mFocusListener = UiUtilities.defaultOnFocusChangeListener((MainActivity) getActivity());
 
         mProviderGrid = (GridView) root.findViewById(R.id.grid_active);
-        mProviderToDownloadGrid = (GridView) root.findViewById(R.id.grid_inactive);
 
         mSelectAppHint = (TextView) root.findViewById(R.id.text_select_hint);
         mNoAppsWarning = (TextView) root.findViewById(R.id.no_auto_apps_warning);
@@ -214,10 +220,9 @@ public class LauncherFragment extends Fragment {
         mPaginationController.initializePagination(root, mFocusListener);
 
         setGridAdapter(mProviderGrid, mProviderAdapter);
-        setGridAdapter(mProviderToDownloadGrid, mProviderToDownloadAdapter);
 
         if (mNowPlayingProvider != null) {
-            final int color = mNowPlayingProvider.getDisplayInfo().colorAccent;
+            final int color = mNowPlayingProvider.getColorAccent();
             final Drawable selector = mProviderGrid.getSelector();
             selector.setTintMode(PorterDuff.Mode.MULTIPLY);
             selector.setTint(color);
@@ -231,39 +236,35 @@ public class LauncherFragment extends Fragment {
         mProviderGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                RsEventBus.postSticky(new ProviderConnectedEvent(null, false, false));
                 ProviderView providerView = (ProviderView) mProviderAdapter.getItem(i);
+                if (providerView instanceof ProviderViewActive) {
+                    ProviderViewActive viewOnline = (ProviderViewActive) providerView;
 
-                final boolean noCurrentProvider = mNowPlayingProvider == null;
-                final boolean hasSomethingToPlay
-                        = providerView.getCurrentMetadata() != null
-                        && providerView.getCurrentMetadata().isTitleEmpty() == false;
-                final boolean isNowPlaying
-                        = mNowPlayingProvider != null
-                        && mNowPlayingProvider.hasSameNameAs(providerView);
-                final boolean showPlayer = (noCurrentProvider && hasSomethingToPlay) || isNowPlaying;
-                onProviderSelected(providerView, showPlayer);
-            }
-        });
-
-        mProviderToDownloadGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                ProviderToDownloadView providerToDownloadView = (ProviderToDownloadView) mProviderToDownloadAdapter.getItem(i);
-                if (providerToDownloadView.getDisplayInfo().link != null) {
-                    Uri uri = providerToDownloadView.getDisplayInfo().link;
-                    startActivity(new Intent(Intent.ACTION_VIEW, uri));
-                } else {
+                    RsEventBus.postSticky(new ProviderConnectedEvent(null, false, false));
+                    final boolean noCurrentProvider = mNowPlayingProvider == null;
+                    final boolean hasSomethingToPlay
+                            = viewOnline.getCurrentMetadata() != null
+                            && viewOnline.getCurrentMetadata().isTitleEmpty() == false;
+                    final boolean isNowPlaying
+                            = mNowPlayingProvider != null
+                            && mNowPlayingProvider.hasSameIdAs(providerView);
+                    final boolean showPlayer = (noCurrentProvider && hasSomethingToPlay) || isNowPlaying;
+                    onProviderSelected(viewOnline, showPlayer);
+                } else if (providerView instanceof ProviderViewInactive) {
                     final Resources resources = getResources();
                     final String appName = resources.getString(R.string.app_name);
                     final String rawMessage = resources.getString(R.string.ml_not_connected);
                     final String message = String.format(rawMessage, appName);
 
                     UiUtilities.showDialog(getActivity(), message);
+                } else if (providerView instanceof  ProviderViewToDownload) {
+                    ProviderViewToDownload viewToDownload = (ProviderViewToDownload) providerView;
+
+                    Uri uri = Uri.parse("market://details?id=" + viewToDownload.getId());
+                    startActivity(new Intent(Intent.ACTION_VIEW, uri));
                 }
             }
         });
-
         return root;
     }
 
@@ -276,7 +277,7 @@ public class LauncherFragment extends Fragment {
         }
     }
 
-    private void onProviderSelected(ProviderView providerView, boolean showPlayer) {
+    private void onProviderSelected(ProviderViewActive providerView, boolean showPlayer) {
         if (providerView != null && providerView.canConnect()) {
             if (mListener != null) {
                 if (showPlayer) {
@@ -322,10 +323,10 @@ public class LauncherFragment extends Fragment {
 
         Button providerButton = (Button) root.findViewById(R.id.buttonLauncher);
         if (mNowPlayingProvider != null) {
-            ProviderView.ProviderDisplayInfo info = mNowPlayingProvider.getDisplayInfo();
             providerName = getResources().getString(R.string.now_playing);
             providerButton.setVisibility(View.VISIBLE);
-            providerIcon = info.notificationDrawable != null ? info.notificationDrawable : info.icon;
+            providerIcon = mNowPlayingProvider.getNotificationDrawable() != null ?
+                    mNowPlayingProvider.getNotificationDrawable() : mNowPlayingProvider.getIconDrawable();
             showSelectAppHint(false);
         } else {
             providerButton.setVisibility(View.INVISIBLE);
@@ -363,26 +364,16 @@ public class LauncherFragment extends Fragment {
     }
 
     private void handleGridsVisibility(int activeCount) {
-        if (mProviderGrid == null || mProviderToDownloadGrid == null) return;
+        if (mProviderGrid == null) return;
 
-        if (mInDriveMode) {
-            if (activeCount <= 0) {
-                showWarningVisibility(true);
-                mProviderGrid.setVisibility(View.GONE);
-                mProviderToDownloadGrid.setVisibility(View.GONE);
-            } else {
-                showWarningVisibility(false);
-                mProviderGrid.setVisibility(View.VISIBLE);
-                mProviderToDownloadGrid.setVisibility(View.GONE);
-            }
-        } else {
-            showWarningVisibility(false);
-            if (activeCount <= 0) {
-                mProviderGrid.setVisibility(View.GONE);
-                mProviderToDownloadGrid.setVisibility(View.VISIBLE);
-            } else {
-                mProviderGrid.setVisibility(View.VISIBLE);
-                mProviderToDownloadGrid.setVisibility(View.GONE);
+        showWarningVisibility(false);
+        mProviderGrid.setVisibility(View.VISIBLE);
+        if (mHeadUnitIsConnected) {
+            if (mInDriveMode) {
+                if (activeCount <= 0) {
+                    showWarningVisibility(true);
+                    mProviderGrid.setVisibility(View.INVISIBLE);
+                }
             }
         }
     }
@@ -391,41 +382,24 @@ public class LauncherFragment extends Fragment {
         ArrayList<ProviderView> activeProviders = new ArrayList<>();
         if (mListProviders != null) {
             for (ProviderView provider : mListProviders) {
-                if (provider.canConnect()) {
-                    activeProviders.add(provider);
-                }
-            }
-        }
-        ArrayList<ProviderToDownloadView> inactiveProviders = new ArrayList<>();
-        if (mListProvidersToDownload != null) {
-            for (ProviderToDownloadView provider : mListProvidersToDownload) {
-                    inactiveProviders.add(provider);
+                activeProviders.add(provider);
             }
         }
 
         mProviderAdapter = new LauncherProviderGridAdapter(this, activeProviders, mUsePagination);
-        mProviderToDownloadAdapter = new LauncherProviderToDownloadGridAdapter(this, inactiveProviders, mUsePagination);
 
         if (mProviderGrid != null) {
             setGridAdapter(mProviderGrid, mProviderAdapter);
-        }
-        if (mProviderToDownloadGrid != null) {
-            setGridAdapter(mProviderToDownloadGrid, mProviderToDownloadAdapter);
         }
 
         mPaginationController = new PaginationController(mProviderAdapter, mUsePagination);
         mPaginationController.initializePagination(root, mFocusListener);
 
         mProviderAdapter.notifyDataSetChanged();
-        mProviderToDownloadAdapter.notifyDataSetChanged();
         handleGridsVisibility(activeProviders.size());
     }
 
     private static void setGridAdapter(GridView grid, LauncherProviderGridAdapter adapter) {
-        grid.setAdapter(adapter);
-        adapter.setOwner(grid);
-    }
-    private static void setGridAdapter(GridView grid, LauncherProviderToDownloadGridAdapter adapter) {
         grid.setAdapter(adapter);
         adapter.setOwner(grid);
     }

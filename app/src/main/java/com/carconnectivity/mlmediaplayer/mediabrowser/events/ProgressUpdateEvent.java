@@ -29,7 +29,7 @@
 
 package com.carconnectivity.mlmediaplayer.mediabrowser.events;
 
-import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
+import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewActive;
 import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
 
 /**
@@ -40,9 +40,9 @@ public final class ProgressUpdateEvent implements RockScoutEvent {
      * Progress of current playback as float value between 0 and 1
      */
     public final float progress;
-    public final ProviderView provider;
+    public final ProviderViewActive provider;
 
-    public ProgressUpdateEvent(ProviderView provider, float progress) {
+    public ProgressUpdateEvent(ProviderViewActive provider, float progress) {
         this.provider = provider;
         this.progress = progress;
     }

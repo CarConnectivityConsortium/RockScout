@@ -29,7 +29,7 @@
 
 package com.carconnectivity.mlmediaplayer.mediabrowser.events;
 
-import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
+import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewActive;
 import com.carconnectivity.mlmediaplayer.mediabrowser.model.TrackMetadata;
 import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
 
@@ -38,10 +38,10 @@ import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
  * Sticky event
  */
 public final class MediaMetadataChangedEvent implements RockScoutEvent {
-    public final ProviderView provider;
+    public final ProviderViewActive provider;
     public final TrackMetadata metadata;
 
-    public MediaMetadataChangedEvent(ProviderView provider, TrackMetadata metadata) {
+    public MediaMetadataChangedEvent(ProviderViewActive provider, TrackMetadata metadata) {
         this.provider = provider;
         this.metadata = metadata;
     }

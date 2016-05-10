@@ -42,9 +42,11 @@ import android.os.Bundle;
 import android.service.media.MediaBrowserService;
 import android.util.Log;
 import android.util.TypedValue;
+
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.DisableEventsEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderDiscoveredEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderDiscoveryFinished;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderInactiveDiscoveredEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderToDownloadDiscoveredEvent;
 import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
 
@@ -142,7 +144,7 @@ public final class ProvidersManager {
     private Provider addNewProvider(ResolveInfo packageInfo) {
         final boolean canPlayOffline = checkIfCanPlayOffline(packageInfo);
         final Provider provider = new Provider(this, packageInfo, canPlayOffline);
-        final ProviderView view = createView(provider, packageInfo);
+        final ProviderViewActive view = createView(provider, packageInfo);
         final ComponentName name = provider.getName();
 
         provider.testConnection();
@@ -231,7 +233,7 @@ public final class ProvidersManager {
         return mRecords.get(name);
     }
 
-    public ProviderView getProviderView(ComponentName name) {
+    public ProviderViewActive getProviderView(ComponentName name) {
         return getProviderRecord(name).immutableView;
     }
 
@@ -239,14 +241,15 @@ public final class ProvidersManager {
         return getProviderRecord(name).provider;
     }
 
-    private ProviderView createView(Provider provider, ResolveInfo packageInfo) {
+    private ProviderViewActive createView(Provider provider, ResolveInfo packageInfo) {
         final String label = packageInfo.loadLabel(mManager).toString();
         final Drawable icon = packageInfo.loadIcon(mManager);
         Integer colorPrimaryDark = null;
         Integer colorAccent = null;
         Drawable notificationDrawable = null;
+        String name = "";
         try {
-            final String name = packageInfo.serviceInfo.packageName;
+            name = packageInfo.serviceInfo.packageName;
             ApplicationInfo appInfo
                     = mManager.getApplicationInfo(name, PackageManager.GET_META_DATA);
             Resources resources = mManager.getResourcesForApplication(name);
@@ -265,7 +268,7 @@ public final class ProvidersManager {
         } catch (PackageManager.NameNotFoundException e) {
             Log.e(TAG, "Error reading app theme data for service: " + packageInfo.serviceInfo.packageName, e);
         }
-        return new ProviderView(provider, label, icon, colorPrimaryDark, colorAccent, notificationDrawable);
+        return new ProviderViewActive(provider, label, name, icon, colorPrimaryDark, colorAccent, notificationDrawable);
     }
 
     private static final String CAR_THEME_KEY = "com.google.android.gms.car.application.theme";
@@ -317,14 +320,15 @@ public final class ProvidersManager {
             Provider provider = getProvider(entry.getKey());
             boolean isPlaying = entry.getValue();
 
-            ProviderView view = getProviderView(entry.getKey());
+            ProviderViewActive viewOnline = getProviderView(entry.getKey());
             if (!mPlayerModeOnline && provider.canPlayOffline() ||
                     mPlayerModeOnline) {
                 count++;
-                RsEventBus.post(new ProviderDiscoveredEvent(view, isPlaying));
+                RsEventBus.post(new ProviderDiscoveredEvent(viewOnline, isPlaying));
             } else {
-                ProviderToDownloadView providerToDownloadView = new ProviderToDownloadView(view.getDisplayInfo().label, view.getDisplayInfo().icon);
-                RsEventBus.post(new ProviderToDownloadDiscoveredEvent(providerToDownloadView));
+                ProviderViewInactive providerViewInactive = new ProviderViewInactive(viewOnline.getLabel(), viewOnline.getId(),
+                        viewOnline.getIconDrawable());
+                RsEventBus.post(new ProviderInactiveDiscoveredEvent(providerViewInactive));
             }
 
             entry.setValue(false);
@@ -332,15 +336,20 @@ public final class ProvidersManager {
 
         //download compatible apps from server
         if (count <= 0) {
-            new ProviderToDownloadParser().download();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    new ProviderToDownloadParser().download();
+                }
+            }).start();
         }
     }
 
     private class ProviderRecord {
         final public Provider provider;
-        final public ProviderView immutableView;
+        final public ProviderViewActive immutableView;
 
-        public ProviderRecord(Provider provider, ProviderView immutableView) {
+        public ProviderRecord(Provider provider, ProviderViewActive immutableView) {
             this.provider = provider;
             this.immutableView = immutableView;
         }

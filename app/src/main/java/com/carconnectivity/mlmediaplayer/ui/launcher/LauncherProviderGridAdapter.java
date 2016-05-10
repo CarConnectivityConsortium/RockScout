@@ -43,8 +43,12 @@ import android.widget.TextView;
 
 import com.carconnectivity.mlmediaplayer.R;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
+import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewInactive;
+import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewActive;
+import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewToDownload;
 import com.carconnectivity.mlmediaplayer.utils.pagination.PaginatedAdapter;
 import com.carconnectivity.mlmediaplayer.utils.pagination.PaginatedCollection;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -69,9 +73,20 @@ public class LauncherProviderGridAdapter extends BaseAdapter implements Paginate
         mProvidersOrder = new Comparator<ProviderView>() {
             @Override
             public int compare(ProviderView a, ProviderView b) {
-                final String displayNameA = a.getDisplayInfo().label;
-                final String displayNameB = b.getDisplayInfo().label;
-                return displayNameA.compareTo(displayNameB);
+                //1 - online, active apps
+                //2 - offline, active apps
+                //3 - online, inactive apps
+                //4 - to download, inactive apps
+                final String displayNameA = a.getLabel();
+                final String displayNameB = b.getLabel();
+                if (a.getType() == b.getType()
+                        ) {
+                    return displayNameA.compareToIgnoreCase(displayNameB);
+                } else if (a.getType() < b.getType()) {
+                    return -1;
+                } else {
+                    return 1;
+                }
             }
         };
 
@@ -97,7 +112,7 @@ public class LauncherProviderGridAdapter extends BaseAdapter implements Paginate
         }
     }
 
-    public void removeItems(){
+    public void removeItems() {
         mItems = null;
         notifyDataSetChanged();
     }
@@ -109,7 +124,7 @@ public class LauncherProviderGridAdapter extends BaseAdapter implements Paginate
         if (mOwner != null) {
             mOwner.setSelection(0);
         }
-        if (mItems!=null && mItems.goToPage(pageNumber)) {
+        if (mItems != null && mItems.goToPage(pageNumber)) {
             notifyDataSetChanged();
         }
     }
@@ -143,11 +158,15 @@ public class LauncherProviderGridAdapter extends BaseAdapter implements Paginate
         final ProviderView provider = (ProviderView) getItem(position);
         initializeViews(viewHolder, provider);
 
-        if (provider.canConnect() == false) {
-            setInactiveStyle(viewHolder);
-            convertView.setEnabled(false);
-            convertView.setOnClickListener(null);
+        if (provider instanceof ProviderViewActive) {
+            ProviderViewActive viewOnline = (ProviderViewActive) provider;
+            if (viewOnline.canConnect() == false) {
+                setInactiveStyle(viewHolder);
+                convertView.setEnabled(false);
+                convertView.setOnClickListener(null);
+            }
         }
+
         return convertView;
     }
 
@@ -163,25 +182,57 @@ public class LauncherProviderGridAdapter extends BaseAdapter implements Paginate
         color2.setTint(0x22ffffff);
         viewHolder.appIconInactivityMark.setImageDrawable(color2);
         viewHolder.appIconInactivityMark.setVisibility(View.VISIBLE);
-        viewHolder.appIconBackground.setVisibility(View.INVISIBLE);
     }
 
-    private void initializeViews(ViewHolder viewHolder, ProviderView provider) {
-        final ProviderView.ProviderDisplayInfo info = provider.getDisplayInfo();
-        viewHolder.appName.setText(info.label);
+    private void setActiveStyle(ViewHolder viewHolder) {
         viewHolder.appName.setTextColor(0xffffffff);
 
         ColorMatrix matrix = new ColorMatrix();
         matrix.setSaturation(1f);
         ColorMatrixColorFilter filter = new ColorMatrixColorFilter(matrix);
-        viewHolder.appIcon.setImageDrawable(info.icon);
-        viewHolder.appIcon.setAlpha(1f);
         viewHolder.appIcon.setColorFilter(filter);
-        Drawable color = mParentFragment.getResources().getDrawable(R.drawable.c4_launcher_icon_background, null);
-        color.setTint(info.colorPrimaryDark);
+        viewHolder.appIcon.setAlpha(1f);
         viewHolder.appIconInactivityMark.setVisibility(View.INVISIBLE);
-        viewHolder.appIconBackground.setImageDrawable(color);
-        viewHolder.appIconBackground.setVisibility(View.VISIBLE);
+    }
+
+    private void initializeViews(ViewHolder viewHolder, ProviderView provider) {
+        viewHolder.appName.setText(provider.getLabel());
+
+        if (provider instanceof ProviderViewActive) {
+            ProviderViewActive viewOnline = (ProviderViewActive) provider;
+
+            viewHolder.appIcon.setImageDrawable(viewOnline.getIconDrawable());
+            setActiveStyle(viewHolder);
+
+            Drawable color = mParentFragment.getResources().getDrawable(R.drawable.c4_launcher_icon_background, null);
+            color.setTint(viewOnline.getColorPrimaryDark());
+            viewHolder.appIconBackground.setImageDrawable(color);
+            viewHolder.appIconAdditional.setVisibility(View.INVISIBLE);
+        } else if (provider instanceof ProviderViewInactive) {
+            ProviderViewInactive viewInactive = (ProviderViewInactive) provider;
+
+            viewHolder.appIcon.setImageDrawable(viewInactive.getIconDrawable());
+            Picasso.with(mParentFragment.getActivity()).load(R.drawable.ic_usb_plug).into(viewHolder.appIconAdditional);
+            setInactiveStyle(viewHolder);
+
+            Drawable color = mParentFragment.getResources().getDrawable(R.drawable.c4_launcher_icon_background, null);
+            color.setTint(viewInactive.getColorPrimaryDark());
+            viewHolder.appIconBackground.setImageDrawable(color);
+            viewHolder.appIconAdditional.setVisibility(View.VISIBLE);
+        } else if(provider instanceof ProviderViewToDownload) {
+            ProviderViewToDownload viewToDownload = (ProviderViewToDownload) provider;
+
+            Picasso.with(mParentFragment.getActivity()).load(viewToDownload.getIconURL().toString()).into(viewHolder.appIcon);
+            Picasso.with(mParentFragment.getActivity()).load(R.drawable.ic_shopping_cart).into(viewHolder.appIconAdditional);
+            setActiveStyle(viewHolder);
+
+            Drawable color = mParentFragment.getResources().getDrawable(R.drawable.c4_launcher_icon_background, null);
+            color.setTint(viewToDownload.getColorPrimaryDark());
+            viewHolder.appIconBackground.setImageDrawable(color);
+            viewHolder.appIconAdditional.setVisibility(View.VISIBLE);
+        }
+
+
     }
 
     private ViewHolder createViewHolder(View convertView) {
@@ -191,6 +242,7 @@ public class LauncherProviderGridAdapter extends BaseAdapter implements Paginate
         viewHolder.appIcon = (ImageView) convertView.findViewById(R.id.app_icon);
         viewHolder.appIconBackground
                 = (ImageView) convertView.findViewById(R.id.app_icon_background);
+        viewHolder.appIconAdditional = (ImageView) convertView.findViewById(R.id.app_icon_additional);
         viewHolder.appName = (TextView) convertView.findViewById(R.id.app_name);
         convertView.setTag(viewHolder);
         return viewHolder;
@@ -210,6 +262,7 @@ public class LauncherProviderGridAdapter extends BaseAdapter implements Paginate
         public ImageView appIcon;
         public ImageView appIconBackground;
         public ImageView appIconInactivityMark;
+        public ImageView appIconAdditional;
         public TextView appName;
     }
 }
