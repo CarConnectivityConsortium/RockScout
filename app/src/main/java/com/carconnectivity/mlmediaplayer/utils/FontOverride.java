@@ -31,6 +31,7 @@ package com.carconnectivity.mlmediaplayer.utils;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.util.Log;
 
 import java.lang.reflect.Field;
 
@@ -38,6 +39,9 @@ import java.lang.reflect.Field;
  * Created by belickim on 20/07/15.
  */
 public final class FontOverride {
+
+    private static final String TAG = FontOverride.class.getSimpleName();
+
     public static void forceRobotoFont(Context context) {
         setDefaultFont(context, "DEFAULT", "fonts/Roboto/Roboto-Regular.ttf");
         setDefaultFont(context, "DEFAULT_BOLD", "fonts/Roboto/Roboto-Regular.ttf");
@@ -60,10 +64,8 @@ public final class FontOverride {
                     .getDeclaredField(staticTypefaceFieldName);
             staticField.setAccessible(true);
             staticField.set(null, newTypeface);
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            Log.e(TAG, "Something went wrong: ", e);
         }
     }
 }

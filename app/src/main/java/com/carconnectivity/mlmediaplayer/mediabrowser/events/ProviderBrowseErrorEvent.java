@@ -29,10 +29,12 @@
 
 package com.carconnectivity.mlmediaplayer.mediabrowser.events;
 
+import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
+
 /**
  * Send when provider reports error when browsing its content
  */
-public final class ProviderBrowseErrorEvent {
+public final class ProviderBrowseErrorEvent implements RockScoutEvent {
     public final String errorId;
 
     public ProviderBrowseErrorEvent(String errorId) {

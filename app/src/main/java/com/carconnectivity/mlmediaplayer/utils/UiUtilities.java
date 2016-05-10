@@ -40,6 +40,7 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -59,6 +60,8 @@ import java.util.TimerTask;
  * Created by belickim on 07/05/15.
  */
 public class UiUtilities {
+
+    private static final String TAG = UiUtilities.class.getSimpleName();
 
     private static View.OnTouchListener generateOnTouchListener(Context context) {
         final GestureDetector detector
@@ -144,7 +147,7 @@ public class UiUtilities {
             thumb.setTintMode(PorterDuff.Mode.MULTIPLY);
             thumb.setTint(color);
         } catch(Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "Something went wrong: ", e);
         }
     }
 
@@ -171,7 +174,7 @@ public class UiUtilities {
     }
 
     public static Dialog showDialog(Context context, String message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setIcon(R.mipmap.ic_warning);
         builder.setTitle(R.string.mirrorlink_dialog_title);
         builder.setMessage(message);
@@ -179,7 +182,7 @@ public class UiUtilities {
         builder.setNeutralButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                System.exit(0);
+               dialog.dismiss();
             }
         });
 

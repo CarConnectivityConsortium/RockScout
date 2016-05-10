@@ -38,18 +38,15 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
-
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.MediaButtonClickedEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.model.MediaButtonData;
-
-import de.greenrobot.event.EventBus;
+import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
 
 /**
  * Media button displayed in player UI
  */
 public class MediaButton extends ImageView {
 
-    private EventBus mBus = EventBus.getDefault();
     private MediaButtonData mMediaButtonData;
     private ColorStateList mDefaultBackgroundColor;
     private ColorStateList mHighlightColor;
@@ -133,7 +130,7 @@ public class MediaButton extends ImageView {
             @Override
             public void onClick(View v) {
                 if (mMediaButtonData != null && mMediaButtonData.type != MediaButtonData.Type.EMPTY) {
-                    mBus.post(new MediaButtonClickedEvent(mMediaButtonData));
+                    RsEventBus.post(new MediaButtonClickedEvent(mMediaButtonData));
                 }
             }
         });

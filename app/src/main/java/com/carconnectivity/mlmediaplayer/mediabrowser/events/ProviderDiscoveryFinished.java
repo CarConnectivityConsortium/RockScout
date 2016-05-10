@@ -29,13 +29,22 @@
 
 package com.carconnectivity.mlmediaplayer.mediabrowser.events;
 
+import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
+
 /**
  * Created by belickim on 13/05/15.
  */
-public final class ProviderDiscoveryFinished {
+public final class ProviderDiscoveryFinished implements RockScoutEvent {
     public final int discoveredCount;
 
     public ProviderDiscoveryFinished(int count) {
         this.discoveredCount = count;
+    }
+
+    @Override
+    public String toString() {
+        return "ProviderDiscoveryFinished{" +
+                "discoveredCount=" + discoveredCount +
+                '}';
     }
 }

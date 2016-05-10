@@ -36,6 +36,8 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- To read album art from external storage: -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!-- To write logs to external storage: -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <!--<supports-screens android:largestWidthLimitDp="320" />-->
     <supports-screens android:compatibleWidthLimitDp="320" />
@@ -50,6 +52,7 @@
         <activity
             android:name=".ui.MainActivity"
             android:label="@string/title_activity_main"
+            android:launchMode="singleTask"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="landscape" >
             <intent-filter>

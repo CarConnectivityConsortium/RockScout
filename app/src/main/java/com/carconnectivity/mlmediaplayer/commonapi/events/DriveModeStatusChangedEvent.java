@@ -29,13 +29,22 @@
 
 package com.carconnectivity.mlmediaplayer.commonapi.events;
 
+import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
+
 /**
  * Created by belickim on 20/05/15.
  */
-public final class DriveModeStatusChangedEvent {
+public final class DriveModeStatusChangedEvent implements RockScoutEvent {
     public final boolean isDriveModeActive;
 
     public DriveModeStatusChangedEvent(boolean inDriveMode) {
         isDriveModeActive = inDriveMode;
+    }
+
+    @Override
+    public String toString() {
+        return "DriveModeStatusChangedEvent{" +
+                "isDriveModeActive=" + isDriveModeActive +
+                '}';
     }
 }

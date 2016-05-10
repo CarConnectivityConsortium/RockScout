@@ -49,7 +49,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.carconnectivity.mlmediaplayer.R;
-import com.carconnectivity.mlmediaplayer.commonapi.events.DriveModeStatusChangedEvent;
+import com.carconnectivity.mlmediaplayer.commonapi.events.MirrorLinkSessionChangedEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.MediaItemView;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.BrowseDirectoryEvent;
@@ -59,11 +59,12 @@ import com.carconnectivity.mlmediaplayer.mediabrowser.events.NowPlayingProviderC
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.PlayMediaItemEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderBrowseCancelEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderBrowseErrorEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderConnectErrorEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderBrowseSuccessfulEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderConnectErrorEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderConnectedEvent;
 import com.carconnectivity.mlmediaplayer.ui.BackButtonHandler;
 import com.carconnectivity.mlmediaplayer.ui.MainActivity;
+import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
 import com.carconnectivity.mlmediaplayer.utils.UiUtilities;
 import com.carconnectivity.mlmediaplayer.utils.breadcrumbs.BreadCrumbs;
 import com.carconnectivity.mlmediaplayer.utils.breadcrumbs.NavigatorLevel;
@@ -71,8 +72,6 @@ import com.carconnectivity.mlmediaplayer.utils.pagination.PaginationController;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import de.greenrobot.event.EventBus;
 
 public final class NavigatorFragment extends Fragment implements BackButtonHandler {
     private static final String TAG = NavigatorFragment.class.getSimpleName();
@@ -135,9 +134,8 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
     }
 
     @SuppressWarnings("unused")
-    public void onEvent(DriveModeStatusChangedEvent event) {
-        enablePagination(event.isDriveModeActive);
-        initializeAdapter();
+    public void onEvent(MirrorLinkSessionChangedEvent event) {
+        enablePagination(event.headUnitIsConnected);
     }
 
     @SuppressWarnings("unused")
@@ -228,13 +226,13 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
             loadState(savedInstanceState);
         }
         mFocusListener = UiUtilities.defaultOnFocusChangeListener((MainActivity) getActivity());
-        EventBus.getDefault().registerSticky(this);
+        RsEventBus.registerSticky(this);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        EventBus.getDefault().unregister(this);
+        RsEventBus.unregister(this);
     }
 
     private void changeState(State state) {
@@ -261,6 +259,9 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
         enableWaitIndicator(true);
         enableFailurePrompt(false);
         enableItemsList(false);
+        if(mPaginationController != null) {
+            mPaginationController.setVisibleButtons(false);
+        }
     }
 
     private void changeToLoaded() {
@@ -268,6 +269,9 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
         enableWaitIndicator(false);
         enableFailurePrompt(false);
         enableItemsList(true);
+        if(mPaginationController != null) {
+            mPaginationController.setVisibleButtons(true);
+        }
     }
 
     private void changeToFailed() {
@@ -275,6 +279,9 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
         enableWaitIndicator(false);
         enableFailurePrompt(true);
         enableItemsList(false);
+        if(mPaginationController != null) {
+            mPaginationController.setVisibleButtons(false);
+        }
     }
 
     public void clearCrumbs() {
@@ -325,10 +332,7 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
         if (mCrumbs.canGoBack()) {
             popLevel();
         } else {
-            final FragmentManager manager = getFragmentManager();
-            if (manager != null) {
-                manager.popBackStack();
-            }
+            ((MainActivity) getActivity()).openLauncher(null);
         }
     }
 
@@ -346,7 +350,7 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
 
     private void browseDirectory(String directoryId) {
         final ComponentName providerName = mCurrentlyBrowsedProvider.getUniqueName();
-        EventBus.getDefault().post(new BrowseDirectoryEvent(providerName, directoryId));
+        RsEventBus.post(new BrowseDirectoryEvent(providerName, directoryId));
         changeState(State.LOADING);
     }
 
@@ -429,7 +433,7 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
     private void playMediaItem(String mediaId, Bundle bundle) {
         final PlayMediaItemEvent event
                 = new PlayMediaItemEvent(mCurrentlyBrowsedProvider, mediaId, bundle);
-        EventBus.getDefault().post(event);
+        RsEventBus.post(event);
         /* todo: define interface or send event */
         ((MainActivity) getActivity()).openMediaPlayer(null);
     }

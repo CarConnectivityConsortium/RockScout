@@ -38,20 +38,15 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.IBinder;
 import android.util.Log;
-
 import com.mirrorlink.android.commonapi.Defs;
 import com.mirrorlink.android.commonapi.ICommonAPIService;
 
 import java.util.List;
 
-import de.greenrobot.event.EventBus;
-
 public class MlServerApiServiceConnection implements ServiceConnection {
     private final static String LOG_TAG = MlServerApiServiceConnection.class.getCanonicalName();
     private ServiceConnectedCallback onServiceConnectedCallback = null;
     private ServiceDisconnectedCallback onServiceDisconnectedCallback = null;
-
-    private EventBus mBus = EventBus.getDefault();
 
     private Application applicationContext;
 

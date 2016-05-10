@@ -29,8 +29,10 @@
 
 package com.carconnectivity.mlmediaplayer.commonapi.events;
 
+import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
+
 /**
  * Created by tomasz.pazdalski on 2015-05-15.
  */
-public final class MirrorLinkNotSupportedEvent {
+public final class MirrorLinkNotSupportedEvent implements RockScoutEvent {
 }

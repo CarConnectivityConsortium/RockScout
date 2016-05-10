@@ -33,9 +33,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 
 import com.carconnectivity.mlmediaplayer.R;
-import com.carconnectivity.mlmediaplayer.ui.MainActivity;
 import com.carconnectivity.mlmediaplayer.ui.widgets.PageButton;
-import com.carconnectivity.mlmediaplayer.utils.UiUtilities;
 
 /**
  * Created by belickim on 18/05/15.
@@ -76,6 +74,13 @@ public class PaginationController {
         button.setOnClickListener(generateListener(button));
     }
 
+    public void setVisibleButtons(boolean visible) {
+        if(!mUsePagination) return;
+        mButtonPrevious.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
+        mButtonCurrent.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
+        mButtonNext.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
+    }
+
     public void changeActiveColor(int color) {
         mButtonPrevious.setActiveColor(color);
         mButtonCurrent.setActiveColor(color);
@@ -102,7 +107,6 @@ public class PaginationController {
 
         if (focusListener != null) {
             mButtonPrevious.applyFocusListener(focusListener);
-            mButtonCurrent.applyFocusListener(focusListener);
             mButtonNext.applyFocusListener(focusListener);
         }
 
@@ -120,5 +124,6 @@ public class PaginationController {
         mButtonNext.setVisibility(currentPage < pagesCount - 1 ? View.VISIBLE : View.INVISIBLE);
 
         mButtonCurrent.setVisibility(pagesCount > 1 ? View.VISIBLE : View.INVISIBLE);
+        mButtonCurrent.setButtonClickable(false);
     }
 }

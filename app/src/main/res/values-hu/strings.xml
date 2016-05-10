@@ -58,6 +58,6 @@
   <string name="press_play_to_start">Nyomja meg a lejátszás gombot </string>
   <string name="launcher">Indító</string>
   <string name="top_level">Felső szint</string>
-  <string name="select_source_hint"></string>
   <string name="splash_subtitle">powered by MirrorLink</string>
+  <string name="select_source_hint"> </string>
 </resources>

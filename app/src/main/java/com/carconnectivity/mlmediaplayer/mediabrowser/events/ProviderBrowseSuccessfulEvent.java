@@ -31,6 +31,7 @@ package com.carconnectivity.mlmediaplayer.mediabrowser.events;
 
 import com.carconnectivity.mlmediaplayer.mediabrowser.MediaItemView;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
+import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,7 +41,7 @@ import java.util.List;
 /**
  * Created by belickim on 20/04/15.
  */
-public final class ProviderBrowseSuccessfulEvent {
+public final class ProviderBrowseSuccessfulEvent implements RockScoutEvent {
     /** Currently browsed provider */
     public final ProviderView provider;
 

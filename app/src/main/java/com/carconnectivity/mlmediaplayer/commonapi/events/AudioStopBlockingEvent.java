@@ -29,5 +29,7 @@
 
 package com.carconnectivity.mlmediaplayer.commonapi.events;
 
-public final class AudioStopBlockingEvent {
+import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
+
+public final class AudioStopBlockingEvent implements RockScoutEvent {
 }

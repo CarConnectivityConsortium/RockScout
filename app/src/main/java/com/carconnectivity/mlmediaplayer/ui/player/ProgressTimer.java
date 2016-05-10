@@ -32,11 +32,10 @@ package com.carconnectivity.mlmediaplayer.ui.player;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProgressUpdateEvent;
 import com.carconnectivity.mlmediaplayer.utils.PlaybackUtils;
+import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
 
 import java.util.Timer;
 import java.util.TimerTask;
-
-import de.greenrobot.event.EventBus;
 
 /**
  * Timer for updating playback progress
@@ -48,8 +47,6 @@ public class ProgressTimer extends Timer {
     private long mPos;
     private long mDuration;
     private long mLastUpdateTime;
-
-    private final EventBus mBus = EventBus.getDefault();
 
     public ProgressTimer() {
     }
@@ -69,7 +66,7 @@ public class ProgressTimer extends Timer {
             public void run() {
                 final float progressPercentage
                         = PlaybackUtils.calculateProgressPercentage(mPos, mLastUpdateTime, mDuration);
-                mBus.post(new ProgressUpdateEvent(provider, progressPercentage));
+                RsEventBus.post(new ProgressUpdateEvent(provider, progressPercentage));
             }
         }, 0, UPDATE_PERIOD);
     }

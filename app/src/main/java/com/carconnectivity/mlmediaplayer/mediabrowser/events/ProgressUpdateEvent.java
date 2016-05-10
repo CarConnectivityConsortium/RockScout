@@ -30,11 +30,12 @@
 package com.carconnectivity.mlmediaplayer.mediabrowser.events;
 
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
+import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
 
 /**
  * Event notifying about playback progress updates
  */
-public final class ProgressUpdateEvent {
+public final class ProgressUpdateEvent implements RockScoutEvent {
     /**
      * Progress of current playback as float value between 0 and 1
      */

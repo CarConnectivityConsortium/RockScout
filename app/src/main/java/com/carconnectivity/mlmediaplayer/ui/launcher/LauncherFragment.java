@@ -31,8 +31,11 @@ package com.carconnectivity.mlmediaplayer.ui.launcher;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -47,14 +50,18 @@ import android.widget.TextView;
 
 import com.carconnectivity.mlmediaplayer.R;
 import com.carconnectivity.mlmediaplayer.commonapi.events.DriveModeStatusChangedEvent;
+import com.carconnectivity.mlmediaplayer.commonapi.events.MirrorLinkSessionChangedEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderToDownloadView;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.DisableEventsEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.NowPlayingProviderChangedEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderConnectedEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderDiscoveredEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderToDownloadDiscoveredEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.StartBrowsingEvent;
 import com.carconnectivity.mlmediaplayer.ui.InteractionListener;
 import com.carconnectivity.mlmediaplayer.ui.MainActivity;
+import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
 import com.carconnectivity.mlmediaplayer.utils.UiUtilities;
 import com.carconnectivity.mlmediaplayer.utils.pagination.PaginationController;
 
@@ -62,26 +69,26 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.greenrobot.event.EventBus;
-
 public class LauncherFragment extends Fragment {
     private static final String TAG = LauncherFragment.class.getSimpleName();
     private boolean mUsePagination = false;
     private PaginationController mPaginationController;
 
-    private LauncherGridAdapter mActiveAdapter;
-    private LauncherGridAdapter mInactiveAdapter;
+    private LauncherProviderGridAdapter mProviderAdapter;
+    private LauncherProviderToDownloadGridAdapter mProviderToDownloadAdapter;
     private WeakReference<InteractionListener> mListener;
 
     private List<ProviderView> mListProviders;
-    private GridView mActiveGrid;
-    private GridView mInactiveGrid;
+    private List<ProviderToDownloadView> mListProvidersToDownload;
+    private GridView mProviderGrid;
+    private GridView mProviderToDownloadGrid;
     private ProviderView mNowPlayingProvider;
 
     private TextView mSelectAppHint;
     private TextView mNoAppsWarning;
     private boolean mIgnoreGoToPlayerOnConnection;
     private boolean mInDriveMode;
+    private boolean mHeadUnitIsConnected;
 
     private View.OnFocusChangeListener mFocusListener;
     private ImageButton mBackButton;
@@ -89,9 +96,11 @@ public class LauncherFragment extends Fragment {
     public static LauncherFragment newInstance() {
         LauncherFragment fragment = new LauncherFragment();
         fragment.mListProviders = new ArrayList<>();
+        fragment.mListProvidersToDownload = new ArrayList<>();
         fragment.mIgnoreGoToPlayerOnConnection = true;
+        fragment.mHeadUnitIsConnected = false;
 
-        EventBus.getDefault().register(fragment);
+        RsEventBus.register(fragment);
 
         return fragment;
     }
@@ -103,14 +112,15 @@ public class LauncherFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        EventBus.getDefault().unregister(this);
+        RsEventBus.unregister(this);
     }
 
     public void clearList() {
         mListProviders.clear();
-        if (mActiveAdapter != null && mInactiveAdapter != null) {
-            mActiveAdapter.removeItems();
-            mInactiveAdapter.removeItems();
+        mListProvidersToDownload.clear();
+        if (mProviderAdapter != null && mProviderToDownloadAdapter != null) {
+            mProviderAdapter.removeItems();
+            mProviderToDownloadAdapter.removeItems();
         }
     }
 
@@ -132,14 +142,30 @@ public class LauncherFragment extends Fragment {
         Log.d(TAG, "Received ProviderDiscoveredEvent: " + event.provider.getUniqueName() + " " + event.isPlaying);
         final ProviderView provider = event.provider;
         mListProviders.add(provider);
-        if (mActiveAdapter != null && provider.canConnect()) {
-            mActiveAdapter.addItem(provider);
-        } else if (mInactiveAdapter != null) {
-            mInactiveAdapter.addItem(provider);
+        if (mProviderAdapter != null && provider.canConnect()) {
+            mProviderAdapter.addItem(provider);
         }
 
-        if (mActiveAdapter != null) {
-            handleWarningVisibility(mActiveAdapter.getCount());
+        if (mProviderAdapter != null) {
+            handleGridsVisibility(mProviderAdapter.getCount());
+        }
+
+        if (event.isPlaying) {
+            RsEventBus.postSticky(new ProviderConnectedEvent(provider, true, false));
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public void onEvent(ProviderToDownloadDiscoveredEvent event) {
+        Log.d(TAG, "Received ProviderToDownloadDiscoveredEvent: " + event.provider.getUniqueName());
+        final ProviderToDownloadView provider = event.provider;
+        mListProvidersToDownload.add(provider);
+        if (mProviderToDownloadAdapter != null) {
+            mProviderToDownloadAdapter.addItem(provider);
+        }
+
+        if (mProviderAdapter != null) {
+            handleGridsVisibility(mProviderAdapter.getCount());
         }
     }
 
@@ -158,6 +184,16 @@ public class LauncherFragment extends Fragment {
         initializeNowPlayingProviderDisplay(getView());
     }
 
+    @SuppressWarnings("unused")
+    public void onEvent(MirrorLinkSessionChangedEvent event) {
+        if (event.headUnitIsConnected) {
+            mHeadUnitIsConnected = true;
+        } else {
+            mHeadUnitIsConnected = false;
+        }
+        initializeBackButton(getView());
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -165,8 +201,8 @@ public class LauncherFragment extends Fragment {
 
         mFocusListener = UiUtilities.defaultOnFocusChangeListener((MainActivity) getActivity());
 
-        mActiveGrid = (GridView) root.findViewById(R.id.grid_active);
-        mInactiveGrid = (GridView) root.findViewById(R.id.grid_inactive);
+        mProviderGrid = (GridView) root.findViewById(R.id.grid_active);
+        mProviderToDownloadGrid = (GridView) root.findViewById(R.id.grid_inactive);
 
         mSelectAppHint = (TextView) root.findViewById(R.id.text_select_hint);
         mNoAppsWarning = (TextView) root.findViewById(R.id.no_auto_apps_warning);
@@ -177,15 +213,12 @@ public class LauncherFragment extends Fragment {
         initializeAdapters(root);
         mPaginationController.initializePagination(root, mFocusListener);
 
-        setGridAdapter(mActiveGrid, mActiveAdapter);
-        setGridAdapter(mInactiveGrid, mInactiveAdapter);
-        mInactiveGrid.setFocusable(false);
-        //mInactiveGrid.setVisibility(mUsePagination ? View.GONE : View.VISIBLE);
-        mInactiveGrid.setVisibility(View.GONE);
+        setGridAdapter(mProviderGrid, mProviderAdapter);
+        setGridAdapter(mProviderToDownloadGrid, mProviderToDownloadAdapter);
 
         if (mNowPlayingProvider != null) {
             final int color = mNowPlayingProvider.getDisplayInfo().colorAccent;
-            final Drawable selector = mActiveGrid.getSelector();
+            final Drawable selector = mProviderGrid.getSelector();
             selector.setTintMode(PorterDuff.Mode.MULTIPLY);
             selector.setTint(color);
 
@@ -195,15 +228,15 @@ public class LauncherFragment extends Fragment {
             mPaginationController.changeActiveColor(color);
         }
 
-        mActiveGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mProviderGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                EventBus.getDefault().postSticky(new ProviderConnectedEvent(null, false, false));
-                ProviderView providerView = (ProviderView) mActiveAdapter.getItem(i);
+                RsEventBus.postSticky(new ProviderConnectedEvent(null, false, false));
+                ProviderView providerView = (ProviderView) mProviderAdapter.getItem(i);
 
                 final boolean noCurrentProvider = mNowPlayingProvider == null;
                 final boolean hasSomethingToPlay
-                        =  providerView.getCurrentMetadata() != null
+                        = providerView.getCurrentMetadata() != null
                         && providerView.getCurrentMetadata().isTitleEmpty() == false;
                 final boolean isNowPlaying
                         = mNowPlayingProvider != null
@@ -213,13 +246,34 @@ public class LauncherFragment extends Fragment {
             }
         });
 
+        mProviderToDownloadGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                ProviderToDownloadView providerToDownloadView = (ProviderToDownloadView) mProviderToDownloadAdapter.getItem(i);
+                if (providerToDownloadView.getDisplayInfo().link != null) {
+                    Uri uri = providerToDownloadView.getDisplayInfo().link;
+                    startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                } else {
+                    final Resources resources = getResources();
+                    final String appName = resources.getString(R.string.app_name);
+                    final String rawMessage = resources.getString(R.string.ml_not_connected);
+                    final String message = String.format(rawMessage, appName);
+
+                    UiUtilities.showDialog(getActivity(), message);
+                }
+            }
+        });
+
         return root;
     }
 
     private void enableDriveMode(boolean enable) {
         enablePagination(enable);
         mInDriveMode = enable;
-        initializeBackButton(getView());
+
+        if (mProviderAdapter != null) {
+            handleGridsVisibility(mProviderAdapter.getCount());
+        }
     }
 
     private void onProviderSelected(ProviderView providerView, boolean showPlayer) {
@@ -231,7 +285,7 @@ public class LauncherFragment extends Fragment {
                     mListener.get().showNavigator(true);
                 }
             }
-            EventBus.getDefault().post(new StartBrowsingEvent(providerView));
+            RsEventBus.post(new StartBrowsingEvent(providerView));
         }
     }
 
@@ -249,7 +303,7 @@ public class LauncherFragment extends Fragment {
         mBackButton.setOnFocusChangeListener(mFocusListener);
 
         final boolean backInvisible
-                = mInDriveMode && getFragmentManager().getBackStackEntryCount() == 0;
+                = mHeadUnitIsConnected && getFragmentManager().getBackStackEntryCount() == 0;
         UiUtilities.setVisibility(mBackButton, backInvisible == false);
     }
 
@@ -301,45 +355,77 @@ public class LauncherFragment extends Fragment {
     private void enablePagination(boolean enabled) {
         mUsePagination = enabled;
         initializeAdapters(getView());
-        if (mInactiveGrid != null) {
-            //mInactiveGrid.setVisibility(mUsePagination ? View.GONE : View.VISIBLE);
-            mInactiveGrid.setVisibility(View.GONE);
-        }
     }
 
-    private void handleWarningVisibility(int activeCount) {
+    private void showWarningVisibility(boolean visible) {
         if (mNoAppsWarning == null) return;
-        UiUtilities.setVisibility(mNoAppsWarning, activeCount <= 0);
+        UiUtilities.setVisibility(mNoAppsWarning, visible);
+    }
+
+    private void handleGridsVisibility(int activeCount) {
+        if (mProviderGrid == null || mProviderToDownloadGrid == null) return;
+
+        if (mInDriveMode) {
+            if (activeCount <= 0) {
+                showWarningVisibility(true);
+                mProviderGrid.setVisibility(View.GONE);
+                mProviderToDownloadGrid.setVisibility(View.GONE);
+            } else {
+                showWarningVisibility(false);
+                mProviderGrid.setVisibility(View.VISIBLE);
+                mProviderToDownloadGrid.setVisibility(View.GONE);
+            }
+        } else {
+            showWarningVisibility(false);
+            if (activeCount <= 0) {
+                mProviderGrid.setVisibility(View.GONE);
+                mProviderToDownloadGrid.setVisibility(View.VISIBLE);
+            } else {
+                mProviderGrid.setVisibility(View.VISIBLE);
+                mProviderToDownloadGrid.setVisibility(View.GONE);
+            }
+        }
     }
 
     private void initializeAdapters(View root) {
         ArrayList<ProviderView> activeProviders = new ArrayList<>();
-        ArrayList<ProviderView> inactiveProviders = new ArrayList<>();
         if (mListProviders != null) {
             for (ProviderView provider : mListProviders) {
                 if (provider.canConnect()) {
                     activeProviders.add(provider);
                 }
-                else {
-                    inactiveProviders.add(provider);
-                }
             }
         }
-        mActiveAdapter = new LauncherGridAdapter(this, activeProviders, mUsePagination);
-        mInactiveAdapter = new LauncherGridAdapter(this, inactiveProviders, mUsePagination);
-
-        if (mActiveGrid != null) {
-            setGridAdapter(mActiveGrid, mActiveAdapter);
+        ArrayList<ProviderToDownloadView> inactiveProviders = new ArrayList<>();
+        if (mListProvidersToDownload != null) {
+            for (ProviderToDownloadView provider : mListProvidersToDownload) {
+                    inactiveProviders.add(provider);
+            }
         }
 
-        mPaginationController = new PaginationController(mActiveAdapter, mUsePagination);
+        mProviderAdapter = new LauncherProviderGridAdapter(this, activeProviders, mUsePagination);
+        mProviderToDownloadAdapter = new LauncherProviderToDownloadGridAdapter(this, inactiveProviders, mUsePagination);
+
+        if (mProviderGrid != null) {
+            setGridAdapter(mProviderGrid, mProviderAdapter);
+        }
+        if (mProviderToDownloadGrid != null) {
+            setGridAdapter(mProviderToDownloadGrid, mProviderToDownloadAdapter);
+        }
+
+        mPaginationController = new PaginationController(mProviderAdapter, mUsePagination);
         mPaginationController.initializePagination(root, mFocusListener);
 
-        mActiveAdapter.notifyDataSetChanged();
-        handleWarningVisibility(activeProviders.size());
+        mProviderAdapter.notifyDataSetChanged();
+        mProviderToDownloadAdapter.notifyDataSetChanged();
+        handleGridsVisibility(activeProviders.size());
     }
 
-    private static void setGridAdapter(GridView grid, LauncherGridAdapter adapter) {
+    private static void setGridAdapter(GridView grid, LauncherProviderGridAdapter adapter) {
+        grid.setAdapter(adapter);
+        adapter.setOwner(grid);
+    }
+    private static void setGridAdapter(GridView grid, LauncherProviderToDownloadGridAdapter adapter) {
         grid.setAdapter(adapter);
         adapter.setOwner(grid);
     }

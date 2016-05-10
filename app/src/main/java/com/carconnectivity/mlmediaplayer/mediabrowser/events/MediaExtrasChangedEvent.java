@@ -30,11 +30,19 @@
 package com.carconnectivity.mlmediaplayer.mediabrowser.events;
 
 import android.os.Bundle;
+import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
 
-public final class MediaExtrasChangedEvent {
+public final class MediaExtrasChangedEvent implements RockScoutEvent {
     public final Bundle extras;
 
     public MediaExtrasChangedEvent(Bundle extras){
         this.extras = extras;
+    }
+
+    @Override
+    public String toString() {
+        return "MediaExtrasChangedEvent{" +
+                "extras=" + extras +
+                '}';
     }
 }

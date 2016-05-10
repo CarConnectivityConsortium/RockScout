@@ -27,24 +27,25 @@
  * in or in connection to any CCC products, software and/or services.
  */
 
-package com.carconnectivity.mlmediaplayer.commonapi.events;
+package com.carconnectivity.mlmediaplayer.mediabrowser.events;
 
+import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderToDownloadView;
 import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
 
 /**
- * Created by tomasz.pazdalski on 2015-05-13.
+ * Created by sebastian.sokolowski on 17/02/16.
  */
-public final class AudioStartBlockingEvent implements RockScoutEvent {
-    public final boolean previousState;
+public final class ProviderToDownloadDiscoveredEvent implements RockScoutEvent {
+    public final ProviderToDownloadView provider;
 
-    public AudioStartBlockingEvent(boolean previousState) {
-        this.previousState = previousState;
+    public ProviderToDownloadDiscoveredEvent(ProviderToDownloadView provider) {
+        this.provider = provider;
     }
 
     @Override
     public String toString() {
-        return "AudioStartBlockingEvent{" +
-                "previousState=" + previousState +
+        return "ProviderToDownloadDiscoveredEvent{" +
+                "provider.getUniqueName()=" + (provider != null ? provider.getUniqueName() : "null") +
                 '}';
     }
 }

@@ -34,25 +34,10 @@ import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
 import android.util.SparseArray;
-
-import com.carconnectivity.mlmediaplayer.commonapi.events.AudioStartBlockingEvent;
-import com.carconnectivity.mlmediaplayer.commonapi.events.AudioStopBlockingEvent;
-import com.carconnectivity.mlmediaplayer.commonapi.events.ConnectionMirrorLinkServiceEvent;
-import com.carconnectivity.mlmediaplayer.commonapi.events.DriveModeStatusChangedEvent;
-import com.carconnectivity.mlmediaplayer.commonapi.events.MirrorLinkNotSupportedEvent;
-import com.carconnectivity.mlmediaplayer.commonapi.events.MirrorLinkSessionChangedEvent;
-import com.carconnectivity.mlmediaplayer.commonapi.events.PlaybackFailedEvent;
-import com.carconnectivity.mlmediaplayer.commonapi.events.PrepareForPlaybackEvent;
+import com.carconnectivity.mlmediaplayer.commonapi.events.*;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.PlaybackStateChangedEvent;
-import com.mirrorlink.android.commonapi.Defs;
-import com.mirrorlink.android.commonapi.IConnectionListener;
-import com.mirrorlink.android.commonapi.IConnectionManager;
-import com.mirrorlink.android.commonapi.IContextListener;
-import com.mirrorlink.android.commonapi.IContextManager;
-import com.mirrorlink.android.commonapi.IDeviceStatusListener;
-import com.mirrorlink.android.commonapi.IDeviceStatusManager;
-
-import de.greenrobot.event.EventBus;
+import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
+import com.mirrorlink.android.commonapi.*;
 
 /**
  * Responsible for connection with MirrorLink, handling blocks
@@ -64,7 +49,6 @@ public final class MirrorLinkConnectionManager {
 
     private final int currentCategory = Defs.ContextInformation.APPLICATION_CATEGORY_MEDIA_MUSIC;
     private MirrorLinkApplicationContext mMirrorLinkApplicationContext;
-    private EventBus mBus = EventBus.getDefault();
 
     private Activity mMainActivity;
 
@@ -98,12 +82,10 @@ public final class MirrorLinkConnectionManager {
     public MirrorLinkConnectionManager(MirrorLinkApplicationContext applicationContext, Activity mainActivity) {
         mMainActivity = mainActivity;
         mMirrorLinkApplicationContext = applicationContext;
-        if (!mBus.isRegistered(this)) {
-            mBus.register(this);
-        }
+        RsEventBus.register(this);
         if (mMirrorLinkApplicationContext.getService() == null) {
             if (!mMirrorLinkApplicationContext.connect()) {             // correct -> !mMirrorLinkApplicationContext.connect()
-                mBus.postSticky(new MirrorLinkNotSupportedEvent());
+                RsEventBus.postSticky(new MirrorLinkNotSupportedEvent());
             }
         }
     }
@@ -120,9 +102,7 @@ public final class MirrorLinkConnectionManager {
 
     public void registerMirrorLinkManagers() {
         Log.d(TAG, "Registering MirrorLinkManagers");
-        if (!mBus.isRegistered(this)) {
-            mBus.register(this);
-        }
+        RsEventBus.register(this);
         if (mMirrorLinkApplicationContext.getService() == null) {
             // TODO : Common API not available, add some message to user
         } else {
@@ -145,7 +125,7 @@ public final class MirrorLinkConnectionManager {
                     mMainActivity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            mBus.postSticky(new DriveModeStatusChangedEvent(mInDriveMode));
+                            RsEventBus.postSticky(new DriveModeStatusChangedEvent(mInDriveMode));
                         }
                     });
                 }
@@ -157,9 +137,7 @@ public final class MirrorLinkConnectionManager {
 
     public void unregisterMirrorLinkManagers() {
         Log.d(TAG, "Unregistering MirrorLinkManagers");
-        if (mBus.isRegistered(this)) {
-            mBus.unregister(this);
-        }
+        RsEventBus.unregister(this);
         if (mMirrorLinkApplicationContext != null) {
             mMirrorLinkApplicationContext.unregisterDeviceStatusManager(this, mDeviceStatusListener);
             mMirrorLinkApplicationContext.unregisterConnectionManager(this, mConnectionListener);
@@ -225,7 +203,7 @@ public final class MirrorLinkConnectionManager {
     void setMirrorLinkConnected(boolean connected) {
         if (mIsMirrorLinkSupported) {
             mConnectionMirrorLinkStatus = connected;
-            mBus.postSticky(new MirrorLinkSessionChangedEvent(mConnectionMirrorLinkStatus));
+            RsEventBus.postSticky(new MirrorLinkSessionChangedEvent(mConnectionMirrorLinkStatus));
         }
     }
 
@@ -254,7 +232,7 @@ public final class MirrorLinkConnectionManager {
             mMainActivity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mBus.postSticky(new DriveModeStatusChangedEvent(mInDriveMode));
+                    RsEventBus.postSticky(new DriveModeStatusChangedEvent(mInDriveMode));
                 }
             });
 
@@ -303,9 +281,9 @@ public final class MirrorLinkConnectionManager {
         if (mAudioBlocked != audioBlocked) {
             mAudioBlocked = audioBlocked;
             if (mAudioBlocked) {
-                mBus.postSticky(new AudioStartBlockingEvent(mStateStatus));
+                RsEventBus.postSticky(new AudioStartBlockingEvent(mStateStatus));
             } else {
-                mBus.postSticky(new AudioStopBlockingEvent());
+                RsEventBus.postSticky(new AudioStopBlockingEvent());
             }
         }
     }

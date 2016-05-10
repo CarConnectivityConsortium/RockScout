@@ -30,11 +30,12 @@
 package com.carconnectivity.mlmediaplayer.mediabrowser.events;
 
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
+import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
 
 /**
  * Created by belickim on 12/06/15.
  */
-public class CurrentlyBrowsedProviderChanged {
+public class CurrentlyBrowsedProviderChanged implements RockScoutEvent {
     public final ProviderView provider;
 
     public CurrentlyBrowsedProviderChanged(ProviderView provider) {
@@ -42,5 +43,12 @@ public class CurrentlyBrowsedProviderChanged {
             throw new IllegalArgumentException("Provider cannot be null.");
         }
         this.provider = provider;
+    }
+
+    @Override
+    public String toString() {
+        return "CurrentlyBrowsedProviderChanged{" +
+                "provider.getUniqueName()=" + (provider != null ? provider.getUniqueName() : "null") +
+                '}';
     }
 }

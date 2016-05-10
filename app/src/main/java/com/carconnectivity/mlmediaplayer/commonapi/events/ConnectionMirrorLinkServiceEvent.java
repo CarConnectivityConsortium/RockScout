@@ -29,10 +29,19 @@
 
 package com.carconnectivity.mlmediaplayer.commonapi.events;
 
-public final class ConnectionMirrorLinkServiceEvent {
+import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
+
+public final class ConnectionMirrorLinkServiceEvent implements RockScoutEvent {
     public final boolean isConnected;
 
     public ConnectionMirrorLinkServiceEvent(boolean connectionStatus) {
         isConnected = connectionStatus;
+    }
+
+    @Override
+    public String toString() {
+        return "ConnectionMirrorLinkServiceEvent{" +
+                "isConnected=" + isConnected +
+                '}';
     }
 }

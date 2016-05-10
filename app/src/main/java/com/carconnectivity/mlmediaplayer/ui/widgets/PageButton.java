@@ -85,6 +85,10 @@ public class PageButton extends FrameLayout {
         update();
     }
 
+    public void setButtonClickable(boolean clickable) {
+        mButton.setClickable(clickable);
+    }
+
     public void applyFocusListener(View.OnFocusChangeListener listener) {
         mButton.setOnFocusChangeListener(listener);
     }

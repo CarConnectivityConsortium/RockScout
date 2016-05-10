@@ -30,13 +30,13 @@
 package com.carconnectivity.mlmediaplayer.mediabrowser.events;
 
 import android.os.Bundle;
-
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
+import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
 
 /**
  * Event requesting to launch specific playable media item
  */
-public final class PlayMediaItemEvent {
+public final class PlayMediaItemEvent implements RockScoutEvent {
     public final ProviderView provider;
     public final String mediaId;
     public final Bundle bundle;

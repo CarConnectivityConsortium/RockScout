@@ -29,12 +29,7 @@
 
 package com.carconnectivity.mlmediaplayer.ui;
 
-import android.app.Activity;
-import android.app.Dialog;
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
-import android.app.Instrumentation;
+import android.app.*;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -45,7 +40,6 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-
 import com.carconnectivity.mlmediaplayer.R;
 import com.carconnectivity.mlmediaplayer.commonapi.MirrorLinkApplicationContext;
 import com.carconnectivity.mlmediaplayer.commonapi.MirrorLinkConnectionManager;
@@ -54,25 +48,20 @@ import com.carconnectivity.mlmediaplayer.commonapi.events.MirrorLinkSessionChang
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderPlaybackState;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
 import com.carconnectivity.mlmediaplayer.mediabrowser.SessionManager;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.DisableEventsEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.MediaButtonClickedEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.PlaybackStateChangedEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderDiscoveryFinished;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.TerminateEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.*;
 import com.carconnectivity.mlmediaplayer.mediabrowser.model.MediaButtonData;
 import com.carconnectivity.mlmediaplayer.ui.launcher.LauncherFragment;
 import com.carconnectivity.mlmediaplayer.ui.navigator.NavigatorFragment;
 import com.carconnectivity.mlmediaplayer.ui.player.MediaPlayerFragment;
 import com.carconnectivity.mlmediaplayer.ui.splash.SplashScreenFragment;
 import com.carconnectivity.mlmediaplayer.utils.FontOverride;
+import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
 import com.carconnectivity.mlmediaplayer.utils.UiUtilities;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import de.greenrobot.event.EventBus;
 
 public class MainActivity extends Activity implements InteractionListener {
     private final static String TAG = MainActivity.class.getCanonicalName();
@@ -89,12 +78,10 @@ public class MainActivity extends Activity implements InteractionListener {
     private MirrorLinkConnectionManager mMirrorLinkConnectionManager;
     private boolean mFindProviders;
 
-    private EventBus mBus = EventBus.getDefault();
-
     private boolean mApplyTransition = true;
     private boolean mTerminateReceived = false;
 
-    private boolean mInstaceStateSaved = false;
+    private boolean mInstanceStateSaved = false;
 
     private boolean mPlayerModeOnline = false;
 
@@ -124,6 +111,7 @@ public class MainActivity extends Activity implements InteractionListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate called with action: " + getIntent().getAction());
         setContentView(R.layout.activity_main);
 
         FontOverride.forceRobotoFont(this);
@@ -140,9 +128,7 @@ public class MainActivity extends Activity implements InteractionListener {
         mPlayerFragment = new MediaPlayerFragment(); /* TODO: replace this with newInstance() */
         mSplashFragment = SplashScreenFragment.newInstance();
 
-        if (!mBus.isRegistered(this)) { /* TODO: this should not be required we are unregistering in onDestroy, check & remove */
-            mBus.register(this);
-        }
+        RsEventBus.register(this);
 
         mManager = new SessionManager(this, getPackageManager());
         mManager.findProviders();
@@ -178,7 +164,7 @@ public class MainActivity extends Activity implements InteractionListener {
         if (mTerminateReceived) {
             final ProviderPlaybackState state = event.state;
             if (state.state == PlaybackState.STATE_PLAYING) {
-                mBus.postSticky(new TerminateEvent());
+                RsEventBus.postSticky(new TerminateEvent());
             } else if (state.state == PlaybackState.STATE_PAUSED
                     || state.state == PlaybackState.STATE_STOPPED) {
                 forceExit();
@@ -258,7 +244,7 @@ public class MainActivity extends Activity implements InteractionListener {
     protected void onResume() {
         Log.d(TAG, "onResume");
         super.onResume();
-        mInstaceStateSaved = false;
+        mInstanceStateSaved = false;
         if ((getFragmentManager().getBackStackEntryCount() == 0) && !mSplashFragment.isAdded()) {
             showLauncher();
         }
@@ -274,6 +260,7 @@ public class MainActivity extends Activity implements InteractionListener {
     public void onPause() {
         Log.d(TAG, "onPause");
         super.onPause();
+        mFindProviders = true;
         mManager.disconnect();
     }
 
@@ -291,14 +278,14 @@ public class MainActivity extends Activity implements InteractionListener {
         super.onDestroy();
         mFindProviders = true;
         mManager.disconnect();
-        EventBus.getDefault().post(new DisableEventsEvent());
-        mBus.unregister(this);
+        RsEventBus.post(new DisableEventsEvent());
+        RsEventBus.unregister(this);
         mMirrorLinkConnectionManager.disconnectFromApiService();
     }
 
     @Override
     public void onSaveInstanceState(Bundle bundle) {
-        mInstaceStateSaved = true;
+        mInstanceStateSaved = true;
     }
 
     @Override
@@ -358,7 +345,7 @@ public class MainActivity extends Activity implements InteractionListener {
 
 
     private void switchFragment(Fragment fragment) {
-        if (mInstaceStateSaved) {
+        if (mInstanceStateSaved) {
             Log.e(TAG, "Cannot change fragment, onSavedInstanceState was called.");
             return;
         }
@@ -487,6 +474,20 @@ public class MainActivity extends Activity implements InteractionListener {
         return R.xml.transition_fade_out;
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        String action = intent.getAction();
+        Log.d(TAG, "onNewIntent called with action: " + action);
+
+        final boolean mirrorLinkLaunch = action.equals(ML_LAUNCH_INTENT);
+        mTerminateReceived = action.equals(ML_TERMINATE_INTENT);
+
+        if (mirrorLinkLaunch == false && mTerminateReceived == false) {
+            mPlayerModeOnline = false;
+        }
+    }
+
     // Unfortunately we need to resort to this little hack to override
     // Android's default TAB focus navigation for the launcher and the
     // Navigator
@@ -596,7 +597,7 @@ public class MainActivity extends Activity implements InteractionListener {
             final ProviderView provider = mManager.getNowPlayingProviderView();
             final MediaButtonData mediaButtonData
                     = new MediaButtonData(provider, buttonType, null, null, null);
-            mBus.post(new MediaButtonClickedEvent(mediaButtonData));
+            RsEventBus.post(new MediaButtonClickedEvent(mediaButtonData));
             return true;
         }
 

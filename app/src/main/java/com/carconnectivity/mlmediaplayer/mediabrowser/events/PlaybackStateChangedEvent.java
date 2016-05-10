@@ -31,12 +31,13 @@ package com.carconnectivity.mlmediaplayer.mediabrowser.events;
 
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderPlaybackState;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
+import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
 
 /**
  * Stores information about playback status.
  * Sticky event.
  */
-public final class PlaybackStateChangedEvent {
+public final class PlaybackStateChangedEvent implements RockScoutEvent {
     /** Immutable view of provider who originated the playback change. */
     public final ProviderView provider;
     /** Latest playback state */
@@ -59,7 +60,8 @@ public final class PlaybackStateChangedEvent {
     @Override
     public String toString() {
         return "PlaybackStateChangedEvent{" +
-                "state=" + state +
+                "provider.getUniqueName()=" + (provider != null ? provider.getUniqueName() : "null") +
+                ", state=" + state +
                 '}';
     }
 }

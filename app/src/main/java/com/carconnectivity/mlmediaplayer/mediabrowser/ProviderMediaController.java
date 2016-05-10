@@ -31,33 +31,22 @@ package com.carconnectivity.mlmediaplayer.mediabrowser;
 
 import android.content.ComponentName;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.media.MediaMetadata;
 import android.media.session.MediaController;
 import android.media.session.PlaybackState;
 import android.os.Bundle;
 import android.util.Log;
-import android.graphics.Bitmap;
-
-import com.carconnectivity.mlmediaplayer.commonapi.events.AudioStartBlockingEvent;
-import com.carconnectivity.mlmediaplayer.commonapi.events.AudioStopBlockingEvent;
-import com.carconnectivity.mlmediaplayer.commonapi.events.MirrorLinkSessionChangedEvent;
-import com.carconnectivity.mlmediaplayer.commonapi.events.PlaybackFailedEvent;
-import com.carconnectivity.mlmediaplayer.commonapi.events.PrepareForPlaybackEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.MediaButtonClickedEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.MediaExtrasChangedEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.MediaMetadataChangedEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.PlayMediaItemEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.PlaybackStateChangedEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.TerminateEvent;
+import com.carconnectivity.mlmediaplayer.commonapi.events.*;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.*;
 import com.carconnectivity.mlmediaplayer.mediabrowser.model.MediaButtonData;
 import com.carconnectivity.mlmediaplayer.mediabrowser.model.SlotReservation;
 import com.carconnectivity.mlmediaplayer.mediabrowser.model.TrackMetadata;
+import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import de.greenrobot.event.EventBus;
 
 /**
  * Responsible for receiving, translating and passing updates from the session
@@ -66,7 +55,6 @@ import de.greenrobot.event.EventBus;
 public final class ProviderMediaController extends MediaController.Callback {
     private static final String TAG = ProviderMediaController.class.getSimpleName();
 
-    private final EventBus mBus;
     private MediaController mMediaController;
     private ProviderMediaControllerHelper mHelper;
 
@@ -83,7 +71,6 @@ public final class ProviderMediaController extends MediaController.Callback {
 
     public ProviderMediaController(Provider owner) {
         mOwner = owner;
-        mBus = EventBus.getDefault();
         mCurrentMetadata = TrackMetadata.createEmpty();
         mCurrentPlaybackState = ProviderPlaybackState.createEmpty(null);
     }
@@ -145,15 +132,14 @@ public final class ProviderMediaController extends MediaController.Callback {
         onMetadataChanged(mMediaController.getMetadata());
         onPlaybackStateChanged(mMediaController.getPlaybackState());
         // Finally register to event bus
-        mBus.register(this);
+        RsEventBus.registerSticky(this);
     }
 
     public void stopListening() {
         if (mIsListening == false) return;
 
         Log.d(TAG, "Unregister callback for provider: " + mOwner.getName().getPackageName());
-        //TODO: BUG with no unregister (multiple action prev, next)
-        mBus.unregister(this);
+        RsEventBus.unregister(this);
         mMediaController.unregisterCallback(this);
         mMediaController = null;
         mIsListening = false;
@@ -166,7 +152,7 @@ public final class ProviderMediaController extends MediaController.Callback {
     @Override
     public void onExtrasChanged(Bundle extras) {
         Log.d(TAG, "Handle extras changed: " + extras.toString());
-        EventBus.getDefault().post(new MediaExtrasChangedEvent(extras));
+        RsEventBus.post(new MediaExtrasChangedEvent(extras));
         updateReservedSlots(extras, true);
     }
 
@@ -188,7 +174,7 @@ public final class ProviderMediaController extends MediaController.Callback {
         final ProviderView view = mOwner.getView();
         if (metadata == null) {
             Log.w(TAG, "Received null metadata from provider.");
-            mBus.post(new MediaMetadataChangedEvent(view, TrackMetadata.createEmpty()));
+            RsEventBus.post(new MediaMetadataChangedEvent(view, TrackMetadata.createEmpty()));
             return;
         }
 
@@ -209,7 +195,7 @@ public final class ProviderMediaController extends MediaController.Callback {
 
         final TrackMetadata newMetadata = new TrackMetadata(title, artist, duration, artUri, artBmp);
         if (newMetadata.sameAsOther(mCurrentMetadata) == false) {
-            mBus.post(new MediaMetadataChangedEvent(view, newMetadata));
+            RsEventBus.post(new MediaMetadataChangedEvent(view, newMetadata));
         }
         mCurrentMetadata = newMetadata;
     }
@@ -229,7 +215,7 @@ public final class ProviderMediaController extends MediaController.Callback {
         final long activeQueueItemId = playbackState.getActiveQueueItemId();
 
         if (state == PlaybackState.STATE_ERROR) {
-            mBus.post(new PlaybackFailedEvent());
+            RsEventBus.post(new PlaybackFailedEvent());
         }
 
         final MediaButtonData playbackButton = mHelper.resolvePlaybackButton(playbackState);
@@ -244,7 +230,7 @@ public final class ProviderMediaController extends MediaController.Callback {
         mCurrentPlaybackState = playback;
         final PlaybackStateChangedEvent event
                 = new PlaybackStateChangedEvent(mOwner.getView(), playback);
-        mBus.post(event);
+        RsEventBus.post(event);
     }
 
     @Override
@@ -274,7 +260,7 @@ public final class ProviderMediaController extends MediaController.Callback {
         if (isOwner(event.provider) == false) return;
 
         if (mMediaController != null && !event.mediaId.isEmpty()) {
-            mBus.post(new PrepareForPlaybackEvent());
+            RsEventBus.post(new PrepareForPlaybackEvent());
             mMediaController.getTransportControls().playFromMediaId(event.mediaId, event.bundle);
         }
     }
@@ -315,7 +301,7 @@ public final class ProviderMediaController extends MediaController.Callback {
                 break;
 
             case PLAY:
-                mBus.post(new PrepareForPlaybackEvent());
+                RsEventBus.post(new PrepareForPlaybackEvent());
                 controls.play();
                 break;
 

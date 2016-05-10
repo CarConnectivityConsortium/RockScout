@@ -31,12 +31,13 @@ package com.carconnectivity.mlmediaplayer.mediabrowser.events;
 
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
 import com.carconnectivity.mlmediaplayer.mediabrowser.model.TrackMetadata;
+import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
 
 /**
  * Stores information about media metadata.
  * Sticky event
  */
-public final class MediaMetadataChangedEvent {
+public final class MediaMetadataChangedEvent implements RockScoutEvent {
     public final ProviderView provider;
     public final TrackMetadata metadata;
 
@@ -48,5 +49,13 @@ public final class MediaMetadataChangedEvent {
     /* TODO: why this is not implementing equals or some other interface? */
     public boolean sameAsOther(MediaMetadataChangedEvent event) {
         return this.metadata.sameAsOther(event.metadata);
+    }
+
+    @Override
+    public String toString() {
+        return "MediaMetadataChangedEvent{" +
+                "provider.getUniqueName()=" + (provider != null ? provider.getUniqueName() : "null") +
+                ", metadata=" + metadata +
+                '}';
     }
 }

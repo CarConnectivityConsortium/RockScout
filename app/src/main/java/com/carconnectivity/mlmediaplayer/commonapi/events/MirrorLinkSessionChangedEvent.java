@@ -29,13 +29,22 @@
 
 package com.carconnectivity.mlmediaplayer.commonapi.events;
 
+import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
+
 /**
  * Created by belickim on 12/06/15.
  */
-public class MirrorLinkSessionChangedEvent {
+public class MirrorLinkSessionChangedEvent implements RockScoutEvent {
     public final boolean headUnitIsConnected;
 
     public MirrorLinkSessionChangedEvent(boolean isEstablished) {
         this.headUnitIsConnected = isEstablished;
+    }
+
+    @Override
+    public String toString() {
+        return "MirrorLinkSessionChangedEvent{" +
+                "headUnitIsConnected=" + headUnitIsConnected +
+                '}';
     }
 }

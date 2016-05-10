@@ -42,14 +42,13 @@ import android.os.Bundle;
 import android.service.media.MediaBrowserService;
 import android.util.Log;
 import android.util.TypedValue;
-
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.DisableEventsEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderDiscoveredEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderDiscoveryFinished;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderToDownloadDiscoveredEvent;
+import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
 
 import java.util.*;
-
-import de.greenrobot.event.EventBus;
 
 /**
  * Created by belickim on 16/04/15.
@@ -62,14 +61,12 @@ public final class ProvidersManager {
 
     private final Context mContext;
     private final PackageManager mManager;
-    private final EventBus mBus;
 
     private final HashMap<ComponentName, ProviderRecord> mRecords;
     private final HashMap<ComponentName, Boolean> mConnectedProviders;
 
     private HashMap<ComponentName, ProviderDiscoveryData> mProvidersTestStatus;
     private Timer mDiscoveryCompletedCheckTimer;
-    private boolean mPlayerModeOnline;
 
     public Context getContext() {
         return mContext;
@@ -80,14 +77,12 @@ public final class ProvidersManager {
         mManager = manager;
         mRecords = new HashMap<>();
         mConnectedProviders = new HashMap<>();
-        mBus = EventBus.getDefault();
-        mBus.register(this);
-        mPlayerModeOnline = false;
+        RsEventBus.register(this);
     }
 
     @SuppressWarnings("unused")
     public void onEvent(DisableEventsEvent event) {
-        mBus.unregister(this);
+        RsEventBus.unregister(this);
     }
 
     @SuppressWarnings("unused")
@@ -115,7 +110,7 @@ public final class ProvidersManager {
         }
         final ProviderDiscoveryFinished finishedEvent
                 = new ProviderDiscoveryFinished(mProvidersTestStatus.size());
-        EventBus.getDefault().postSticky(finishedEvent);
+        RsEventBus.postSticky(finishedEvent);
         mProvidersTestStatus = null;
 
         if (mDiscoveryCompletedCheckTimer != null) {
@@ -134,13 +129,12 @@ public final class ProvidersManager {
         try {
             appInfo = mManager.getApplicationInfo(packageInfo.serviceInfo.packageName, PackageManager.GET_META_DATA);
         } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Something went wrong: ", e);
             return false;
         }
-        if(appInfo.metaData != null) {
+        if (appInfo.metaData != null) {
             return appInfo.metaData.getBoolean(ML_OFFLINE_PLAYBACK, false);
-        }
-        else{
+        } else {
             return false;
         }
     }
@@ -289,6 +283,7 @@ public final class ProvidersManager {
     }
 
     private static final String CAR_NOTIFICATION_SMALL_ICON = "com.google.android.gms.car.notification.SmallIcon";
+
     private int resolveAndroidAutoNotificationIcon(ApplicationInfo appInfo) {
         if (appInfo == null) return 0;
         if (appInfo.metaData == null) return 0;
@@ -316,22 +311,29 @@ public final class ProvidersManager {
     }
 
     public void changeModePlayer(boolean mPlayerModeOnline) {
-        this.mPlayerModeOnline = mPlayerModeOnline;
-        for (HashMap.Entry<ComponentName, Boolean> entry: mConnectedProviders.entrySet()
-             ) {
+        int count = 0;
+        for (HashMap.Entry<ComponentName, Boolean> entry : mConnectedProviders.entrySet()
+                ) {
             Provider provider = getProvider(entry.getKey());
             boolean isPlaying = entry.getValue();
 
             ProviderView view = getProviderView(entry.getKey());
-            if(!mPlayerModeOnline && provider.canPlayOffline() ||
+            if (!mPlayerModeOnline && provider.canPlayOffline() ||
                     mPlayerModeOnline) {
-                mBus.post(new ProviderDiscoveredEvent(view, isPlaying));
+                count++;
+                RsEventBus.post(new ProviderDiscoveredEvent(view, isPlaying));
+            } else {
+                ProviderToDownloadView providerToDownloadView = new ProviderToDownloadView(view.getDisplayInfo().label, view.getDisplayInfo().icon);
+                RsEventBus.post(new ProviderToDownloadDiscoveredEvent(providerToDownloadView));
             }
 
             entry.setValue(false);
         }
 
-
+        //download compatible apps from server
+        if (count <= 0) {
+            new ProviderToDownloadParser().download();
+        }
     }
 
     private class ProviderRecord {

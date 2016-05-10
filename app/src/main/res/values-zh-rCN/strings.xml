@@ -58,6 +58,6 @@
   <string name="press_play_to_start">按播放键</string>
   <string name="launcher">回手机主界面</string>
   <string name="top_level">最上层</string>
-  <string name="select_source_hint"></string>
+  <string name="select_source_hint"> </string>
   <string name="splash_subtitle">powered by MirrorLink</string>
 </resources>

@@ -32,11 +32,9 @@ package com.carconnectivity.mlmediaplayer.mediabrowser;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.PackageManager;
-
 import android.util.Log;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.*;
-
-import de.greenrobot.event.EventBus;
+import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
 
 /**
  * Created by belickim on 20/04/15.
@@ -44,7 +42,6 @@ import de.greenrobot.event.EventBus;
 public class SessionManager {
     private static final String TAG = SessionManager.class.getSimpleName();
     private final ProvidersManager mManger;
-    private final EventBus mBus;
 
     /**
      * the provider that is now browsed
@@ -59,11 +56,11 @@ public class SessionManager {
     public SessionManager(Context context, PackageManager packageManager) {
         mManger = new ProvidersManager(context, packageManager);
 
-        mBus = EventBus.getDefault();
-        mBus.register(this);
+        RsEventBus.register(this);
     }
 
     public void findProviders() {
+        Log.d(TAG,"find providers");
         mManger.findProviders();
     }
 
@@ -82,6 +79,7 @@ public class SessionManager {
     }
 
     public void refreshProviders() {
+        Log.d(TAG,"refresh providers");
         mManger.refreshProviders();
     }
 
@@ -99,7 +97,7 @@ public class SessionManager {
         if(event.provider != null) return;
         if(!event.cleanPlayingProvider) return;
 
-        mBus.postSticky(new NowPlayingProviderChangedEvent(null));
+        RsEventBus.postSticky(new NowPlayingProviderChangedEvent(null));
         mPlayingProvider = null;
     }
 
@@ -113,7 +111,7 @@ public class SessionManager {
             /* if already connected manually browse root directory: */
             final ComponentName currentName = mBrowsedProvider.getName();
             final BrowseDirectoryEvent browseEvent = new BrowseDirectoryEvent(currentName, null);
-            mBus.post(browseEvent);
+            RsEventBus.post(browseEvent);
         }
     }
 
@@ -132,15 +130,7 @@ public class SessionManager {
 
     @SuppressWarnings("unused")
     public void onEvent(DisableEventsEvent event){
-        mBus.unregister(this);
-    }
-
-    @SuppressWarnings("unused")
-    public void onEvent(PlaybackStateChangedEvent event) {
-        final Provider provider = mManger.getProvider(event.provider.getUniqueName());
-        changePlayingProviderIfPlaying(provider);
-        Log.d(TAG, "PlaybackStateChangedEvent");
-
+        RsEventBus.unregister(this);
     }
 
     private void changePlayingProvider(Provider maybePlayingProvider) {
@@ -152,7 +142,7 @@ public class SessionManager {
 
         if (mPlayingProvider != null && mPlayingProvider.isPlaying()) mPlayingProvider.forcePause();
         mPlayingProvider = maybePlayingProvider;
-        mBus.postSticky(new NowPlayingProviderChangedEvent(mPlayingProvider.getView()));
+        RsEventBus.postSticky(new NowPlayingProviderChangedEvent(mPlayingProvider.getView()));
     }
 
     private void changePlayingProviderIfPlaying(Provider maybePlayingProvider) {
@@ -164,28 +154,27 @@ public class SessionManager {
     }
 
     public void changeBrowsedProvider(ComponentName providerName, boolean showPlayer) {
-        disconnectBrowsedProvider();
+        disconnectBrowsedProvider(false);
 
         mBrowsedProvider = mManger.getProvider(providerName);
-        mBus.postSticky(new CurrentlyBrowsedProviderChanged(mBrowsedProvider.getView()));
+        RsEventBus.postSticky(new CurrentlyBrowsedProviderChanged(mBrowsedProvider.getView()));
         if (!mBrowsedProvider.isConnected()) {
             mBrowsedProvider.connect(showPlayer);
         }
 
-        if (mPlayingProvider == null || !mPlayingProvider.isPlayingOrPreparing()) {
+        if (mPlayingProvider == null) {
             Log.d(TAG,"changeBrowsedProvider");
             changePlayingProvider(mBrowsedProvider);
         }
     }
 
-    private void disconnectBrowsedProvider() {
+    private void disconnectBrowsedProvider(boolean unconditionalDisconnect) {
         if (mBrowsedProvider == null) return;
         if (!mBrowsedProvider.isConnected()) return;
 
-        if (mBrowsedProvider.isPlaying()) {
+        // don't disconnect when browserProvider is equal playingProvider
+        if (unconditionalDisconnect || mPlayingProvider != null && !mBrowsedProvider.isNameEqual(mPlayingProvider.getName())) {
             Log.d(TAG, "disconnectBrowsedProvider");
-            changePlayingProviderIfPlaying(mBrowsedProvider);
-        } else {
             mBrowsedProvider.disconnect(false);
         }
     }
@@ -194,11 +183,12 @@ public class SessionManager {
         if (mPlayingProvider == null) return;
         if (!mPlayingProvider.isConnected()) return;
 
+        Log.d(TAG, "disconnectPlayingProvider");
         mPlayingProvider.disconnect(false);
     }
 
     public void disconnect() {
-        disconnectBrowsedProvider();
+        disconnectBrowsedProvider(true);
         disconnectPlayingProvider();
     }
 
@@ -234,7 +224,7 @@ public class SessionManager {
         if(mBrowsedProvider != null) {
             if(mPlayingProvider.getName().equals(mBrowsedProvider.getName())) return;
             if(!mPlayerModeOnline && !mBrowsedProvider.canPlayOffline()) {
-                mBus.post(new ProviderBrowseCancelEvent());
+                RsEventBus.post(new ProviderBrowseCancelEvent());
                 mBrowsedProvider = null;
             }
         }

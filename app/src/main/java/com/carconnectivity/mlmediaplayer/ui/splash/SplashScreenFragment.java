@@ -38,16 +38,16 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.carconnectivity.mlmediaplayer.R;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.AnimateAlphaEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderConnectedEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderDiscoveryFinished;
 import com.carconnectivity.mlmediaplayer.ui.BackButtonHandler;
 import com.carconnectivity.mlmediaplayer.ui.InteractionListener;
+import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
 
 import java.lang.ref.WeakReference;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import de.greenrobot.event.EventBus;
 
 public class SplashScreenFragment extends Fragment implements BackButtonHandler {
     public static final int TIMER_PERIOD = 5;
@@ -71,7 +71,7 @@ public class SplashScreenFragment extends Fragment implements BackButtonHandler 
         Bundle args = new Bundle();
         fragment.setArguments(args);
 
-        EventBus.getDefault().register(fragment);
+        RsEventBus.register(fragment);
 
         return fragment;
     }
@@ -86,9 +86,22 @@ public class SplashScreenFragment extends Fragment implements BackButtonHandler 
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        mSplashShown = true;
+        checkAndHide();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mSplashShown = false;
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
-        EventBus.getDefault().unregister(this);
+        RsEventBus.unregister(this);
     }
 
     @Override
@@ -98,19 +111,21 @@ public class SplashScreenFragment extends Fragment implements BackButtonHandler 
 
     private void checkAndHide() {
         if (mDiscoveryOver && mTimerFinished && mListener != null
-                && mLaunchedAlreadyPlaying == false && mSplashShown) {
-            mListener.get().showLauncher();
+                 && mSplashShown) {
+            if (mLaunchedAlreadyPlaying) {
+                mListener.get().showMediaPlayer();
+            } else {
+                mListener.get().showLauncher();
+            }
+
             mSplashShown = false;
         }
     }
 
     @SuppressWarnings("unused")
     public void onEvent(ProviderConnectedEvent event) {
-        final InteractionListener listener = mListener.get();
-        if (event.showPlayer && listener != null) {
-            listener.showMediaPlayer();
+        if (event.showPlayer) {
             mLaunchedAlreadyPlaying = true;
-            mSplashShown = false;
         }
     }
 
@@ -139,7 +154,7 @@ public class SplashScreenFragment extends Fragment implements BackButtonHandler 
             public void run() {
                 mSplashAlpha += ALPHA_STEP; /* TODO: nonlinear easing would look much better */
                 if (mSplashAlpha < 1.0f) {
-                    EventBus.getDefault().post(new AnimateAlphaEvent(mSplashAlpha));
+                    RsEventBus.post(new AnimateAlphaEvent(mSplashAlpha));
                 } else {
                     mTimerFinished = true;
                     mTimer.cancel();
@@ -167,13 +182,5 @@ public class SplashScreenFragment extends Fragment implements BackButtonHandler 
     public void onDetach() {
         super.onDetach();
         mListener = null;
-    }
-
-    private class AnimateAlphaEvent {
-        public final float currentAlphaLevel;
-
-        public AnimateAlphaEvent(float alphaLevel) {
-            this.currentAlphaLevel = alphaLevel;
-        }
     }
 }

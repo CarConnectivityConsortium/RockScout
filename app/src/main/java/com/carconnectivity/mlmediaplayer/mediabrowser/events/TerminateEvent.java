@@ -29,8 +29,10 @@
 
 package com.carconnectivity.mlmediaplayer.mediabrowser.events;
 
+import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
+
 /**
  * Created by belickim on 06/07/15.
  */
-public class TerminateEvent {
+public class TerminateEvent implements RockScoutEvent {
 }

@@ -29,6 +29,7 @@
 
 package com.carconnectivity.mlmediaplayer.utils.pagination;
 
+import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderToDownloadView;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
 
 import java.util.ArrayList;
@@ -112,6 +113,11 @@ public class PaginatedCollection<T> {
             if (owned instanceof ProviderView && item instanceof ProviderView) {
                 ProviderView ownedView = (ProviderView) owned;
                 ProviderView itemView = (ProviderView) item;
+                if (itemView.hasSameNameAs(ownedView))
+                    return true;
+            } else if (owned instanceof ProviderToDownloadView && item instanceof ProviderToDownloadView) {
+                ProviderToDownloadView ownedView = (ProviderToDownloadView) owned;
+                ProviderToDownloadView itemView = (ProviderToDownloadView) item;
                 if (itemView.hasSameNameAs(ownedView))
                     return true;
             } else if (owned.equals(item)) {

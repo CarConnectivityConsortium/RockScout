@@ -57,7 +57,7 @@
   <string name="no_auto_compatible_app">Aucune application multimédia compatible n\'est installée sur votre mobile. Pour utiliser %s, veuillez installer une application multimédia compatible \'Android Media Browse Service\'.</string>
   <string name="press_play_to_start">Appuyer sur Play pour démarrer la lecture</string>
   <string name="launcher">Lanceur</string>
-  <string name="top_level">Acceuil</string>
+  <string name="top_level">Accueil</string>
   <string name="select_source_hint">Choisissez une source:</string>
   <string name="splash_subtitle">powered by MirrorLink</string>
 </resources>

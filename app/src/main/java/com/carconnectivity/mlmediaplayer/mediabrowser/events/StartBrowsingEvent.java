@@ -30,14 +30,22 @@
 package com.carconnectivity.mlmediaplayer.mediabrowser.events;
 
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
+import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
 
 /**
  * Created by belickim on 20/04/15.
  */
-public final class StartBrowsingEvent {
+public final class StartBrowsingEvent implements RockScoutEvent {
     public final ProviderView provider;
 
     public StartBrowsingEvent(ProviderView providerView) {
         this.provider = providerView;
+    }
+
+    @Override
+    public String toString() {
+        return "StartBrowsingEvent{" +
+                "provider.getUniqueName()=" + (provider != null ? provider.getUniqueName() : "null") +
+                '}';
     }
 }

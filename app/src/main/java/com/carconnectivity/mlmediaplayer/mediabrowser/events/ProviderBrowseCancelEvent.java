@@ -29,5 +29,7 @@
 
 package com.carconnectivity.mlmediaplayer.mediabrowser.events;
 
-public final class ProviderBrowseCancelEvent {
+import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
+
+public final class ProviderBrowseCancelEvent implements RockScoutEvent {
 }

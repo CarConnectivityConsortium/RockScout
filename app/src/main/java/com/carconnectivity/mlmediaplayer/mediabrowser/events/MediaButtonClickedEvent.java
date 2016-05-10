@@ -30,11 +30,12 @@
 package com.carconnectivity.mlmediaplayer.mediabrowser.events;
 
 import com.carconnectivity.mlmediaplayer.mediabrowser.model.MediaButtonData;
+import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
 
 /**
  * Emitted when media button has been clicked in UI.
  */
-public final class MediaButtonClickedEvent {
+public final class MediaButtonClickedEvent implements RockScoutEvent {
     public final MediaButtonData mediaButtonData;
 
     public MediaButtonClickedEvent(MediaButtonData mediaButtonData) {

@@ -32,6 +32,7 @@ package com.carconnectivity.mlmediaplayer.ui.player;
 import android.app.Fragment;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.media.session.PlaybackState;
 import android.os.Bundle;
@@ -44,24 +45,16 @@ import android.view.animation.RotateAnimation;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.graphics.Bitmap;
-
 import com.carconnectivity.mlmediaplayer.R;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderPlaybackState;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.MediaButtonClickedEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.MediaExtrasChangedEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.MediaMetadataChangedEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.NowPlayingProviderChangedEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.PlaybackStateChangedEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProgressUpdateEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderConnectedEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderConnectErrorEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.*;
 import com.carconnectivity.mlmediaplayer.mediabrowser.model.MediaButtonData;
 import com.carconnectivity.mlmediaplayer.mediabrowser.model.TrackMetadata;
 import com.carconnectivity.mlmediaplayer.ui.BackButtonHandler;
 import com.carconnectivity.mlmediaplayer.ui.MainActivity;
 import com.carconnectivity.mlmediaplayer.utils.PlaybackUtils;
+import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
 import com.carconnectivity.mlmediaplayer.utils.UiUtilities;
 import com.squareup.picasso.Picasso;
 
@@ -69,8 +62,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-
-import de.greenrobot.event.EventBus;
 
 /**
  * Fragment for handling music playback controls
@@ -80,8 +71,6 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
 
     private static final int WAIT_INDICATOR_ANIMATION_TIME_SPIN = 1000;
     private static final int WAIT_INDICATOR_ANIMATION_TIME_FADE = 200;
-
-    private EventBus mBus = EventBus.getDefault();
 
     private TextView mProviderName;
     private ImageView mAlbumArt;
@@ -132,7 +121,6 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
         mNavigatorButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((MainActivity) getActivity()).openLauncher(null);
                 ((MainActivity) getActivity()).openNavigator(null);
             }
         });
@@ -257,7 +245,11 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
         if (mSongTitle == null) return;
 
         if (metadata == null || metadata.isTitleEmpty()) {
-            title = getResources().getString(R.string.press_play_to_start);
+            if(mCurrentPlaybackState != null && !mCurrentPlaybackState.mediaButtons.isEmpty()) {
+                title = getResources().getString(R.string.press_play_to_start);
+            } else {
+                title = getResources().getString(R.string.select_track_to_start);
+            }
         } else {
             title = metadata.title;
             artist = metadata.artist;
@@ -583,7 +575,7 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBus.register(this);
+        RsEventBus.register(this);
     }
 
     @Override
@@ -591,7 +583,7 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
         super.onDestroy();
         mRootView = null;
         cancelProgressTimer();
-        mBus.unregister(this);
+        RsEventBus.unregister(this);
     }
 
     @Override

@@ -137,7 +137,7 @@ public class NavigatorListAdapter extends BaseAdapter implements PaginatedAdapte
         if (mOwner != null) {
             mOwner.setSelection(0);
         }
-        if (mItems.goToPage(pageNumber)) {
+        if (mItems!=null && mItems.goToPage(pageNumber)) {
             notifyDataSetChanged();
         }
     }

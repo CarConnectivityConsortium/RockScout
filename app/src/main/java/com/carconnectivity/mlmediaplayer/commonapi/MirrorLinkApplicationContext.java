@@ -32,28 +32,19 @@ package com.carconnectivity.mlmediaplayer.commonapi;
 import android.app.Application;
 import android.os.RemoteException;
 import android.util.Log;
-
 import com.carconnectivity.mlmediaplayer.commonapi.events.ConnectionMirrorLinkServiceEvent;
-import com.mirrorlink.android.commonapi.ICommonAPIService;
-import com.mirrorlink.android.commonapi.IConnectionListener;
-import com.mirrorlink.android.commonapi.IConnectionManager;
-import com.mirrorlink.android.commonapi.IContextListener;
-import com.mirrorlink.android.commonapi.IContextManager;
-import com.mirrorlink.android.commonapi.IDeviceStatusListener;
-import com.mirrorlink.android.commonapi.IDeviceStatusManager;
+import com.carconnectivity.mlmediaplayer.utils.LogUtils;
+import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
+import com.mirrorlink.android.commonapi.*;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import de.greenrobot.event.EventBus;
 
 public final class MirrorLinkApplicationContext extends Application {
     public static final String TAG = MirrorLinkApplicationContext.class.getSimpleName();
 
     private static volatile ICommonAPIService mService = null;
     private MlServerApiServiceConnection mlsConnection = null;
-
-    private EventBus mBus = EventBus.getDefault();
 
     private IDeviceStatusManager mDeviceStatusManager;
     private IConnectionManager mConnectionManager = null;
@@ -70,6 +61,7 @@ public final class MirrorLinkApplicationContext extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        LogUtils.setupLogcatLogs(getApplicationInfo());
     }
 
     public ICommonAPIService getService() {
@@ -92,11 +84,11 @@ public final class MirrorLinkApplicationContext extends Application {
         @Override
         public void connected(ICommonAPIService service) {
             mService = service;
-            mBus.postSticky(new ConnectionMirrorLinkServiceEvent(true));
+            RsEventBus.postSticky(new ConnectionMirrorLinkServiceEvent(true));
             try {
                 mService.applicationStarted(getPackageName(), 1);
             } catch (RemoteException e) {
-                e.printStackTrace();
+                Log.e(TAG, "Something went wrong: ", e);
             }
         }
     };
@@ -105,7 +97,7 @@ public final class MirrorLinkApplicationContext extends Application {
         @Override
         public void disconnected() {
             mService = null;
-            mBus.postSticky(new ConnectionMirrorLinkServiceEvent(false));
+            RsEventBus.postSticky(new ConnectionMirrorLinkServiceEvent(false));
 
             mConnectionManager = null;
             mContextManager = null;
@@ -142,7 +134,7 @@ public final class MirrorLinkApplicationContext extends Application {
                     mDeviceStatusManager = null;
                 }
             } catch (RemoteException e) {
-                e.printStackTrace();
+                Log.e(TAG, "Something went wrong: ", e);
             }
         }
     }
@@ -158,7 +150,7 @@ public final class MirrorLinkApplicationContext extends Application {
             try {
                 mDeviceStatusManager = mService.getDeviceStatusManager(getPackageName(), listener);
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e(TAG, "Something went wrong: ", e);
             }
         }
         mDeviceStatusManagerReferenceList.add(obj);
@@ -181,7 +173,7 @@ public final class MirrorLinkApplicationContext extends Application {
                     mConnectionManager = null;
                 }
             } catch (RemoteException e) {
-                e.printStackTrace();
+                Log.e(TAG, "Something went wrong: ", e);
             }
         }
     }
@@ -198,7 +190,7 @@ public final class MirrorLinkApplicationContext extends Application {
                 // TODO : check if mConnection or listener
                 mConnectionManager = mService.getConnectionManager(getPackageName(), listener);
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e(TAG, "Something went wrong: ", e);
             }
         }
         mConnectionManagerReferenceList.add(obj);
@@ -221,7 +213,7 @@ public final class MirrorLinkApplicationContext extends Application {
                     mContextManager = null;
                 }
             } catch (RemoteException e) {
-                e.printStackTrace();
+                Log.e(TAG, "Something went wrong: ", e);
             }
         }
     }
@@ -237,7 +229,7 @@ public final class MirrorLinkApplicationContext extends Application {
             try {
                 mContextManager = mService.getContextManager(getPackageName(), listener);
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e(TAG, "Something went wrong: ", e);
             }
         }
         mContextManagerReferenceList.add(obj);

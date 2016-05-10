@@ -29,8 +29,10 @@
 
 package com.carconnectivity.mlmediaplayer.commonapi.events;
 
+import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
+
 /**
  * Created by belickim on 24/08/15.
  */
-public class PlaybackFailedEvent {
+public class PlaybackFailedEvent implements RockScoutEvent {
 }
