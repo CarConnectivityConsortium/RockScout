@@ -186,7 +186,7 @@ public class LauncherProviderToDownloadGridAdapter extends BaseAdapter implement
             Picasso.with(mParentFragment.getActivity()).load(R.drawable.ic_shopping_cart).into(viewHolder.appIconAdditional);
         } else {
             viewHolder.appIcon.setImageDrawable(info.iconDraw);
-            Picasso.with(mParentFragment.getActivity()).load(R.drawable.ic_front_car).into(viewHolder.appIconAdditional);
+            Picasso.with(mParentFragment.getActivity()).load(R.drawable.ic_usb_plug).into(viewHolder.appIconAdditional);
             setInactiveStyle(viewHolder);
         }
 

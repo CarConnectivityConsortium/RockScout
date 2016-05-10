@@ -42,18 +42,24 @@ import java.util.List;
  * Created by belickim on 20/04/15.
  */
 public final class ProviderBrowseSuccessfulEvent implements RockScoutEvent {
-    /** Currently browsed provider */
+    /**
+     * Currently browsed provider
+     */
     public final ProviderView provider;
 
-    /** Parent id of the successfully browsed directory, cannot be null. */
+    /**
+     * Parent id of the successfully browsed directory, cannot be null.
+     */
     public final String parentId;
 
-    /** List of items in the browsed directory, cannot be null. */
+    /**
+     * List of items in the browsed directory, cannot be null.
+     */
     public final List<MediaItemView> items;
 
     public ProviderBrowseSuccessfulEvent
-            ( ProviderView provider, String parentId
-            , Collection<MediaItemView> items
+            (ProviderView provider, String parentId
+                    , Collection<MediaItemView> items
             ) {
         if (provider == null) {
             throw new IllegalArgumentException("Provider cannot be null.");
@@ -72,9 +78,15 @@ public final class ProviderBrowseSuccessfulEvent implements RockScoutEvent {
 
     @Override
     public String toString() {
-        return "ProviderBrowseSuccessfulEvent{" +
-                "parentId='" + parentId + '\'' +
-                ", items=" + items.toString() +
-                '}';
+        String text =
+                "ProviderBrowseSuccessfulEvent{" +
+                        "parentId='" + parentId + ", items=";
+        for (MediaItemView view : items
+                ) {
+            text += ", displayLabel=" + view.getDisplayLabel();
+        }
+        text += '}';
+        return text;
+
     }
 }

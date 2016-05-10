@@ -31,6 +31,7 @@ package com.carconnectivity.mlmediaplayer.ui.navigator;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -111,8 +112,14 @@ public class NavigatorListAdapter extends BaseAdapter implements PaginatedAdapte
         final MediaItemView view = (MediaItemView) getItem(position);
         viewHolder.appName.setText(view.getDisplayLabel());
         viewHolder.appIcon.setImageDrawable(null);
+
         Uri displayIconUri = view.getDisplayIconUri();
-        if (displayIconUri != null) {
+        Bitmap displayIconBitmap = view.getDisplayIconBitmap();
+
+        //set icon from bitmap or uri
+        if(displayIconBitmap != null) {
+            viewHolder.appIcon.setImageBitmap(displayIconBitmap);
+        } else if(displayIconUri != null) {
             final Context context = mParentFragment.getActivity().getApplicationContext();
             final String rawUri = displayIconUri.toString();
             Picasso.with(context).load(rawUri).into(viewHolder.appIcon);

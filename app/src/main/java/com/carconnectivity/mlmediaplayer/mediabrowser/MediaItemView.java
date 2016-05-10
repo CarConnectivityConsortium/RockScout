@@ -29,6 +29,7 @@
 
 package com.carconnectivity.mlmediaplayer.mediabrowser;
 
+import android.graphics.Bitmap;
 import android.media.browse.MediaBrowser;
 import android.net.Uri;
 import android.os.Bundle;
@@ -48,6 +49,7 @@ public class MediaItemView {
     public String getId() { return mItem.getMediaId(); }
     public boolean isBrowsable() { return mItem.isBrowsable(); }
     public boolean isPlayable() { return mItem.isPlayable(); }
+    public Bitmap getDisplayIconBitmap() { return mItem.getDescription().getIconBitmap(); }
     public Uri getDisplayIconUri() { return mItem.getDescription().getIconUri(); }
     public Bundle getExtras() { return mItem.getDescription().getExtras(); }
 
