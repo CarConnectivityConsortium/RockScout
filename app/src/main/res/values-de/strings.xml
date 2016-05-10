@@ -54,6 +54,7 @@
     <string name="play">Play</string>
     <string name="playlist">Playlist</string>
     <string name="press_play_to_start">Play zum Starten drücken</string>
+    <string name="select_track_to_start">Zum Starten Titel auswählen</string>
     <string name="previous">Zurück</string>
     <string name="providers_list">Liste von Medieninhalten</string>
     <string name="top_level">Hauptmenu</string>

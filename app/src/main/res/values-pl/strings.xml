@@ -56,6 +56,7 @@
     <string name="mirrorlink_dialog_message">Twój telefon nie obsługuje technologii MirrorLink.\n\nMożesz używać RockScout na swoim telefonie, ale połączenie z Twoim samochodem za pomocą technologii MirrorLink jest niemożliwe.</string>
     <string name="no_auto_compatible_app">Nie posiadasz aplikacji kompatybilnych z \'Android Media Browse Service\' na swoim telefonie.\n\nAby używać RockScout, zainstaluj jedną z obsługiwanych aplikacji multimedialnych.</string>
     <string name="press_play_to_start">Naciśnij "odtwarzaj" aby rozpocząć.</string>
+    <string name="select_track_to_start">Wybierz utwór aby rozpocząć</string>
     <string name="launcher">Launcher</string>
     <string name="top_level">Poziom początkowy</string>
     <string name="select_source_hint">Wybierz źródło muzyki:</string>

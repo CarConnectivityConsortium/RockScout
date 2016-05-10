@@ -58,7 +58,7 @@
     <string name="mirrorlink_dialog_message">Your phone does not support MirrorLink technology.\n\nYou can use %s on your phone but not on the head unit of your car.</string>
     <string name="no_auto_compatible_app">You have no MediaBrowser compatible media application on your phone.\n\nTo use RockScout, please install one of the supported media applications.</string>
     <string name="press_play_to_start">Press play to start</string>
-    <string name="select_track_to_start" translatable="false">Select a track to start</string>
+    <string name="select_track_to_start">Select a track to start</string>
     <string name="launcher">Launcher</string>
     <string name="top_level">Top Level</string>
     <!-- not sent: -->

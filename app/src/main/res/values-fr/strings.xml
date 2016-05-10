@@ -56,6 +56,7 @@
   <string name="mirrorlink_dialog_message">Votre mobile n\'est pas compatible avec la technologie MirrorLink. Vous pouvez utiliser %s avec votre mobile mais vous ne pourrez pas le connecter à l\'autoradio de votre voiture</string>
   <string name="no_auto_compatible_app">Aucune application multimédia compatible n\'est installée sur votre mobile. Pour utiliser %s, veuillez installer une application multimédia compatible \'Android Media Browse Service\'.</string>
   <string name="press_play_to_start">Appuyer sur Play pour démarrer la lecture</string>
+  <string name="select_track_to_start">Choisissez une chanson pour commencer.</string>
   <string name="launcher">Lanceur</string>
   <string name="top_level">Accueil</string>
   <string name="select_source_hint">Choisissez une source:</string>

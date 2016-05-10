@@ -56,6 +56,7 @@
   <string name="mirrorlink_dialog_message">あなたのスマートフォンはMirrorLinkをサポートしていません。スマートフォンでRockScoutはご利用できますが、車載機ではご利用できません。</string>
   <string name="no_auto_compatible_app">\'Android Media Browse Service\'のメディアアプリはありません。RockScoutのご利用には、アプリをインストールしてください。</string>
   <string name="press_play_to_start">再生ボタンを押してください。</string>
+  <string name="select_track_to_start">トラックを選択してください</string>
   <string name="launcher">ローンチャー</string>
   <string name="top_level">トップレベル</string>
   <string name="select_source_hint">再生のソースを選択してください。</string>

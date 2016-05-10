@@ -56,8 +56,9 @@
   <string name="mirrorlink_dialog_message">A MirrorLink teknológia ezen a telefonon nem támogatott.\n\nA RockScout a telefonon használható de az autó fejkészüléken nem.</string>
   <string name="no_auto_compatible_app">A telefonján nincs \'Android Media Browse Service\' kompatibilis média lejátszó.\n\n Kérem telepítsen egy támogatott média lejátszót, hogy a RockScout használható legyen.</string>
   <string name="press_play_to_start">Nyomja meg a lejátszás gombot </string>
+  <string name="select_track_to_start">Válaszd ki a lejátszani kívánt sávot</string>
   <string name="launcher">Indító</string>
   <string name="top_level">Felső szint</string>
   <string name="splash_subtitle">powered by MirrorLink</string>
-  <string name="select_source_hint"> </string>
+  <string name="select_source_hint">Válaszd ki a lejátszani kívánt eszközt</string>
 </resources>

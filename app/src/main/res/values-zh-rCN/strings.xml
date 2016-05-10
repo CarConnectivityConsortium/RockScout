@@ -56,8 +56,9 @@
   <string name="mirrorlink_dialog_message">您的手机不支持Mirrorlink。您可以在手机上继续使用本应用，但是无法在汽车车机上使用。</string>
   <string name="no_auto_compatible_app">未安装支持\'Android Media Browse Service\'的应用。请按照应用后再启动本应用。</string>
   <string name="press_play_to_start">按播放键</string>
+  <string name="select_track_to_start">选择开始曲目</string>
   <string name="launcher">回手机主界面</string>
   <string name="top_level">最上层</string>
-  <string name="select_source_hint"> </string>
+  <string name="select_source_hint">选择播放音源</string>
   <string name="splash_subtitle">powered by MirrorLink</string>
 </resources>

@@ -56,6 +56,7 @@
   <string name="mirrorlink_dialog_message">휴대전화 단말기가 미러링크 기능을 지원하지 않습니다.  단말기에서 카 뮤직 컨트롤러 (RockScout)는 사용하실 수 있으나, 자동차 헤드유닛에 있는 기능은 사용하실 수 없습니다.</string>
   <string name="no_auto_compatible_app">휴대전화 단말기에 안드로이드오토(\'Android Media Browse Service\')용 미디어 어플리케이션이 존재하지 않습니다.  카 뮤직 컨트롤러 (RockScout)를 사용하기 위해서, 호환되는 미디어 어플리케이션을 설치해 주시기 바랍니다.</string>
   <string name="press_play_to_start">시작을 위해 플레이(Play)를 누르세요.</string>
+  <string name="select_track_to_start">재생할 트랙을 선택하세요</string>
   <string name="launcher">론처</string>
   <string name="top_level">최상위 레벨</string>
   <string name="select_source_hint">플레이할 소스를 선택해주세요:</string>
