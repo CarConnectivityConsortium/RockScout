@@ -53,14 +53,13 @@ import com.carconnectivity.mlmediaplayer.mediabrowser.MediaItemView;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewActive;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.BrowseDirectoryEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.CurrentlyBrowsedProviderChanged;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.DisconnectFromCurrentProviderEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.DisconnectFromProviderEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.NowPlayingProviderChangedEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.PlayMediaItemEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderBrowseCancelEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderBrowseErrorEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderBrowseSuccessfulEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderConnectErrorEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderConnectedEvent;
 import com.carconnectivity.mlmediaplayer.ui.BackButtonHandler;
 import com.carconnectivity.mlmediaplayer.ui.MainActivity;
 import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
@@ -79,11 +78,14 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
     private static final String BREAD_CRUMBS_KEY
             = NavigatorFragment.class.getSimpleName() + ".bread_crumbs";
 
-    /** Think of this fragment as of simple state machine, each visual change
-     * should be tied to changing the state. */
+    /**
+     * Think of this fragment as of simple state machine, each visual change
+     * should be tied to changing the state.
+     */
     private enum State {
         CREATED, LOADING, LOADED, FAILED
     }
+
     private State mState;
 
     private ProviderViewActive mNowPlayingProvider;
@@ -122,13 +124,11 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
 
     @SuppressWarnings("unused")
     public void onEvent(BrowseDirectoryEvent event) {
-        Log.d(TAG, "handle BrowseDirectoryEvent");
         changeState(State.LOADING);
     }
 
     @SuppressWarnings("unused")
-    public void onEvent(DisconnectFromCurrentProviderEvent event) {
-        Log.d(TAG, "handle DisconnectFromCurrentProviderEvent");
+    public void onEvent(DisconnectFromProviderEvent event) {
         clearCrumbs();
     }
 
@@ -144,12 +144,15 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
 
     @SuppressWarnings("unused")
     public void onEvent(ProviderBrowseSuccessfulEvent event) {
-        Log.e(TAG, "handle ProviderBrowseSuccessfulEvent: " + event.toString());
-
         final String currentDirectoryId = mCrumbs.getTopItem().id;
         if (currentDirectoryId != null && currentDirectoryId.equals(event.parentId) == false) {
             Log.d(TAG, "Got browse response with unexpected parent id.");
             return;
+        }
+
+        if (mAdapter != null) {
+            mAdapter.setItems(event.items);
+            mPaginationController.initializePagination(getView(), mFocusListener);
         }
 
         if (event.items.size() == 0) {
@@ -158,20 +161,17 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
             changeState(State.LOADED);
         }
 
-        if (mAdapter != null) {
-            mAdapter.setItems(event.items);
-            mPaginationController.initializePagination(getView(), mFocusListener);
-        }
         mCurrentProviderItems = new ArrayList<>(event.items);
     }
 
     public void refreshPaginationController() {
+        Log.d(TAG, "refreshPaginationController");
         mPaginationController.setNumbers();
     }
 
     private void changeBrowsedProvider(ProviderViewActive provider) {
+        Log.d(TAG, "changeBrowsedProvider: provider=" + (provider != null ? provider.toString() : "null"));
         mCurrentlyBrowsedProvider = provider;
-
         /* if the same name was loaded form the saved instance
          * do not reject current state of the bread crumbs
          */
@@ -184,42 +184,29 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
     }
 
     @SuppressWarnings("unused")
-    public void onEvent(ProviderBrowseCancelEvent event) {
-        Log.d(TAG, "handle ProviderBrowseCancel");
-        ((MainActivity) getActivity()).openLauncher(null);
-    }
-
-    @SuppressWarnings("unused")
     public void onEvent(ProviderBrowseErrorEvent event) {
-        Log.d(TAG, "handle ProviderBrowseErrorEvent: " + event.toString());
         changeState(State.FAILED);
     }
- 
+
     @SuppressWarnings("unused")
     public void onEvent(ProviderConnectErrorEvent event) {
-        Log.d(TAG, "handle ProviderConnectErrorEvent: " + event.toString());
         changeState(State.FAILED);
     }
 
-    @SuppressWarnings("unused")
-    public void onEvent(ProviderConnectedEvent event) {
-        Log.d(TAG, "handle ProviderConnectedEvent");
-        if (event.provider == null) return;
-        mCurrentProviderItems = null;
-    }
 
     @SuppressWarnings("unused")
     public void onEvent(NowPlayingProviderChangedEvent event) {
         mNowPlayingProvider = event.provider;
-        initializeNowPlayingProviderDisplay(getView());
 
-        if(event.provider == null) {
-            ((MainActivity) getActivity()).openLauncher(null);
+        if (event.provider == null) {
+            mNowPlayingProvider = mCurrentlyBrowsedProvider;
         }
+        initializeNowPlayingProviderDisplay(getView());
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         if (savedInstanceState != null) {
             loadState(savedInstanceState);
@@ -230,11 +217,13 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
 
     @Override
     public void onDestroy() {
+        Log.d(TAG, "onDestroy");
         super.onDestroy();
         RsEventBus.unregister(this);
     }
 
     private void changeState(State state) {
+        Log.d(TAG, "changeState: state" + (state != null ? state.name() : "null"));
         if (state == mState)
             return;
 
@@ -254,40 +243,45 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
     }
 
     private void changeToLoading() {
+        Log.d(TAG, "changeToLoading");
         startTimer();
         enableWaitIndicator(true);
         enableFailurePrompt(false);
         enableItemsList(false);
-        if(mPaginationController != null) {
-            mPaginationController.setVisibleButtons(false);
+        if (mPaginationController != null) {
+            mPaginationController.setVisibility(false);
         }
     }
 
     private void changeToLoaded() {
+        Log.d(TAG, "changeToLoaded");
         stopTimer();
         enableWaitIndicator(false);
         enableFailurePrompt(false);
         enableItemsList(true);
-        if(mPaginationController != null) {
-            mPaginationController.setVisibleButtons(true);
+        if (mPaginationController != null) {
+            mPaginationController.setVisibility(true);
         }
     }
 
     private void changeToFailed() {
+        Log.d(TAG, "changeToFailed");
         stopTimer();
         enableWaitIndicator(false);
         enableFailurePrompt(true);
         enableItemsList(false);
-        if(mPaginationController != null) {
-            mPaginationController.setVisibleButtons(false);
+        if (mPaginationController != null) {
+            mPaginationController.setVisibility(false);
         }
     }
 
     public void clearCrumbs() {
+        Log.d(TAG, "clearCrumbs");
         mCrumbs.reset();
     }
 
     private void enablePagination(boolean enablePagination) {
+        Log.d(TAG, "enablePagination: enablePagination=" + enablePagination);
         mUsePagination = enablePagination;
         initializeAdapter();
     }
@@ -301,8 +295,7 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
             final String providerName
                     = mCurrentlyBrowsedProvider == null
                     ? null
-                    : mCurrentlyBrowsedProvider.getUniqueName().toString()
-                    ;
+                    : mCurrentlyBrowsedProvider.getUniqueName().toString();
 
             bundle.putString(BREAD_CRUMBS_KEY, json);
             bundle.putString(PROVIDER_NAME_KEY, providerName);
@@ -322,12 +315,14 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
     }
 
     private void browseCurrentDirectory() {
+        Log.d(TAG, "browseCurrentDirectory");
         final NavigatorLevel currentLevel = mCrumbs.getTopItem();
         browseDirectory(currentLevel.id);
         mDirectoryNameLabel.setText(currentLevel.displayName);
     }
 
     private void onGoingBack() {
+        Log.d(TAG, "onGoingBack");
         if (mCrumbs.canGoBack()) {
             popLevel();
         } else {
@@ -336,18 +331,21 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
     }
 
     private void pushNewLevel(String displayName, String id) {
+        Log.d(TAG, "pushNewLevel");
         mCrumbs.push(displayName, id);
         mDirectoryNameLabel.setText(displayName);
         browseDirectory(id);
     }
 
     private void popLevel() {
+        Log.d(TAG, "popLevel");
         mCrumbs.goBack();
         mDirectoryNameLabel.setText(mCrumbs.getTopItem().displayName);
         browseDirectory(mCrumbs.getTopItem().id);
     }
 
     private void browseDirectory(String directoryId) {
+        Log.d(TAG, "browseDirectory");
         final ComponentName providerName = mCurrentlyBrowsedProvider.getUniqueName();
         RsEventBus.post(new BrowseDirectoryEvent(providerName, directoryId));
         changeState(State.LOADING);
@@ -362,6 +360,7 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView");
         final View root = inflater.inflate(R.layout.c4_fragment_navigator, container, false);
         mDirectoryNameLabel = (TextView) root.findViewById(R.id.parent_directory);
         mNoResultsLabel = (TextView) root.findViewById(R.id.no_results_notification);
@@ -487,7 +486,7 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        Log.e(TAG, "on save instance state");
+        Log.d(TAG, "onSaveInstanceState");
         super.onSaveInstanceState(outState);
         saveState(outState);
     }
@@ -515,7 +514,9 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
     private final CountDownTimer mWaitForResultsTimer
             = new CountDownTimer(SHOW_MISSING_DELAY, SHOW_MISSING_DELAY) {
 
-        @Override public void onTick(long millisUntilFinished) { }
+        @Override
+        public void onTick(long millisUntilFinished) {
+        }
 
         @Override
         public void onFinish() {

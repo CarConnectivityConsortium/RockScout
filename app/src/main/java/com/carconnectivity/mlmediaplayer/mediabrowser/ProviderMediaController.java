@@ -109,11 +109,10 @@ public final class ProviderMediaController extends MediaController.Callback {
     }
 
     public void forcePause() {
-        Log.d(TAG, "ForcePause");
+        Log.d(TAG, "forcePause");
         if (mIsListening == false) return;
         final MediaController.TransportControls controls
                 = mMediaController.getTransportControls();
-        Log.d(TAG, "Force Pauseing");
         controls.pause();
     }
 
@@ -247,15 +246,8 @@ public final class ProviderMediaController extends MediaController.Callback {
     }
 
     @SuppressWarnings("unused")
-    public void onEvent(MirrorLinkSessionChangedEvent event) {
-        if (event.headUnitIsConnected == false) {
-            forcePause();
-        }
-    }
-
-    @SuppressWarnings("unused")
     public void onEvent(PlayMediaItemEvent event) {
-        Log.d(TAG, "handle MediaButtonClickedEvent event: " + event.toString());
+        Log.d(TAG, "Handle MediaButtonClickedEvent event: " + event.toString());
 
         if (isOwner(event.provider) == false) return;
 
@@ -267,13 +259,13 @@ public final class ProviderMediaController extends MediaController.Callback {
 
     @SuppressWarnings("unused") 
    public void onEvent(TerminateEvent event) {
-        Log.d(TAG, "handle TerminateEvent event: " + event.toString());
+        Log.d(TAG, "Handle TerminateEvent event: " + event.toString());
         forcePause();
     }
 
     @SuppressWarnings("unused")
     public void onEvent(MediaButtonClickedEvent event) {
-        Log.d(TAG, "handle MediaButtonClickedEvent event: " + event.toString());
+        Log.d(TAG, "Handle MediaButtonClickedEvent event: " + event.toString());
 
         final MediaButtonData data = event.mediaButtonData;
         if (mHandleMediaButtonDataEvents == false) return;
