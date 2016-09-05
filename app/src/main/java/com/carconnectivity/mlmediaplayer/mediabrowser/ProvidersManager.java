@@ -47,10 +47,17 @@ import com.carconnectivity.mlmediaplayer.mediabrowser.events.DisableEventsEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderDiscoveredEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderDiscoveryFinished;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderInactiveDiscoveredEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderToDownloadDiscoveredEvent;
 import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by belickim on 16/04/15.
@@ -87,14 +94,6 @@ public final class ProvidersManager {
         RsEventBus.unregister(this);
     }
 
-    @SuppressWarnings("unused")
-    public void onEvent(ProviderDiscoveredEvent event) {
-        if (mProvidersTestStatus != null) {
-            final ComponentName name = event.provider.getUniqueName();
-            mProvidersTestStatus.put(name, new ProviderDiscoveryData(true));
-        }
-    }
-
     private void checkIfTestConnectionsCompleted() {
         if (mProvidersTestStatus == null) return;
 
@@ -112,7 +111,7 @@ public final class ProvidersManager {
         }
         final ProviderDiscoveryFinished finishedEvent
                 = new ProviderDiscoveryFinished(mProvidersTestStatus.size());
-        RsEventBus.postSticky(finishedEvent);
+        RsEventBus.post(finishedEvent);
         mProvidersTestStatus = null;
 
         if (mDiscoveryCompletedCheckTimer != null) {
@@ -319,8 +318,12 @@ public final class ProvidersManager {
         return getProvider(name).isConnected();
     }
 
-    public void addConnectedProvider(ComponentName componentName, boolean isPlaying) {
-        mConnectedProviders.put(componentName, isPlaying);
+    public void addTestedProvider(ComponentName componentName, boolean connected, boolean isPlaying) {
+        if(mProvidersTestStatus == null) return;
+        if(connected) {
+            mConnectedProviders.put(componentName, isPlaying);
+        }
+        mProvidersTestStatus.put(componentName, new ProviderDiscoveryData(true));
     }
 
     public void changeModePlayer(boolean mPlayerModeOnline) {

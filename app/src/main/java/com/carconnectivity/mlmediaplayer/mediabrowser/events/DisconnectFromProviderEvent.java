@@ -31,29 +31,19 @@ package com.carconnectivity.mlmediaplayer.mediabrowser.events;
 
 import android.content.ComponentName;
 
-import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewActive;
 import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
 
-/**
- * Created by belickim on 08/05/15.
- */
-public final class ProviderConnectedEvent implements RockScoutEvent {
-    public final ComponentName componentName;
-    public final boolean showPlayer;
-    public final boolean cleanPlayingProvider;
+public final class DisconnectFromProviderEvent implements RockScoutEvent {
+    public final ComponentName mName;
 
-    public ProviderConnectedEvent(ComponentName componentName, boolean showPlayer ,boolean cleanProvider) {
-        this.componentName = componentName;
-        this.showPlayer = showPlayer;
-        this.cleanPlayingProvider = cleanProvider;
+    public DisconnectFromProviderEvent(ComponentName mName) {
+        this.mName = mName;
     }
 
     @Override
     public String toString() {
-        return "ProviderConnectedEvent{" +
-                "componentName=" +  (componentName != null ? componentName : "null") +
-                ", showPlayer=" + showPlayer +
-                ", cleanPlayingProvider=" + cleanPlayingProvider +
+        return "DisconnectFromProviderEvent{" +
+                "mName=" + mName +
                 '}';
     }
 }
