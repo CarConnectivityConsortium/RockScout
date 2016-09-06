@@ -219,7 +219,7 @@ public class LauncherProviderGridAdapter extends BaseAdapter implements Paginate
             color.setTint(viewInactive.getColorPrimaryDark());
             viewHolder.appIconBackground.setImageDrawable(color);
             viewHolder.appIconAdditional.setVisibility(View.VISIBLE);
-        } else if(provider instanceof ProviderViewToDownload) {
+        } else if (provider instanceof ProviderViewToDownload) {
             ProviderViewToDownload viewToDownload = (ProviderViewToDownload) provider;
 
             Picasso.with(mParentFragment.getActivity()).load(viewToDownload.getIconURL().toString()).into(viewHolder.appIcon);

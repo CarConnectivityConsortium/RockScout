@@ -116,7 +116,7 @@ public class MainActivity extends Activity implements InteractionListener {
 
         mLauncherFragment = LauncherFragment.newInstance();
         mNavigatorFragment = NavigatorFragment.newInstance(rootDirectoryName);
-        mPlayerFragment = new MediaPlayerFragment(); /* TODO: replace this with newInstance() */
+        mPlayerFragment = MediaPlayerFragment.newInstance();
         mSplashFragment = SplashScreenFragment.newInstance();
 
         getFragmentManager().beginTransaction()
@@ -138,8 +138,8 @@ public class MainActivity extends Activity implements InteractionListener {
         checkAction(action);
     }
 
-    private void checkAction(String action){
-        if(action != null){
+    private void checkAction(String action) {
+        if (action != null) {
             mTerminateReceived = action.equals(ML_TERMINATE_INTENT);
             if (mTerminateReceived) {
                 RsEventBus.postSticky(new TerminateEvent());
@@ -158,10 +158,10 @@ public class MainActivity extends Activity implements InteractionListener {
 
     @SuppressWarnings("unused")
     public void onEventMainThread(NowPlayingProviderChangedEvent event) {
-        if (event.provider == null){
+        if (event.provider == null) {
             mOpenLauncherAfterCancelPlaying = true;
             openLauncherAfterChangeMode();
-        };
+        }
         mPlayingProvider = event.provider;
     }
 
@@ -268,9 +268,9 @@ public class MainActivity extends Activity implements InteractionListener {
         }
 
         if (useDefaultBehavior) {
-            if(currentFragment instanceof LauncherFragment){
+            if (currentFragment instanceof LauncherFragment) {
                 RsEventBus.post(new FinishActivityEvent());
-            }else{
+            } else {
                 super.onBackPressed();
             }
         }
@@ -295,7 +295,7 @@ public class MainActivity extends Activity implements InteractionListener {
 
             return newNavigator;
         } else if (detachedFragment instanceof MediaPlayerFragment) {
-            return new MediaPlayerFragment(); /* TODO: replace this with newInstance() */
+            return MediaPlayerFragment.newInstance();
         } else if (detachedFragment instanceof SplashScreenFragment) {
             return SplashScreenFragment.newInstance();
         }
@@ -363,7 +363,7 @@ public class MainActivity extends Activity implements InteractionListener {
 
     public void openMediaPlayer(View caller) {
         if (mPlayerFragment == null)
-            mPlayerFragment = new MediaPlayerFragment();
+            mPlayerFragment = MediaPlayerFragment.newInstance();
         switchFragment(mPlayerFragment);
     }
 

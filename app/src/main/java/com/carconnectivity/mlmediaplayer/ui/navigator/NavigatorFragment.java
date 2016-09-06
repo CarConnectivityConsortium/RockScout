@@ -56,7 +56,6 @@ import com.carconnectivity.mlmediaplayer.mediabrowser.events.CurrentlyBrowsedPro
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.DisconnectFromProviderEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.NowPlayingProviderChangedEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.PlayMediaItemEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderBrowseCancelEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderBrowseErrorEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderBrowseSuccessfulEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderConnectErrorEvent;
@@ -432,7 +431,6 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
         final PlayMediaItemEvent event
                 = new PlayMediaItemEvent(mCurrentlyBrowsedProvider, mediaId, bundle);
         RsEventBus.post(event);
-        /* todo: define interface or send event */
         ((MainActivity) getActivity()).openMediaPlayer(null);
     }
 
@@ -463,7 +461,6 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
             listener = new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    /* todo: define interface or send event */
                     ((MainActivity) getActivity()).openMediaPlayer(root);
                 }
             };

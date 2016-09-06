@@ -192,8 +192,8 @@ public final class ProviderMediaControllerHelper {
             final PlaybackState.CustomAction customAction = customActions.next();
             final Drawable icon = getCustomIconForMediaButton(customAction.getIcon());
             return new MediaButtonData
-                    ( mBoundProvider, MediaButtonData.Type.CUSTOM
-                    , customAction.getAction(), icon, customAction.getExtras()
+                    (mBoundProvider, MediaButtonData.Type.CUSTOM
+                            , customAction.getAction(), icon, customAction.getExtras()
                     );
         }
         return null;
@@ -204,8 +204,8 @@ public final class ProviderMediaControllerHelper {
             case QUEUE:
                 final MediaButtonData.Type buttonType = MediaButtonData.Type.QUEUE;
                 return new MediaButtonData
-                        ( mBoundProvider, buttonType, null
-                        , PlaybackUtils.getDefaultIconForMediaButton(mContext, buttonType), null
+                        (mBoundProvider, buttonType, null
+                                , PlaybackUtils.getDefaultIconForMediaButton(mContext, buttonType), null
                         );
 
             default:
@@ -217,8 +217,8 @@ public final class ProviderMediaControllerHelper {
         MediaButtonData.Type buttonType = MediaButtonData.Type.fromActionId(actionId);
         if (buttonType != null) {
             return new MediaButtonData
-                    ( mBoundProvider, buttonType, null
-                    , PlaybackUtils.getDefaultIconForMediaButton(mContext, buttonType), null
+                    (mBoundProvider, buttonType, null
+                            , PlaybackUtils.getDefaultIconForMediaButton(mContext, buttonType), null
                     );
         }
         return null;

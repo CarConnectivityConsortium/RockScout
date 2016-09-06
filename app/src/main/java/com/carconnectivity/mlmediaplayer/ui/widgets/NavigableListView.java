@@ -30,10 +30,10 @@
 package com.carconnectivity.mlmediaplayer.ui.widgets;
 
 import android.content.Context;
-import android.util.AttributeSet;
 import android.graphics.Rect;
-import android.widget.ListView;
+import android.util.AttributeSet;
 import android.view.View;
+import android.widget.ListView;
 
 public class NavigableListView extends ListView {
     public NavigableListView(Context context) {
@@ -59,7 +59,7 @@ public class NavigableListView extends ListView {
             final int selected = getSelectedItemPosition() - getFirstVisiblePosition();
             if (selected >= 0) {
                 final View view = getChildAt(selected);
-                if((view != null) && (view.getTop() < 0)) {
+                if ((view != null) && (view.getTop() < 0)) {
                     setSelectionFromTop(getSelectedItemPosition() + 1, getChildAt(selected + 1).getTop());
                 }
             }

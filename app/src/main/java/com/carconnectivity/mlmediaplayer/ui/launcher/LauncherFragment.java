@@ -56,10 +56,8 @@ import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewActive;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewInactive;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewToDownload;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.DisableEventsEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.FinishActivityEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.NowPlayingProviderChangedEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderConnectedEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderDiscoveredEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderInactiveDiscoveredEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderToDownloadDiscoveredEvent;
@@ -89,8 +87,6 @@ public class LauncherFragment extends Fragment {
 
     private TextView mSelectAppHint;
     private TextView mNoAppsWarning;
-    private boolean mIgnoreGoToPlayerOnConnection;
-    private boolean mInDriveMode;
     private boolean mHeadUnitIsConnected;
     private Dialog mDialog;
 
@@ -101,16 +97,11 @@ public class LauncherFragment extends Fragment {
     public static LauncherFragment newInstance() {
         LauncherFragment fragment = new LauncherFragment();
         fragment.mListProviders = new ArrayList<>();
-        fragment.mIgnoreGoToPlayerOnConnection = true;
         fragment.mHeadUnitIsConnected = false;
 
         RsEventBus.registerSticky(fragment);
 
         return fragment;
-    }
-
-    public void enableIgnoreGoToPlayerOnConnection(boolean enabled) {
-        mIgnoreGoToPlayerOnConnection = enabled;
     }
 
     @Override
@@ -124,6 +115,7 @@ public class LauncherFragment extends Fragment {
         mListProviders.clear();
         if (mProviderAdapter != null) {
             mProviderAdapter.removeItems();
+            handleGridsVisibility(0);
         }
     }
 
@@ -133,48 +125,33 @@ public class LauncherFragment extends Fragment {
 
     @SuppressWarnings("unused")
     public void onEvent(DriveModeStatusChangedEvent event) {
-        enableDriveMode(event.isDriveModeActive);
+        enablePagination(event.isDriveModeActive);
     }
 
     @SuppressWarnings("unused")
     public void onEventMainThread(ProviderDiscoveredEvent event) {
         final ProviderViewActive provider = event.provider;
-        mListProviders.add(provider);
-
-        if (mProviderAdapter != null) {
-            handleGridsVisibility(mProviderAdapter.getCount());
-            mProviderAdapter.addItem(provider);
-        }
+        addItem(provider);
     }
 
     @SuppressWarnings("unused")
     public void onEventMainThread(ProviderToDownloadDiscoveredEvent event) {
         final ProviderViewToDownload provider = event.provider;
-        mListProviders.add(provider);
-
-        if (mProviderAdapter != null) {
-            handleGridsVisibility(mProviderAdapter.getCount());
-            mProviderAdapter.addItem(provider);
-        }
+        addItem(provider);
     }
 
     @SuppressWarnings("unused")
     public void onEventMainThread(ProviderInactiveDiscoveredEvent event) {
         final ProviderViewInactive provider = event.provider;
+        addItem(provider);
+    }
+
+    private void addItem(ProviderView provider) {
         mListProviders.add(provider);
 
         if (mProviderAdapter != null) {
-            handleGridsVisibility(mProviderAdapter.getCount());
             mProviderAdapter.addItem(provider);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    public void onEvent(ProviderConnectedEvent event) {
-        if (event.componentName != null) {
-            if (mIgnoreGoToPlayerOnConnection == false && event.showPlayer && mListener != null) {
-                mListener.get().showMediaPlayer();
-            }
+            handleGridsVisibility(mProviderAdapter.getCount());
         }
     }
 
@@ -262,16 +239,6 @@ public class LauncherFragment extends Fragment {
         return root;
     }
 
-    private void enableDriveMode(boolean enable) {
-        Log.d(TAG, "enableDriveMode: enable=" + enable);
-        enablePagination(enable);
-        mInDriveMode = enable;
-
-        if (mProviderAdapter != null) {
-            handleGridsVisibility(mProviderAdapter.getCount());
-        }
-    }
-
     private void onProviderSelected(ProviderViewActive providerView, boolean showPlayer) {
         Log.d(TAG, "onProviderSelected: providerView=" + (providerView != null ? providerView.toString() : "null") + ", showPlayer=" + showPlayer);
         if (providerView != null && providerView.canConnect()) {
@@ -305,7 +272,7 @@ public class LauncherFragment extends Fragment {
             public void onClick(View view) {
                 if (getFragmentManager().getBackStackEntryCount() == 0) {
                     RsEventBus.post(new FinishActivityEvent());
-                };
+                }
                 getFragmentManager().popBackStack();
             }
         });
@@ -380,11 +347,9 @@ public class LauncherFragment extends Fragment {
         showWarningVisibility(false);
         mProviderGrid.setVisibility(View.VISIBLE);
         if (mHeadUnitIsConnected) {
-            if (mInDriveMode) {
-                if (activeCount <= 0) {
-                    showWarningVisibility(true);
-                    mProviderGrid.setVisibility(View.INVISIBLE);
-                }
+            if (activeCount <= 0) {
+                showWarningVisibility(true);
+                mProviderGrid.setVisibility(View.INVISIBLE);
             }
         }
     }

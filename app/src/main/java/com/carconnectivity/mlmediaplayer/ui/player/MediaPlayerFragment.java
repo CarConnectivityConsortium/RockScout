@@ -36,6 +36,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.media.session.PlaybackState;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,7 +57,6 @@ import com.carconnectivity.mlmediaplayer.mediabrowser.events.NowPlayingProviderC
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.PlaybackStateChangedEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProgressUpdateEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderConnectErrorEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderConnectedEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.model.MediaButtonData;
 import com.carconnectivity.mlmediaplayer.mediabrowser.model.TrackMetadata;
 import com.carconnectivity.mlmediaplayer.ui.BackButtonHandler;
@@ -113,7 +113,9 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
 
     private ProviderViewActive mNowPlayingProvider;
 
-    public MediaPlayerFragment() {
+    public static MediaPlayerFragment newInstance() {
+        MediaPlayerFragment fragment = new MediaPlayerFragment();
+        return fragment;
     }
 
     @Override
@@ -507,6 +509,10 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
     private void scheduleProgressTimer(ProviderViewActive currentProvider, long pos, long lastUpdateTime) {
         cancelProgressTimer();
         mProgressTimer = new ProgressTimer();
+
+        if (lastUpdateTime == 0) {
+            lastUpdateTime = SystemClock.elapsedRealtime();
+        }
 
         mProgressTimer.setPosition(pos, lastUpdateTime);
         mProgressTimer.setDuration(mCurrentTrackDuration);

@@ -51,9 +51,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class SplashScreenFragment extends Fragment implements BackButtonHandler {
+    private static final String TAG = SplashScreenFragment.class.getSimpleName();
     public static final int TIMER_PERIOD = 5;
     public static final float ALPHA_STEP = 0.001f;
-    private static final String TAG = SplashScreenFragment.class.getSimpleName();
 
     private FrameLayout mSplashImage;
     private float mSplashAlpha;
@@ -184,7 +184,7 @@ public class SplashScreenFragment extends Fragment implements BackButtonHandler 
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = new WeakReference<InteractionListener>((InteractionListener) activity);
+            mListener = new WeakReference<>((InteractionListener) activity);
             checkAndHide();
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()

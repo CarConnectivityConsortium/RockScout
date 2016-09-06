@@ -32,5 +32,5 @@ package com.carconnectivity.mlmediaplayer.commonapi;
 import com.mirrorlink.android.commonapi.ICommonAPIService;
 
 public interface ServiceConnectedCallback {
-    public void connected(ICommonAPIService service);
+    void connected(ICommonAPIService service);
 }

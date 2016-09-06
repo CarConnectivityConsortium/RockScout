@@ -78,7 +78,7 @@ public final class MirrorLinkConnectionManager {
         STATE_PAUSE(2);
         private final int value;
 
-        private States(int value) {
+        States(int value) {
             this.value = value;
         }
 
@@ -113,9 +113,7 @@ public final class MirrorLinkConnectionManager {
     public void registerMirrorLinkManagers() {
         Log.d(TAG, "Registering MirrorLinkManagers");
         RsEventBus.register(this);
-        if (mMirrorLinkApplicationContext.getService() == null) {
-            // TODO : Common API not available, add some message to user
-        } else {
+        if (mMirrorLinkApplicationContext.getService() != null) {
             try {
                 mMirrorLinkApplicationContext.registerDeviceStatusManager(this, mDeviceStatusListener);
                 mMirrorLinkApplicationContext.registerConnectionManager(this, mConnectionListener);
@@ -219,7 +217,8 @@ public final class MirrorLinkConnectionManager {
 
     IConnectionListener mConnectionListener = new IConnectionListener.Stub() {
         @Override
-        public void onRemoteDisplayConnectionChanged(int remoteDisplayConnection) throws RemoteException { }
+        public void onRemoteDisplayConnectionChanged(int remoteDisplayConnection) throws RemoteException {
+        }
 
         @Override
         public void onMirrorLinkSessionChanged(final boolean mirrorLinkSessionIsEstablished) throws RemoteException {
@@ -232,7 +231,8 @@ public final class MirrorLinkConnectionManager {
         }
 
         @Override
-        public void onAudioConnectionsChanged(Bundle audioConnections) throws RemoteException { }
+        public void onAudioConnectionsChanged(Bundle audioConnections) throws RemoteException {
+        }
     };
 
     IDeviceStatusListener mDeviceStatusListener = new IDeviceStatusListener.Stub() {
@@ -249,10 +249,12 @@ public final class MirrorLinkConnectionManager {
         }
 
         @Override
-        public void onNightModeChanged(boolean nightMode) throws RemoteException {  }
+        public void onNightModeChanged(boolean nightMode) throws RemoteException {
+        }
 
         @Override
-        public void onMicrophoneStatusChanged(boolean micInput) throws RemoteException {  }
+        public void onMicrophoneStatusChanged(boolean micInput) throws RemoteException {
+        }
     };
     IContextListener mContextListener = new IContextListener.Stub() {
         @Override
@@ -266,10 +268,12 @@ public final class MirrorLinkConnectionManager {
         }
 
         @Override
-        public void onFramebufferBlocked(int reason, Bundle framebufferArea) throws RemoteException {  }
+        public void onFramebufferBlocked(int reason, Bundle framebufferArea) throws RemoteException {
+        }
 
         @Override
-        public void onFramebufferUnblocked() throws RemoteException { }
+        public void onFramebufferUnblocked() throws RemoteException {
+        }
 
         @Override
         public void onAudioUnblocked() throws RemoteException {

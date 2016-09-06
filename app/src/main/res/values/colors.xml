@@ -36,4 +36,5 @@
     <color name="c4_scroll_bar_color">#EA9000</color>
     <color name="c4_active_button_color">#EA9000</color>
     <color name="c4_inactive_button_color">#A3A3A3</color>
+    <color name="provider_default_theme_color">#041424</color>
 </resources>

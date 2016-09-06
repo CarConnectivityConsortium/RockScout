@@ -144,7 +144,7 @@ public class UiUtilities {
             final Drawable thumb = (Drawable) verticalThumb;
             thumb.setTintMode(PorterDuff.Mode.MULTIPLY);
             thumb.setTint(color);
-        } catch(Exception e) {
+        } catch (Exception e) {
             Log.e(TAG, "Something went wrong: ", e);
         }
     }
@@ -180,7 +180,7 @@ public class UiUtilities {
         builder.setNeutralButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-               dialog.dismiss();
+                dialog.dismiss();
             }
         });
 

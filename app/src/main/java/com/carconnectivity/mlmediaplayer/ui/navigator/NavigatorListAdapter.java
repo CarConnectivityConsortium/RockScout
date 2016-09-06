@@ -38,8 +38,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.carconnectivity.mlmediaplayer.R;
 import com.carconnectivity.mlmediaplayer.mediabrowser.MediaItemView;
@@ -117,9 +117,9 @@ public class NavigatorListAdapter extends BaseAdapter implements PaginatedAdapte
         Bitmap displayIconBitmap = view.getDisplayIconBitmap();
 
         //set icon from bitmap or uri
-        if(displayIconBitmap != null) {
+        if (displayIconBitmap != null) {
             viewHolder.appIcon.setImageBitmap(displayIconBitmap);
-        } else if(displayIconUri != null) {
+        } else if (displayIconUri != null) {
             final Context context = mParentFragment.getActivity().getApplicationContext();
             final String rawUri = displayIconUri.toString();
             Picasso.with(context).load(rawUri).into(viewHolder.appIcon);
@@ -144,7 +144,7 @@ public class NavigatorListAdapter extends BaseAdapter implements PaginatedAdapte
         if (mOwner != null) {
             mOwner.setSelection(0);
         }
-        if (mItems!=null && mItems.goToPage(pageNumber)) {
+        if (mItems != null && mItems.goToPage(pageNumber)) {
             notifyDataSetChanged();
         }
     }

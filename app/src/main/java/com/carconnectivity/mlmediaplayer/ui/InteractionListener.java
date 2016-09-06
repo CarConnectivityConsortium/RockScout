@@ -34,8 +34,10 @@ package com.carconnectivity.mlmediaplayer.ui;
  */
 
 public interface InteractionListener {
-    public void showLauncher();
-    public void showNavigator(boolean startInRootDirectory);
-    public void showMediaPlayer();
+    void showLauncher();
+
+    void showNavigator(boolean startInRootDirectory);
+
+    void showMediaPlayer();
 }
 

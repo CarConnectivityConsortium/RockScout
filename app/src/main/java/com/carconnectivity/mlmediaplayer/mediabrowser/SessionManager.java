@@ -213,14 +213,14 @@ public class SessionManager {
         tryConnectIfDisconnected(mBrowsedProvider);
     }
 
-    public boolean isDisconnectedProvider(){
-        if(mPlayingProvider != null){
-            if(!mPlayingProvider.isConnected()){
+    public boolean isDisconnectedProvider() {
+        if (mPlayingProvider != null) {
+            if (!mPlayingProvider.isConnected()) {
                 return true;
             }
         }
-        if(mBrowsedProvider != null){
-            if(!mBrowsedProvider.isConnected()){
+        if (mBrowsedProvider != null) {
+            if (!mBrowsedProvider.isConnected()) {
                 return true;
             }
         }
@@ -237,10 +237,10 @@ public class SessionManager {
 
         // check only situation online -> offline
         // all providers can play in situation offline -> online
-        if(mLastPlayerModeOnline == null || mLastPlayerModeOnline == playerModeOnline || playerModeOnline){
+        if (mLastPlayerModeOnline == null || mLastPlayerModeOnline == playerModeOnline || playerModeOnline) {
             mLastPlayerModeOnline = playerModeOnline;
             return;
-        }else{
+        } else {
             mLastPlayerModeOnline = playerModeOnline;
         }
 

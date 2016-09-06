@@ -46,12 +46,29 @@ public class MediaItemView {
         mItem = item;
     }
 
-    public String getId() { return mItem.getMediaId(); }
-    public boolean isBrowsable() { return mItem.isBrowsable(); }
-    public boolean isPlayable() { return mItem.isPlayable(); }
-    public Bitmap getDisplayIconBitmap() { return mItem.getDescription().getIconBitmap(); }
-    public Uri getDisplayIconUri() { return mItem.getDescription().getIconUri(); }
-    public Bundle getExtras() { return mItem.getDescription().getExtras(); }
+    public String getId() {
+        return mItem.getMediaId();
+    }
+
+    public boolean isBrowsable() {
+        return mItem.isBrowsable();
+    }
+
+    public boolean isPlayable() {
+        return mItem.isPlayable();
+    }
+
+    public Bitmap getDisplayIconBitmap() {
+        return mItem.getDescription().getIconBitmap();
+    }
+
+    public Uri getDisplayIconUri() {
+        return mItem.getDescription().getIconUri();
+    }
+
+    public Bundle getExtras() {
+        return mItem.getDescription().getExtras();
+    }
 
     public String getDisplayLabel() {
         final String rawTitle = mItem.getDescription().getTitle().toString();

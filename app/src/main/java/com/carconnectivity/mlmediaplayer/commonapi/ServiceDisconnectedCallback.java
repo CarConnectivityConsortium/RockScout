@@ -30,5 +30,5 @@
 package com.carconnectivity.mlmediaplayer.commonapi;
 
 public interface ServiceDisconnectedCallback {
-    public void disconnected();
+    void disconnected();
 }

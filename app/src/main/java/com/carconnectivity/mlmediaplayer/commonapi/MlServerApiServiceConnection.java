@@ -38,6 +38,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.IBinder;
 import android.util.Log;
+
 import com.mirrorlink.android.commonapi.Defs;
 import com.mirrorlink.android.commonapi.ICommonAPIService;
 
@@ -85,18 +86,18 @@ public class MlServerApiServiceConnection implements ServiceConnection {
     public boolean connectService() {
         Log.d(LOG_TAG, "connectService Called");
 
-        // new standard of binding Intets - Android 5.0
+        // new standard of binding Intents - Android 5.0
         Intent implicitIntent = new Intent(Defs.Intents.BIND_MIRRORLINK_API);
         Intent bindIntent = createExplicitFromImplicitIntent(this.applicationContext, implicitIntent);
 
-        // verify if MirrrorLink is available - bindIntent != NULL
+        // verify if MirrorLink is available - bindIntent != NULL
         if (bindIntent != null) {
             this.applicationContext.bindService(bindIntent, this, Context.BIND_AUTO_CREATE);
             // Is supported
             MirrorLinkConnectionManager.mIsMirrorLinkSupported = true;
             return true;
         } else {
-            // TODO : Unsupported communicate
+            // Unsupported communicate
             return false;
         }
 

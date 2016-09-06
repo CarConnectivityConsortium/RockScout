@@ -50,8 +50,13 @@ public class PaginationModel {
         mCurrentPage = 0;
     }
 
-    public int getPagesCount() { return (int) Math.ceil(mItemsCount / (double) mItemsPerPage); }
-    public int getPageSize() { return mItemsPerPage; }
+    public int getPagesCount() {
+        return (int) Math.ceil(mItemsCount / (double) mItemsPerPage);
+    }
+
+    public int getPageSize() {
+        return mItemsPerPage;
+    }
 
     public boolean setCurrentPage(int currentPage) {
         if (currentPage < 0) return false;
@@ -61,7 +66,9 @@ public class PaginationModel {
         return true;
     }
 
-    public int getCurrentPage() { return mCurrentPage; }
+    public int getCurrentPage() {
+        return mCurrentPage;
+    }
 
     public void grow(int amount) {
         mItemsCount += amount;
@@ -78,7 +85,7 @@ public class PaginationModel {
         int[] visibleIndices = new int[visibleItemsCount];
 
         int firstIndex = mCurrentPage * mItemsPerPage;
-        for(int i = 0; i < visibleItemsCount; ++i) {
+        for (int i = 0; i < visibleItemsCount; ++i) {
             visibleIndices[i] = firstIndex + i;
         }
 
