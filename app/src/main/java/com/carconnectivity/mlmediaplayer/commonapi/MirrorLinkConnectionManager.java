@@ -35,6 +35,7 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.util.SparseArray;
 
+import com.carconnectivity.mlmediaplayer.commonapi.events.AudioContextChangedEvent;
 import com.carconnectivity.mlmediaplayer.commonapi.events.AudioStartBlockingEvent;
 import com.carconnectivity.mlmediaplayer.commonapi.events.AudioStopBlockingEvent;
 import com.carconnectivity.mlmediaplayer.commonapi.events.ConnectionMirrorLinkServiceEvent;
@@ -176,7 +177,7 @@ public final class MirrorLinkConnectionManager {
     }
 
     @SuppressWarnings("unused")
-    public void onEvent(PlaybackStateChangedEvent event) {
+    public void onEvent(AudioContextChangedEvent event) {
         if (!mIsMirrorLinkSupported) return;
         if (!mConnectionMirrorLinkStatus) return;
 

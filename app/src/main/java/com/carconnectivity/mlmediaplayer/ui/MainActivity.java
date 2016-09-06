@@ -47,6 +47,7 @@ import com.carconnectivity.mlmediaplayer.R;
 import com.carconnectivity.mlmediaplayer.commonapi.events.MirrorLinkSessionChangedEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewActive;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ClearLauncherList;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.DisableEventsEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.FinishActivityEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.MediaButtonClickedEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.NowPlayingProviderChangedEvent;
@@ -66,6 +67,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends Activity implements InteractionListener {
+
     private final static String TAG = MainActivity.class.getCanonicalName();
     public final static String ML_TERMINATE_INTENT = "com.mirrorlink.android.app.TERMINATE";
     public final static String ML_LAUNCH_INTENT = "com.mirrorlink.android.app.LAUNCH";
@@ -142,7 +144,7 @@ public class MainActivity extends Activity implements InteractionListener {
         if (action != null) {
             mTerminateReceived = action.equals(ML_TERMINATE_INTENT);
             if (mTerminateReceived) {
-                RsEventBus.postSticky(new TerminateEvent());
+                RsEventBus.post(new TerminateEvent());
             }
         }
     }
@@ -168,7 +170,7 @@ public class MainActivity extends Activity implements InteractionListener {
     @SuppressWarnings("unused")
     public void onEventMainThread(ProviderBrowseCancelEvent event) {
         Log.d(TAG, "handle ProviderBrowseCancel");
-        mOpenLauncherAfterCancelPlaying = true;
+        mOpenLauncherAfterCancelBrowsing = true;
         openLauncherAfterChangeMode();
     }
 
@@ -178,6 +180,11 @@ public class MainActivity extends Activity implements InteractionListener {
         mLauncherFragment.clearList();
     }
 
+    @SuppressWarnings("unused")
+    public void onEventMainThread(DisableEventsEvent event) {
+        RsEventBus.unregister(this);
+        finish();
+    }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -213,7 +220,6 @@ public class MainActivity extends Activity implements InteractionListener {
         RsEventBus.postSticky(new RefreshProvidersEvent());
     }
 
-
     @Override
     public void onPause() {
         Log.d(TAG, "onPause");
@@ -230,7 +236,6 @@ public class MainActivity extends Activity implements InteractionListener {
     protected void onDestroy() {
         Log.d(TAG, "onDestroy");
         super.onDestroy();
-        RsEventBus.unregister(this);
     }
 
     @Override
@@ -248,7 +253,6 @@ public class MainActivity extends Activity implements InteractionListener {
         return false;
     }
 
-
     @Override
     public void onLowMemory() {
         super.onLowMemory();
@@ -258,13 +262,11 @@ public class MainActivity extends Activity implements InteractionListener {
     @Override
     public void onBackPressed() {
         boolean useDefaultBehavior = true;
+
         final Fragment currentFragment = getCurrentFragment();
         if (currentFragment != null && currentFragment instanceof BackButtonHandler) {
             BackButtonHandler handlerFragment = (BackButtonHandler) currentFragment;
             useDefaultBehavior = handlerFragment.handleBackButtonPress();
-        }
-        if (mHeadUnitIsConnected) {
-            useDefaultBehavior = false;
         }
 
         if (useDefaultBehavior) {
@@ -303,7 +305,6 @@ public class MainActivity extends Activity implements InteractionListener {
         throw new IllegalArgumentException
                 ("Failed to create new instance. Unsupported fragment type.");
     }
-
 
     private void switchFragment(Fragment fragment) {
         if (mInstanceStateSaved) {

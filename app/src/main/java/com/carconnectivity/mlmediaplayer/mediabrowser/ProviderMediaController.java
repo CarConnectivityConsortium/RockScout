@@ -105,7 +105,6 @@ public final class ProviderMediaController extends MediaController.Callback {
                 || state == PlaybackState.STATE_SKIPPING_TO_NEXT
                 || state == PlaybackState.STATE_SKIPPING_TO_PREVIOUS
                 || state == PlaybackState.STATE_SKIPPING_TO_QUEUE_ITEM
-                || state == PlaybackState.STATE_PAUSED
                 ;
     }
 
@@ -269,7 +268,10 @@ public final class ProviderMediaController extends MediaController.Callback {
     @SuppressWarnings("unused")
     public void onEvent(TerminateEvent event) {
         Log.d(TAG, "Handle TerminateEvent event: " + event.toString());
-        forcePause();
+        if(isPlayingOrPreparing()){
+            forcePause();
+        }
+        mOwner.disconnect();
     }
 
     @SuppressWarnings("unused")

@@ -42,13 +42,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.GridView;
-import android.widget.ImageButton;
-import android.widget.ScrollView;
-import android.widget.TextView;
-
+import android.widget.*;
 import com.carconnectivity.mlmediaplayer.R;
 import com.carconnectivity.mlmediaplayer.commonapi.events.DriveModeStatusChangedEvent;
 import com.carconnectivity.mlmediaplayer.commonapi.events.MirrorLinkSessionChangedEvent;
@@ -56,12 +50,7 @@ import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewActive;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewInactive;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewToDownload;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.FinishActivityEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.NowPlayingProviderChangedEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderDiscoveredEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderInactiveDiscoveredEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderToDownloadDiscoveredEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.StartBrowsingEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.*;
 import com.carconnectivity.mlmediaplayer.ui.InteractionListener;
 import com.carconnectivity.mlmediaplayer.ui.MainActivity;
 import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
@@ -73,6 +62,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LauncherFragment extends Fragment {
+
     private static final String TAG = LauncherFragment.class.getSimpleName();
     private boolean mUsePagination = false;
     private PaginationController mPaginationController;
@@ -91,8 +81,6 @@ public class LauncherFragment extends Fragment {
     private Dialog mDialog;
 
     private View.OnFocusChangeListener mFocusListener;
-    private ImageButton mBackButton;
-
 
     public static LauncherFragment newInstance() {
         LauncherFragment fragment = new LauncherFragment();
@@ -168,7 +156,6 @@ public class LauncherFragment extends Fragment {
         } else {
             mHeadUnitIsConnected = false;
         }
-        initializeBackButton(getView());
         hideNotSupportedDialog();
     }
 
@@ -185,9 +172,20 @@ public class LauncherFragment extends Fragment {
         mSelectAppHint = (TextView) root.findViewById(R.id.text_select_hint);
         mNoAppsWarning = (TextView) root.findViewById(R.id.no_auto_apps_warning);
 
+        ImageButton backButton = (ImageButton) root.findViewById(R.id.launcher_back_button);
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (getFragmentManager().getBackStackEntryCount() == 0) {
+                    RsEventBus.post(new FinishActivityEvent());
+                }
+                getFragmentManager().popBackStack();
+            }
+        });
+        backButton.setOnFocusChangeListener(mFocusListener);
+
         initializeScrollView(root);
         initializeNowPlayingProviderDisplay(root);
-        initializeBackButton(root);
         initializeAdapters(root);
         mPaginationController.initializePagination(root, mFocusListener);
 
@@ -260,27 +258,6 @@ public class LauncherFragment extends Fragment {
 
         mDialog.hide();
         mDialog = null;
-    }
-
-    private void initializeBackButton(View root) {
-        Log.d(TAG, "initializeBackButton");
-        if (root == null) return;
-
-        mBackButton = (ImageButton) root.findViewById(R.id.launcher_back_button);
-        mBackButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (getFragmentManager().getBackStackEntryCount() == 0) {
-                    RsEventBus.post(new FinishActivityEvent());
-                }
-                getFragmentManager().popBackStack();
-            }
-        });
-        mBackButton.setOnFocusChangeListener(mFocusListener);
-
-        final boolean backInvisible
-                = mHeadUnitIsConnected && getFragmentManager().getBackStackEntryCount() == 0;
-        UiUtilities.setVisibility(mBackButton, backInvisible == false);
     }
 
     private void initializeScrollView(View root) {

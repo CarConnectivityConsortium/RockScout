@@ -33,7 +33,6 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.media.session.PlaybackState;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -44,12 +43,10 @@ import com.carconnectivity.mlmediaplayer.R;
 import com.carconnectivity.mlmediaplayer.commonapi.MirrorLinkApplicationContext;
 import com.carconnectivity.mlmediaplayer.commonapi.MirrorLinkConnectionManager;
 import com.carconnectivity.mlmediaplayer.commonapi.events.MirrorLinkSessionChangedEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderPlaybackState;
 import com.carconnectivity.mlmediaplayer.mediabrowser.SessionManager;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ClearLauncherList;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.DisableEventsEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.FinishActivityEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.PlaybackStateChangedEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderDiscoveryFinished;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.RefreshProvidersEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ShowLauncherFragment;
@@ -140,10 +137,11 @@ public class RockScoutService extends Service {
     @SuppressWarnings("unused")
     public void onEvent(RefreshProvidersEvent event) {
         if (!mProviderDiscoveryFinished) return;
-        mManager.refreshProviders();
-        mManager.tryConnectIfDisconnected();
-        if (mTerminateReceived && !mManager.isDisconnectedProvider()) {
-            forceExit();
+        if (!mTerminateReceived) {
+            mManager.refreshProviders();
+            mManager.tryConnectIfDisconnected();
+        } else {
+            stopSelf();
         }
     }
 
@@ -160,7 +158,7 @@ public class RockScoutService extends Service {
         launcherRefreshApps();
 
         if (mTerminateReceived) {
-            forceExit();
+            stopSelf();
         }
     }
 
@@ -170,39 +168,9 @@ public class RockScoutService extends Service {
     }
 
     @SuppressWarnings("unused")
-    public void onEvent(PlaybackStateChangedEvent event) {
-        if (mTerminateReceived) {
-            final ProviderPlaybackState state = event.state;
-            if (state.state == PlaybackState.STATE_PLAYING) {
-                RsEventBus.postSticky(new TerminateEvent());
-            } else if (state.state == PlaybackState.STATE_PAUSED
-                    || state.state == PlaybackState.STATE_STOPPED) {
-                forceExit();
-            }
-        }
-    }
-
-    @SuppressWarnings("unused")
     public void onEvent(FinishActivityEvent event) {
-        RsEventBus.postSticky(new TerminateEvent());
-        forceExit();
-    }
-
-    private void forceExit() {
-        Log.d(TAG, "forceExit()");
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                Intent homeIntent = new Intent(Intent.ACTION_MAIN);
-                homeIntent.addCategory(Intent.CATEGORY_HOME);
-                homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(homeIntent);
-
-                stopSelf();
-
-                System.exit(0);
-            }
-        });
+        RsEventBus.post(new TerminateEvent());
+        stopSelf();
     }
 
     private void startNotification() {

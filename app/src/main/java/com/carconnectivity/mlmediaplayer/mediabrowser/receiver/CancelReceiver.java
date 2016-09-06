@@ -43,7 +43,7 @@ import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
 public class CancelReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        RsEventBus.postSticky(new TerminateEvent());
-        RsEventBus.postSticky(new RefreshProvidersEvent());
+        RsEventBus.post(new TerminateEvent());
+        RsEventBus.post(new RefreshProvidersEvent());
     }
 }
