@@ -49,6 +49,10 @@
         android:theme="@style/AppTheme"
         android:name=".commonapi.MirrorLinkApplicationContext" >
 
+        <service android:name=".mediabrowser.service.RockScoutService" />
+
+        <receiver android:name=".mediabrowser.receiver.CancelReceiver" />
+
         <activity
             android:name=".ui.MainActivity"
             android:label="@string/title_activity_main"

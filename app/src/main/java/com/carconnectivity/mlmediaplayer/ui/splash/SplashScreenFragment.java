@@ -41,6 +41,7 @@ import com.carconnectivity.mlmediaplayer.R;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.AnimateAlphaEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderConnectedEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderDiscoveryFinished;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.ShowLauncherFragment;
 import com.carconnectivity.mlmediaplayer.ui.BackButtonHandler;
 import com.carconnectivity.mlmediaplayer.ui.InteractionListener;
 import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
@@ -111,7 +112,7 @@ public class SplashScreenFragment extends Fragment implements BackButtonHandler 
 
     private void checkAndHide() {
         if (mDiscoveryOver && mTimerFinished && mListener != null
-                 && mSplashShown) {
+                && mSplashShown) {
             if (mLaunchedAlreadyPlaying) {
                 mListener.get().showMediaPlayer();
             } else {
@@ -123,7 +124,20 @@ public class SplashScreenFragment extends Fragment implements BackButtonHandler 
     }
 
     @SuppressWarnings("unused")
+    public void onEvent(ShowLauncherFragment event) {
+        if (event.show && mListener != null) {
+            mTimer.cancel();
+            if (mLaunchedAlreadyPlaying) {
+                mListener.get().showMediaPlayer();
+            } else {
+                mListener.get().showLauncher();
+            }
+        }
+    }
+
+    @SuppressWarnings("unused")
     public void onEvent(ProviderConnectedEvent event) {
+        if (event.componentName == null) return;
         if (event.showPlayer) {
             mLaunchedAlreadyPlaying = true;
         }

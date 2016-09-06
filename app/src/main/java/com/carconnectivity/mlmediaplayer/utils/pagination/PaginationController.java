@@ -46,6 +46,7 @@ public class PaginationController {
     private PageButton mButtonPrevious;
     private PageButton mButtonCurrent;
     private PageButton mButtonNext;
+    private LinearLayout mPaginationControls;
 
     public PaginationController(PaginatedAdapter adapter, boolean usePagination) {
         mAdapter = adapter;
@@ -74,11 +75,10 @@ public class PaginationController {
         button.setOnClickListener(generateListener(button));
     }
 
-    public void setVisibleButtons(boolean visible) {
-        if(!mUsePagination) return;
-        mButtonPrevious.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
-        mButtonCurrent.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
-        mButtonNext.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
+    public void setVisibility(boolean visible) {
+        if (!mUsePagination) return;
+        if (mPaginationControls == null) return;
+        mPaginationControls.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
     }
 
     public void changeActiveColor(int color) {
@@ -91,9 +91,9 @@ public class PaginationController {
             (View root, View.OnFocusChangeListener focusListener) {
         if (root == null) return;
 
-        LinearLayout paginationControls
+        mPaginationControls
                 = (LinearLayout) root.findViewById(R.id.launcher_pagination);
-        paginationControls.setVisibility(mUsePagination ? View.VISIBLE : View.INVISIBLE);
+        mPaginationControls.setVisibility(mUsePagination ? View.VISIBLE : View.INVISIBLE);
         mButtonPrevious = (PageButton) root.findViewById(R.id.page_button_previous);
         mButtonCurrent = (PageButton) root.findViewById(R.id.page_button_current);
         mButtonNext = (PageButton) root.findViewById(R.id.page_button_next);

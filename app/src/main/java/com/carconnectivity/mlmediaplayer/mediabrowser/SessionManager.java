@@ -34,7 +34,16 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.*;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.BrowseDirectoryEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.CurrentlyBrowsedProviderChanged;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.DisableEventsEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.DisconnectFromProviderEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.NowPlayingProviderChangedEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.PlayMediaItemEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderBrowseCancelEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderConnectedEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderDiscoveredEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.StartBrowsingEvent;
 import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
 
 /**
@@ -43,6 +52,7 @@ import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
 public class SessionManager {
     private static final String TAG = SessionManager.class.getSimpleName();
     private final ProvidersManager mManger;
+    private Boolean mLastPlayerModeOnline;
 
     /**
      * the provider that is now browsed
@@ -53,7 +63,6 @@ public class SessionManager {
      */
     private Provider mPlayingProvider;
 
-
     public SessionManager(Context context, PackageManager packageManager) {
         mManger = new ProvidersManager(context, packageManager);
 
@@ -61,26 +70,12 @@ public class SessionManager {
     }
 
     public void findProviders() {
-        Log.d(TAG,"find providers");
+        Log.d(TAG, "findProviders");
         mManger.findProviders();
     }
 
-    public boolean hasBrowsedProvider() {
-        return mBrowsedProvider != null && mBrowsedProvider.isConnected();
-    }
-
-    public ProviderViewActive getNowPlayingProviderView() {
-        if (mPlayingProvider == null) return null;
-        return mManger.getProviderView(mPlayingProvider.getName());
-    }
-
-    public ProviderView getBrowsedProviderView() {
-        if (mBrowsedProvider == null) return null;
-        return mManger.getProviderView(mBrowsedProvider.getName());
-    }
-
     public void refreshProviders() {
-        Log.d(TAG,"refresh providers");
+        Log.d(TAG, "refreshProviders");
         mManger.refreshProviders();
     }
 
@@ -90,16 +85,15 @@ public class SessionManager {
 
     @SuppressWarnings("unused")
     public void onEvent(PlayMediaItemEvent event) {
-        changePlayingProvider(mBrowsedProvider);
+        changePlayingProvider(mBrowsedProvider.getName());
     }
 
     @SuppressWarnings("unused")
     public void onEvent(ProviderConnectedEvent event) {
-        if(event.provider != null) return;
-        if(!event.cleanPlayingProvider) return;
-
-        RsEventBus.postSticky(new NowPlayingProviderChangedEvent(null));
-        mPlayingProvider = null;
+        if (event.componentName == null) return;
+        if (!event.showPlayer) return;
+        Provider provider = mManger.getProvider(event.componentName);
+        changePlayingProvider(event.componentName);
     }
 
     @SuppressWarnings("unused")
@@ -118,43 +112,38 @@ public class SessionManager {
 
     @SuppressWarnings("unused")
     public void onEvent(ProviderDiscoveredEvent event) {
-        if (event.isPlaying && mPlayingProvider == null) {
-            Log.d(TAG,"ProviderDiscoveredEvent");
-            changeBrowsedProvider(event.provider.getUniqueName(), true);
+        if (event.isPlaying) {
+            Provider provider = mManger.getProvider(event.provider.getUniqueName());
+            provider.connect(true);
         }
     }
 
     @SuppressWarnings("unused")
-    public void onEvent(DisconnectFromCurrentProviderEvent event) {
-        disconnect();
+    public void onEvent(DisconnectFromProviderEvent event) {
+        disconnectProvider(event.mName);
     }
 
     @SuppressWarnings("unused")
-    public void onEvent(DisableEventsEvent event){
+    public void onEvent(DisableEventsEvent event) {
         RsEventBus.unregister(this);
     }
 
-    private void changePlayingProvider(Provider maybePlayingProvider) {
-        if (maybePlayingProvider == null) return;
+    private void changePlayingProvider(ComponentName providerName) {
+        Log.d(TAG, "changePlayingProvider: providerName=" + (providerName != null ? providerName : "null"));
+        if (providerName == null) return;
 
-        final ComponentName newName = maybePlayingProvider.getName();
-        if (isPlayingProvider(newName)) return;
-
+        if (isPlayingProvider(providerName)) return;
 
         if (mPlayingProvider != null && mPlayingProvider.isPlaying()) mPlayingProvider.forcePause();
-        mPlayingProvider = maybePlayingProvider;
+        mPlayingProvider = mManger.getProvider(providerName);
         RsEventBus.postSticky(new NowPlayingProviderChangedEvent(mPlayingProvider.getView()));
-    }
-
-    private void changePlayingProviderIfPlaying(Provider maybePlayingProvider) {
-        if (maybePlayingProvider == null) return;
-        if (!maybePlayingProvider.isPlaying()) return;
-        if (mPlayingProvider != null && mPlayingProvider.isPlayingOrPreparing()) return;
-        Log.d(TAG,"changePlayingProviderIfPlaying");
-        changePlayingProvider(maybePlayingProvider);
+        if (mBrowsedProvider == null) {
+            changeBrowsedProvider(providerName, false);
+        }
     }
 
     public void changeBrowsedProvider(ComponentName providerName, boolean showPlayer) {
+        Log.d(TAG, "changeBrowsedProvider: providerName=" + (providerName != null ? providerName : "null") + ", showPlayer=" + showPlayer);
         disconnectBrowsedProvider(false);
 
         mBrowsedProvider = mManger.getProvider(providerName);
@@ -164,71 +153,126 @@ public class SessionManager {
         }
 
         if (mPlayingProvider == null) {
-            Log.d(TAG,"changeBrowsedProvider");
-            changePlayingProvider(mBrowsedProvider);
+            changePlayingProvider(providerName);
         }
     }
 
     private void disconnectBrowsedProvider(boolean unconditionalDisconnect) {
+        Log.d(TAG, "disconnectBrowsedProvider: unconditionalDisconnect=" + unconditionalDisconnect);
         if (mBrowsedProvider == null) return;
         if (!mBrowsedProvider.isConnected()) return;
 
         // don't disconnect when browserProvider is equal playingProvider
         if (unconditionalDisconnect || mPlayingProvider != null && !mBrowsedProvider.isNameEqual(mPlayingProvider.getName())) {
             Log.d(TAG, "disconnectBrowsedProvider");
-            mBrowsedProvider.disconnect(false);
+            mBrowsedProvider.disconnect();
         }
     }
 
     private void disconnectPlayingProvider() {
+        Log.d(TAG, "disconnectPlayingProvider");
         if (mPlayingProvider == null) return;
         if (!mPlayingProvider.isConnected()) return;
 
-        Log.d(TAG, "disconnectPlayingProvider");
-        mPlayingProvider.disconnect(false);
+        mPlayingProvider.disconnect();
     }
 
-    public void disconnect() {
-        disconnectBrowsedProvider(true);
-        disconnectPlayingProvider();
+    public void disconnectProvider(ComponentName providerName) {
+        Log.d(TAG, "disconnectProvider");
+        // check if it's playing provider
+        if (mPlayingProvider != null && providerName.equals(mPlayingProvider.getName())) {
+            if (mPlayingProvider.isPlaying()) {
+                mPlayingProvider.forcePause();
+            }
+            mPlayingProvider.disconnect();
+            mPlayingProvider = null;
+            RsEventBus.postSticky(new NowPlayingProviderChangedEvent(null));
+        }
+        // check if it's browsing provider
+        if (mBrowsedProvider != null && providerName.equals(mBrowsedProvider.getName())) {
+            mBrowsedProvider.disconnect();
+            mBrowsedProvider = null;
+            RsEventBus.post(new ProviderBrowseCancelEvent());
+        }
     }
 
-    private void tryReconnectProvider(Provider provider) {
+    private void tryConnectIfDisconnected(Provider provider) {
+        Log.d(TAG, "tryConnectIfDisconnected: provider=" + (provider != null ? provider.getName() : "null"));
         if (provider == null) {
             Log.w(TAG, "Cannot reconnect, current provider is null");
             return;
         }
-        if (provider.isConnected()) {
-            provider.disconnect(false);
+        if (!provider.isConnected()) {
+            provider.connect(false);
         }
-        provider.connect(false);
     }
 
-    public void tryReconnect() {
-        tryReconnectProvider(mPlayingProvider);
-        tryReconnectProvider(mBrowsedProvider);
+    public void tryConnectIfDisconnected() {
+        Log.d(TAG, "tryConnectIfDisconnected");
+        tryConnectIfDisconnected(mPlayingProvider);
+        tryConnectIfDisconnected(mBrowsedProvider);
     }
 
-    public void changeModePlayer(boolean mPlayerModeOnline) {
-        mManger.changeModePlayer(mPlayerModeOnline);
+    public boolean isDisconnectedProvider(){
+        if(mPlayingProvider != null){
+            if(!mPlayingProvider.isConnected()){
+                return true;
+            }
+        }
+        if(mBrowsedProvider != null){
+            if(!mBrowsedProvider.isConnected()){
+                return true;
+            }
+        }
+        return false;
+    }
 
-        //playing provider
+    public void changeModePlayer(boolean playerModeOnline) {
+        Log.d(TAG, "changeModePlayer: mLastPlayerModeOnline=" + mLastPlayerModeOnline + " playerModeOnline=" + playerModeOnline);
+        mManger.changeModePlayer(playerModeOnline);
+
+        String playingProviderId = mPlayingProvider != null ? mPlayingProvider.getView().getId() : null;
+        String browsingProviderId = mBrowsedProvider != null ? mBrowsedProvider.getView().getId() : null;
+        Log.d(TAG, "Actual providers: Playing=" + playingProviderId + ", Browsing=" + browsingProviderId);
+
+        // check only situation online -> offline
+        // all providers can play in situation offline -> online
+        if(mLastPlayerModeOnline == null || mLastPlayerModeOnline == playerModeOnline || playerModeOnline){
+            mLastPlayerModeOnline = playerModeOnline;
+            return;
+        }else{
+            mLastPlayerModeOnline = playerModeOnline;
+        }
+
         if (mPlayingProvider != null) {
-            if (!mPlayerModeOnline && !mPlayingProvider.canPlayOffline()
-                    || !mManger.isRecordsContainsProvider(mPlayingProvider.getName())) {
-                //pause playing and disconnect
-                if (mPlayingProvider.isPlaying()) mPlayingProvider.forcePause();
-                mPlayingProvider.disconnect(true);
+            if (mPlayingProvider.isPlaying()) {
+                // pause music if mode is change
+                mPlayingProvider.forcePause();
+            }
+            if (!mPlayingProvider.canPlayOffline()) {
+                // cancel playing if provider can't play offline
+                disconnectProvider(mPlayingProvider.getName());
             }
         }
 
-        //browsing provider
         if (mBrowsedProvider != null) {
-            if (mPlayingProvider.getName().equals(mBrowsedProvider.getName())) return;
-            if (!mPlayerModeOnline && !mBrowsedProvider.canPlayOffline()
-                    || !mManger.isRecordsContainsProvider(mBrowsedProvider.getName())) {
-                RsEventBus.post(new ProviderBrowseCancelEvent());
-                mBrowsedProvider = null;
+            // playing provider is browsing provider
+            if (playingProviderId != null && browsingProviderId != null &&
+                    playingProviderId.equals(browsingProviderId)) {
+                if (!mBrowsedProvider.canPlayOffline()) {
+                    // cancel browsing if playing browser is browsing browser
+                    // and can't play offline
+                    disconnectProvider(mBrowsedProvider.getName());
+                }
+            } else {
+                if (!mBrowsedProvider.canPlayOffline()) {
+                    // cancel browsing when player isn't offline
+                    disconnectProvider(mBrowsedProvider.getName());
+                } else if (mPlayingProvider == null) {
+                    // if we cancel playing and provider browser can play offline
+                    // set it as playing provider
+                    changePlayingProvider(mBrowsedProvider.getName());
+                }
             }
         }
     }

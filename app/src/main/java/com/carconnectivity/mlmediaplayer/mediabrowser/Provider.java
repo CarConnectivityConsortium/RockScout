@@ -39,6 +39,7 @@ import android.media.session.PlaybackState;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.*;
 import com.carconnectivity.mlmediaplayer.mediabrowser.model.TrackMetadata;
 import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
@@ -80,10 +81,21 @@ final class Provider {
         mMediaController = new ProviderMediaController(this);
     }
 
-    public boolean isConnected() { return mConnected; }
-    public boolean canConnect() { return mCanConnect; }
-    public boolean canPlayOffline() { return mCanPlayOffline; }
-    public ComponentName getName() { return mName; }
+    public boolean isConnected() {
+        return mConnected;
+    }
+
+    public boolean canConnect() {
+        return mCanConnect;
+    }
+
+    public boolean canPlayOffline() {
+        return mCanPlayOffline;
+    }
+
+    public ComponentName getName() {
+        return mName;
+    }
 
     public boolean isNameEqual(ComponentName name) {
         return name != null && mName.equals(name);
@@ -121,22 +133,20 @@ final class Provider {
     }
 
     public void connect(boolean showPlayer) {
-        if (mConnected) {
-            throw new IllegalStateException("Provider is already connected.");
+        Log.d(TAG, "Connect to provider: " + mName);
+        if (!mConnected) {
+            mActiveConnectionCallback = new ConnectionCallback(showPlayer);
+            connectWithCallback(mActiveConnectionCallback);
         }
-        mActiveConnectionCallback = new ConnectionCallback(showPlayer);
-        connectWithCallback(mActiveConnectionCallback);
     }
 
-    public void disconnect(boolean cleanProvider) {
-        RsEventBus.post(new ProviderConnectedEvent(null, false, cleanProvider));
-        if (mActiveConnectionCallback == null) {
-            throw new NullPointerException("Unexpected state: active connection callback is null.");
+    public void disconnect() {
+        Log.d(TAG, "Disconnect from provider: " + mName);
+        if (mActiveConnectionCallback != null) {
+            mActiveConnectionCallback.disconnect();
+            mActiveConnectionCallback = null;
+            mConnected = false;
         }
-
-        mActiveConnectionCallback.disconnect();
-        mActiveConnectionCallback = null;
-        mConnected = false;
     }
 
     private void connectWithCallback(final ConnectionCallbackBase callback) {
@@ -158,48 +168,81 @@ final class Provider {
     }
 
     private abstract class ConnectionCallbackBase extends MediaBrowser.ConnectionCallback {
+        private final int MAX_RECONNECT = 20;
+        private final int TIME_BEFORE_RECONNECT = 250;
+        private int mCountReconnect;
+
         private MediaBrowser mBrowser = null;
         private Provider mProvider = null;
+        private boolean mTestConnection;
 
-        public void setBrowser(MediaBrowser browser) { mBrowser = browser; }
-        public MediaBrowser getBrowser() { return mBrowser; }
+        public ConnectionCallbackBase(boolean testConnection) {
+            mTestConnection = testConnection;
+            mCountReconnect = 0;
+        }
 
-        public void setProvider(Provider browser) { mProvider = browser; }
-        public Provider getProvider() { return mProvider; }
+        public void setBrowser(MediaBrowser browser) {
+            mBrowser = browser;
+        }
+
+        public MediaBrowser getBrowser() {
+            return mBrowser;
+        }
+
+        public void setProvider(Provider browser) {
+            mProvider = browser;
+        }
+
+        public Provider getProvider() {
+            return mProvider;
+        }
+
+        private void reconnect() {
+            getBrowser().disconnect();
+            mMediaController.stopListening();
+            mConnected = false;
+            mCountReconnect++;
+            Log.d(TAG, "Connection failed to acquire token: " + mName.toString());
+            if (mCountReconnect >= MAX_RECONNECT) {
+                if (mTestConnection) {
+                    mManager.addTestedProvider(mName, false, false);
+                } else {
+                    RsEventBus.postSticky(new ProviderConnectErrorEvent(mName.toString()));
+                }
+
+            } else {
+                Log.d(TAG, "Retry provider connection, count retry: " + mCountReconnect);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        getBrowser().connect();
+                    }
+                }, TIME_BEFORE_RECONNECT);
+            }
+        }
     }
 
     private class TestConnectionCallback extends ConnectionCallbackBase {
-        private final int MAX_RETRY_CONNECT = 20;
-        private final int TIME_BEFORE_RECONNECT = 100;
-        private boolean mRetryConnect;
-        private int mCountRetryConnect;
 
         public TestConnectionCallback() {
-            super();
-            mRetryConnect = false;
-            mCountRetryConnect = 0;
+            super(true);
         }
 
         @Override
         public void onConnected() {
             final MediaBrowser browser = getBrowser();
             final MediaSession.Token token = browser.getSessionToken();
-            if(token != null) {
+            if (token != null) {
                 mCanConnect = true;
                 mConnected = true;
-                final ProviderViewActive view = mManager.getProviderView(mName);
                 final boolean isPlaying = checkIsPlaying();
             /* possibility to make connection has been tested, disconnect */
                 getBrowser().disconnect();
                 mConnected = false;
-                mManager.addConnectedProvider(view.getUniqueName(), isPlaying);
+                mManager.addTestedProvider(mName, true, isPlaying);
             } else {
-                mRetryConnect = true;
-                mCountRetryConnect++;
-                Log.d(TAG, "Test connection failed to acquire token: " + mName.toString());
-                disconnect();
+                super.reconnect();
             }
-
         }
 
         private boolean checkIsPlaying() {
@@ -215,33 +258,14 @@ final class Provider {
 
         @Override
         public void onConnectionFailed() {
+            Log.d(TAG, "TestConnectionCallback onConnectionFailed: " + mName);
             mCanConnect = false;
+            mManager.addTestedProvider(mName, false, false);
         }
 
         @Override
         public void onConnectionSuspended() {
-            RsEventBus.post(new ProviderConnectedEvent(null, false, false));
-            RsEventBus.post(new DisconnectFromCurrentProviderEvent());
-        }
-
-        private void disconnect() {
-            getBrowser().disconnect();
-            mMediaController.stopListening();
-            mConnected = false;
-            if (mRetryConnect) {
-                if (mCountRetryConnect >= MAX_RETRY_CONNECT) {
-                    final ProviderViewActive viewOnline = mManager.getProviderView(mName);
-                    RsEventBus.post(new ProviderDiscoveredEvent(viewOnline, false));
-                } else {
-                    Log.d(TAG, "Retry provider test connection, count retry:" + mCountRetryConnect);
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            getBrowser().connect();
-                        }
-                    }, TIME_BEFORE_RECONNECT);
-                }
-            }
+            Log.d(TAG, "TestConnectionCallback onConnectionSuspended: " + mName);
         }
     }
 
@@ -254,11 +278,7 @@ final class Provider {
     }
 
     private class ConnectionCallback extends ConnectionCallbackBase {
-        private final int MAX_RETRY_CONNECT = 20;
-        private final int TIME_BEFORE_RECONNECT = 300;
         private final boolean mShowPlayer;
-        private boolean mRetryConnect;
-        private int mCountRetryConnect;
         MediaController mController;
         String mLastSubscription;
         MediaBrowser.SubscriptionCallback mSubscriptionCallback
@@ -281,30 +301,19 @@ final class Provider {
         };
 
         public ConnectionCallback(boolean showPlayer) {
-            super();
-            mRetryConnect = false;
-            mCountRetryConnect = 0;
+            super(false);
             mShowPlayer = showPlayer;
         }
 
         public void disconnect() {
-            getBrowser().disconnect();
+            Log.d(TAG, "disconnect " + mName);
+            final MediaBrowser browser = getBrowser();
+            if (browser != null) {
+                getBrowser().disconnect();
+            }
             mMediaController.stopListening();
             mConnected = false;
             RsEventBus.unregister(this);
-            if (mRetryConnect) {
-                if (mCountRetryConnect >= MAX_RETRY_CONNECT) {
-                    RsEventBus.postSticky(new ProviderConnectErrorEvent(mName.toString()));
-                } else {
-                    Log.d(TAG, "Retry provider connection, count retry:" + mCountRetryConnect);
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            getBrowser().connect();
-                        }
-                    }, TIME_BEFORE_RECONNECT);
-                }
-            }
         }
 
         @Override
@@ -320,17 +329,11 @@ final class Provider {
                 browser.subscribe(root, mSubscriptionCallback);
                 RsEventBus.register(this);
 
-                final ProviderViewActive view = mManager.getProviderView(mName);
-                RsEventBus.postSticky(new ProviderConnectedEvent(view, mShowPlayer, false));
+                RsEventBus.post(new ProviderConnectedEvent(mName, mShowPlayer, false));
 
                 mConnected = true;
-                mRetryConnect = false;
-                mCountRetryConnect = 0;
             } else {
-                mRetryConnect = true;
-                mCountRetryConnect++;
-                Log.d(TAG, "Connection failed to acquire token: " + mName.toString());
-                disconnect();
+                super.reconnect();
             }
         }
 
@@ -353,15 +356,18 @@ final class Provider {
 
         @Override
         public void onConnectionFailed() {
+            Log.d(TAG, "ConnectionCallback onConnectionFailed " + mName);
             mConnected = false;
             mMediaController.stopListening();
+            RsEventBus.post(new DisconnectFromProviderEvent(mName));
         }
 
         @Override
         public void onConnectionSuspended() {
+            Log.d(TAG, "ConnectionCallback onConnectionSuspended " + mName);
+            mConnected = false;
             mMediaController.stopListening();
-            RsEventBus.post(new ProviderConnectedEvent(null, false, false));
-            RsEventBus.post(new DisconnectFromCurrentProviderEvent());
+            RsEventBus.post(new DisconnectFromProviderEvent(mName));
         }
     }
 }
