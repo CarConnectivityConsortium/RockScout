@@ -37,8 +37,17 @@ import android.media.session.MediaController;
 import android.media.session.PlaybackState;
 import android.os.Bundle;
 import android.util.Log;
-import com.carconnectivity.mlmediaplayer.commonapi.events.*;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.*;
+
+import com.carconnectivity.mlmediaplayer.commonapi.events.AudioStartBlockingEvent;
+import com.carconnectivity.mlmediaplayer.commonapi.events.AudioStopBlockingEvent;
+import com.carconnectivity.mlmediaplayer.commonapi.events.PlaybackFailedEvent;
+import com.carconnectivity.mlmediaplayer.commonapi.events.PrepareForPlaybackEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.MediaButtonClickedEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.MediaExtrasChangedEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.MediaMetadataChangedEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.PlayMediaItemEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.PlaybackStateChangedEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.TerminateEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.model.MediaButtonData;
 import com.carconnectivity.mlmediaplayer.mediabrowser.model.SlotReservation;
 import com.carconnectivity.mlmediaplayer.mediabrowser.model.TrackMetadata;
@@ -93,27 +102,25 @@ public final class ProviderMediaController extends MediaController.Callback {
     public boolean isPlaying() {
         final int state = mCurrentPlaybackState.state;
         return state == PlaybackState.STATE_PLAYING
-            || state == PlaybackState.STATE_SKIPPING_TO_NEXT
-            || state == PlaybackState.STATE_SKIPPING_TO_PREVIOUS
-            || state == PlaybackState.STATE_SKIPPING_TO_QUEUE_ITEM
-            || state == PlaybackState.STATE_PAUSED
-            ;
+                || state == PlaybackState.STATE_SKIPPING_TO_NEXT
+                || state == PlaybackState.STATE_SKIPPING_TO_PREVIOUS
+                || state == PlaybackState.STATE_SKIPPING_TO_QUEUE_ITEM
+                ;
     }
 
     public boolean isPlayingOrPreparing() {
         final int state = mCurrentPlaybackState.state;
         return isPlaying()
-            || state == PlaybackState.STATE_BUFFERING
-            || state == PlaybackState.STATE_CONNECTING
-            ;
+                || state == PlaybackState.STATE_BUFFERING
+                || state == PlaybackState.STATE_CONNECTING
+                ;
     }
 
     public void forcePause() {
-        Log.d(TAG, "ForcePause");
+        Log.d(TAG, "forcePause");
         if (mIsListening == false) return;
         final MediaController.TransportControls controls
                 = mMediaController.getTransportControls();
-        Log.d(TAG, "Force Pauseing");
         controls.pause();
     }
 
@@ -223,9 +230,9 @@ public final class ProviderMediaController extends MediaController.Callback {
                 = mHelper.resolveMediaButtons(mReservedSlots, playbackState);
 
         final ProviderPlaybackState playback = new ProviderPlaybackState
-                ( state, position, lastPositionUpdateTime
-                , playbackSpeed, activeQueueItemId, playbackButton
-                , mediaButtons
+                (state, position, lastPositionUpdateTime
+                        , playbackSpeed, activeQueueItemId, playbackButton
+                        , mediaButtons
                 );
         mCurrentPlaybackState = playback;
         final PlaybackStateChangedEvent event
@@ -247,15 +254,8 @@ public final class ProviderMediaController extends MediaController.Callback {
     }
 
     @SuppressWarnings("unused")
-    public void onEvent(MirrorLinkSessionChangedEvent event) {
-        if (event.headUnitIsConnected == false) {
-            forcePause();
-        }
-    }
-
-    @SuppressWarnings("unused")
     public void onEvent(PlayMediaItemEvent event) {
-        Log.d(TAG, "handle MediaButtonClickedEvent event: " + event.toString());
+        Log.d(TAG, "Handle MediaButtonClickedEvent event: " + event.toString());
 
         if (isOwner(event.provider) == false) return;
 
@@ -265,15 +265,18 @@ public final class ProviderMediaController extends MediaController.Callback {
         }
     }
 
-    @SuppressWarnings("unused") 
-   public void onEvent(TerminateEvent event) {
-        Log.d(TAG, "handle TerminateEvent event: " + event.toString());
-        forcePause();
+    @SuppressWarnings("unused")
+    public void onEvent(TerminateEvent event) {
+        Log.d(TAG, "Handle TerminateEvent event: " + event.toString());
+        if(isPlayingOrPreparing()){
+            forcePause();
+        }
+        mOwner.disconnect();
     }
 
     @SuppressWarnings("unused")
     public void onEvent(MediaButtonClickedEvent event) {
-        Log.d(TAG, "handle MediaButtonClickedEvent event: " + event.toString());
+        Log.d(TAG, "Handle MediaButtonClickedEvent event: " + event.toString());
 
         final MediaButtonData data = event.mediaButtonData;
         if (mHandleMediaButtonDataEvents == false) return;

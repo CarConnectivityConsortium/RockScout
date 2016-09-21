@@ -32,9 +32,9 @@ package com.carconnectivity.mlmediaplayer.mediabrowser;
 import android.media.session.PlaybackState;
 import android.test.AndroidTestCase;
 
-import com.carconnectivity.mlmediaplayer.mediabrowser.model.SlotReservation;
 import com.carconnectivity.mlmediaplayer.mediabrowser.model.MediaButtonData;
 import com.carconnectivity.mlmediaplayer.mediabrowser.model.MediaButtonData.Type;
+import com.carconnectivity.mlmediaplayer.mediabrowser.model.SlotReservation;
 
 import java.util.ArrayList;
 import java.util.Arrays;

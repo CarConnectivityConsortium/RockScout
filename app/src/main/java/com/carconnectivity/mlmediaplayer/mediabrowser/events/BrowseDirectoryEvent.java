@@ -30,21 +30,28 @@
 package com.carconnectivity.mlmediaplayer.mediabrowser.events;
 
 import android.content.ComponentName;
+
 import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
 
 /**
  * Created by belickim on 22/04/15.
  */
 public final class BrowseDirectoryEvent implements RockScoutEvent {
-    /** Name of provider which is browsed, cannot be null. */
+    /**
+     * Name of provider which is browsed, cannot be null.
+     */
     public final ComponentName providerName;
-    /** Id of the browsed directory, if null root directory is browsed. */
+    /**
+     * Id of the browsed directory, if null root directory is browsed.
+     */
     public final String directoryId;
 
-    /** Creates new instance of BrowseDirectoryEvent
+    /**
+     * Creates new instance of BrowseDirectoryEvent
+     *
      * @param providerName name of the browsed provider, cannot be null.
-     * @param directoryId id of the directory to browse, if null
-     *                    the root of given provider will be browsed
+     * @param directoryId  id of the directory to browse, if null
+     *                     the root of given provider will be browsed
      */
     public BrowseDirectoryEvent(ComponentName providerName, String directoryId) {
         if (providerName == null) {

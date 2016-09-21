@@ -119,8 +119,7 @@ public class PageButton extends FrameLayout {
         final int backgroundColor
                 = mIsActive
                 ? mCurrentActiveColor
-                : getResources().getColor(R.color.c4_inactive_button_color)
-                ;
+                : getResources().getColor(R.color.c4_inactive_button_color);
 
         mBackground.setImageTintList(ColorStateList.valueOf(backgroundColor));
         mNextIcon.setVisibility(mIsNextButton ? VISIBLE : INVISIBLE);

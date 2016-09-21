@@ -38,6 +38,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.MediaButtonClickedEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.model.MediaButtonData;
 import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
@@ -116,7 +117,7 @@ public class MediaButton extends ImageView {
                         }
                         Rect hitRect = new Rect();
                         v.getHitRect(hitRect);
-                        if (hitRect.contains((int)event.getX(), (int)event.getY())) {
+                        if (hitRect.contains((int) event.getX(), (int) event.getY())) {
                             callOnClick();
                         }
                         return true;
@@ -188,7 +189,7 @@ public class MediaButton extends ImageView {
         } else {
             setImageBitmap(null);
         }
-        switch(mMediaButtonData.type) {
+        switch (mMediaButtonData.type) {
             case PAUSE:
             case STOP:
             case PLAY:

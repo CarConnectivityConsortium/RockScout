@@ -29,8 +29,6 @@
 
 package com.carconnectivity.mlmediaplayer.utils.pagination;
 
-import java.util.ArrayList;
-
 /**
  * Created by belickim on 15/05/15.
  */
@@ -52,8 +50,13 @@ public class PaginationModel {
         mCurrentPage = 0;
     }
 
-    public int getPagesCount() { return (int) Math.ceil(mItemsCount / (double) mItemsPerPage); }
-    public int getPageSize() { return mItemsPerPage; }
+    public int getPagesCount() {
+        return (int) Math.ceil(mItemsCount / (double) mItemsPerPage);
+    }
+
+    public int getPageSize() {
+        return mItemsPerPage;
+    }
 
     public boolean setCurrentPage(int currentPage) {
         if (currentPage < 0) return false;
@@ -63,30 +66,29 @@ public class PaginationModel {
         return true;
     }
 
-    public int getCurrentPage() { return mCurrentPage; }
+    public int getCurrentPage() {
+        return mCurrentPage;
+    }
 
     public void grow(int amount) {
         mItemsCount += amount;
     }
 
     public int getCountOfItemsOnCurrentPage() {
-        /* TODO: would you kindly optimize me? */
-        return getVisibleItemIndices().length;
+        int itemsBehind = mCurrentPage * mItemsPerPage;
+        int itemsHereAndForward = mItemsCount - itemsBehind;
+        return Math.min(itemsHereAndForward, mItemsPerPage);
     }
 
     public int[] getVisibleItemIndices() {
-        final ArrayList<Integer> visible = new ArrayList<>(mItemsPerPage);
-        for (int i = 0; i < mItemsPerPage; i++) {
-            int index = mCurrentPage * mItemsPerPage + i;
-            if (index >= mItemsCount) break;
-            visible.add(index);
+        int visibleItemsCount = getCountOfItemsOnCurrentPage();
+        int[] visibleIndices = new int[visibleItemsCount];
+
+        int firstIndex = mCurrentPage * mItemsPerPage;
+        for (int i = 0; i < visibleItemsCount; ++i) {
+            visibleIndices[i] = firstIndex + i;
         }
 
-        int[] array = new int[visible.size()];
-        for (int i = 0; i < array.length; i++) {
-            array[i] = visible.get(i);
-        }
-
-        return array;
+        return visibleIndices;
     }
 }

@@ -38,13 +38,17 @@ import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
  * Sticky event.
  */
 public final class PlaybackStateChangedEvent implements RockScoutEvent {
-    /** Immutable view of provider who originated the playback change. */
+    /**
+     * Immutable view of provider who originated the playback change.
+     */
     public final ProviderViewActive provider;
-    /** Latest playback state */
+    /**
+     * Latest playback state
+     */
     public final ProviderPlaybackState state;
 
     public PlaybackStateChangedEvent
-            ( ProviderViewActive provider, ProviderPlaybackState state
+            (ProviderViewActive provider, ProviderPlaybackState state
             ) {
         if (provider == null) {
             throw new IllegalArgumentException("Provider cannot be null.");

@@ -30,6 +30,7 @@
 package com.carconnectivity.mlmediaplayer.ui.launcher;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.Fragment;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -41,13 +42,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.GridView;
-import android.widget.ImageButton;
-import android.widget.ScrollView;
-import android.widget.TextView;
-
+import android.widget.*;
 import com.carconnectivity.mlmediaplayer.R;
 import com.carconnectivity.mlmediaplayer.commonapi.events.DriveModeStatusChangedEvent;
 import com.carconnectivity.mlmediaplayer.commonapi.events.MirrorLinkSessionChangedEvent;
@@ -55,13 +50,7 @@ import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewActive;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewInactive;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewToDownload;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.DisableEventsEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.NowPlayingProviderChangedEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderConnectedEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderDiscoveredEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderInactiveDiscoveredEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderToDownloadDiscoveredEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.StartBrowsingEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.*;
 import com.carconnectivity.mlmediaplayer.ui.InteractionListener;
 import com.carconnectivity.mlmediaplayer.ui.MainActivity;
 import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
@@ -73,6 +62,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LauncherFragment extends Fragment {
+
     private static final String TAG = LauncherFragment.class.getSimpleName();
     private boolean mUsePagination = false;
     private PaginationController mPaginationController;
@@ -87,31 +77,24 @@ public class LauncherFragment extends Fragment {
 
     private TextView mSelectAppHint;
     private TextView mNoAppsWarning;
-    private boolean mIgnoreGoToPlayerOnConnection;
-    private boolean mInDriveMode;
     private boolean mHeadUnitIsConnected;
+    private Dialog mDialog;
 
     private View.OnFocusChangeListener mFocusListener;
-    private ImageButton mBackButton;
-
 
     public static LauncherFragment newInstance() {
         LauncherFragment fragment = new LauncherFragment();
         fragment.mListProviders = new ArrayList<>();
-        fragment.mIgnoreGoToPlayerOnConnection = true;
         fragment.mHeadUnitIsConnected = false;
 
-        RsEventBus.register(fragment);
+        RsEventBus.registerSticky(fragment);
 
         return fragment;
     }
 
-    public void enableIgnoreGoToPlayerOnConnection(boolean enabled) {
-        mIgnoreGoToPlayerOnConnection = enabled;
-    }
-
     @Override
     public void onDestroy() {
+        Log.d(TAG, "onDestroy");
         super.onDestroy();
         RsEventBus.unregister(this);
     }
@@ -120,6 +103,7 @@ public class LauncherFragment extends Fragment {
         mListProviders.clear();
         if (mProviderAdapter != null) {
             mProviderAdapter.removeItems();
+            handleGridsVisibility(0);
         }
     }
 
@@ -129,59 +113,33 @@ public class LauncherFragment extends Fragment {
 
     @SuppressWarnings("unused")
     public void onEvent(DriveModeStatusChangedEvent event) {
-        enableDriveMode(event.isDriveModeActive);
-    }
-
-    @SuppressWarnings("unused")
-    public void onEvent(DisableEventsEvent event) {
+        enablePagination(event.isDriveModeActive);
     }
 
     @SuppressWarnings("unused")
     public void onEventMainThread(ProviderDiscoveredEvent event) {
-        Log.d(TAG, "Received ProviderDiscoveredEvent: " + event.provider.getUniqueName() + " " + event.isPlaying);
         final ProviderViewActive provider = event.provider;
-        mListProviders.add(provider);
-
-        if (mProviderAdapter != null) {
-            handleGridsVisibility(mProviderAdapter.getCount());
-            mProviderAdapter.addItem(provider);
-        }
-
-        if (event.isPlaying) {
-            RsEventBus.postSticky(new ProviderConnectedEvent(provider, true, false));
-        }
+        addItem(provider);
     }
 
     @SuppressWarnings("unused")
     public void onEventMainThread(ProviderToDownloadDiscoveredEvent event) {
-        Log.d(TAG, "Received ProviderToDownloadDiscoveredEvent: " + event.provider.getId());
         final ProviderViewToDownload provider = event.provider;
-        mListProviders.add(provider);
-
-        if (mProviderAdapter != null) {
-            handleGridsVisibility(mProviderAdapter.getCount());
-            mProviderAdapter.addItem(provider);
-        }
+        addItem(provider);
     }
 
     @SuppressWarnings("unused")
     public void onEventMainThread(ProviderInactiveDiscoveredEvent event) {
-        Log.d(TAG, "Received ProviderInactiveDiscoveredEvent: " + event.provider.getId());
         final ProviderViewInactive provider = event.provider;
+        addItem(provider);
+    }
+
+    private void addItem(ProviderView provider) {
         mListProviders.add(provider);
 
         if (mProviderAdapter != null) {
-            handleGridsVisibility(mProviderAdapter.getCount());
             mProviderAdapter.addItem(provider);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    public void onEvent(ProviderConnectedEvent event) {
-        if (event.provider != null) {
-            if (mIgnoreGoToPlayerOnConnection == false && event.showPlayer && mListener != null) {
-                mListener.get().showMediaPlayer();
-            }
+            handleGridsVisibility(mProviderAdapter.getCount());
         }
     }
 
@@ -198,12 +156,13 @@ public class LauncherFragment extends Fragment {
         } else {
             mHeadUnitIsConnected = false;
         }
-        initializeBackButton(getView());
+        hideNotSupportedDialog();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView");
         View root = inflater.inflate(R.layout.c4_fragment_launcher, container, false);
 
         mFocusListener = UiUtilities.defaultOnFocusChangeListener((MainActivity) getActivity());
@@ -213,9 +172,20 @@ public class LauncherFragment extends Fragment {
         mSelectAppHint = (TextView) root.findViewById(R.id.text_select_hint);
         mNoAppsWarning = (TextView) root.findViewById(R.id.no_auto_apps_warning);
 
+        ImageButton backButton = (ImageButton) root.findViewById(R.id.launcher_back_button);
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (getFragmentManager().getBackStackEntryCount() == 0) {
+                    RsEventBus.post(new FinishActivityEvent());
+                }
+                getFragmentManager().popBackStack();
+            }
+        });
+        backButton.setOnFocusChangeListener(mFocusListener);
+
         initializeScrollView(root);
         initializeNowPlayingProviderDisplay(root);
-        initializeBackButton(root);
         initializeAdapters(root);
         mPaginationController.initializePagination(root, mFocusListener);
 
@@ -240,7 +210,6 @@ public class LauncherFragment extends Fragment {
                 if (providerView instanceof ProviderViewActive) {
                     ProviderViewActive viewOnline = (ProviderViewActive) providerView;
 
-                    RsEventBus.postSticky(new ProviderConnectedEvent(null, false, false));
                     final boolean noCurrentProvider = mNowPlayingProvider == null;
                     final boolean hasSomethingToPlay
                             = viewOnline.getCurrentMetadata() != null
@@ -256,8 +225,8 @@ public class LauncherFragment extends Fragment {
                     final String rawMessage = resources.getString(R.string.ml_not_connected);
                     final String message = String.format(rawMessage, appName);
 
-                    UiUtilities.showDialog(getActivity(), message);
-                } else if (providerView instanceof  ProviderViewToDownload) {
+                    mDialog = UiUtilities.showDialog(getActivity(), message);
+                } else if (providerView instanceof ProviderViewToDownload) {
                     ProviderViewToDownload viewToDownload = (ProviderViewToDownload) providerView;
 
                     Uri uri = Uri.parse("market://details?id=" + viewToDownload.getId());
@@ -268,16 +237,8 @@ public class LauncherFragment extends Fragment {
         return root;
     }
 
-    private void enableDriveMode(boolean enable) {
-        enablePagination(enable);
-        mInDriveMode = enable;
-
-        if (mProviderAdapter != null) {
-            handleGridsVisibility(mProviderAdapter.getCount());
-        }
-    }
-
     private void onProviderSelected(ProviderViewActive providerView, boolean showPlayer) {
+        Log.d(TAG, "onProviderSelected: providerView=" + (providerView != null ? providerView.toString() : "null") + ", showPlayer=" + showPlayer);
         if (providerView != null && providerView.canConnect()) {
             if (mListener != null) {
                 if (showPlayer) {
@@ -290,25 +251,17 @@ public class LauncherFragment extends Fragment {
         }
     }
 
-    private void initializeBackButton(View root) {
-        if (root == null) return;
+    private void hideNotSupportedDialog() {
+        Log.d(TAG, "hideNotSupportedDialog");
+        if (!mHeadUnitIsConnected) return;
+        if (mDialog == null) return;
 
-        mBackButton = (ImageButton) root.findViewById(R.id.launcher_back_button);
-        mBackButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (getFragmentManager().getBackStackEntryCount() == 0) getActivity().finish();
-                getFragmentManager().popBackStack();
-            }
-        });
-        mBackButton.setOnFocusChangeListener(mFocusListener);
-
-        final boolean backInvisible
-                = mHeadUnitIsConnected && getFragmentManager().getBackStackEntryCount() == 0;
-        UiUtilities.setVisibility(mBackButton, backInvisible == false);
+        mDialog.hide();
+        mDialog = null;
     }
 
     private void initializeScrollView(View root) {
+        Log.d(TAG, "initializeScrollView");
         if (root == null) return;
 
         final ScrollView scrollView = (ScrollView) root.findViewById(R.id.scrollview);
@@ -316,6 +269,7 @@ public class LauncherFragment extends Fragment {
     }
 
     private void initializeNowPlayingProviderDisplay(View root) {
+        Log.d(TAG, "initializeNowPlayingProviderDisplay");
         if (root == null) return;
 
         String providerName = "";
@@ -364,16 +318,15 @@ public class LauncherFragment extends Fragment {
     }
 
     private void handleGridsVisibility(int activeCount) {
+        Log.d(TAG, "handleGridsVisibility");
         if (mProviderGrid == null) return;
 
         showWarningVisibility(false);
         mProviderGrid.setVisibility(View.VISIBLE);
         if (mHeadUnitIsConnected) {
-            if (mInDriveMode) {
-                if (activeCount <= 0) {
-                    showWarningVisibility(true);
-                    mProviderGrid.setVisibility(View.INVISIBLE);
-                }
+            if (activeCount <= 0) {
+                showWarningVisibility(true);
+                mProviderGrid.setVisibility(View.INVISIBLE);
             }
         }
     }

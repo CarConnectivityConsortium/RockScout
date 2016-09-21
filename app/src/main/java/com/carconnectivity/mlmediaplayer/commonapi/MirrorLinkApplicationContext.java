@@ -32,10 +32,17 @@ package com.carconnectivity.mlmediaplayer.commonapi;
 import android.app.Application;
 import android.os.RemoteException;
 import android.util.Log;
+
 import com.carconnectivity.mlmediaplayer.commonapi.events.ConnectionMirrorLinkServiceEvent;
 import com.carconnectivity.mlmediaplayer.utils.LogUtils;
 import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
-import com.mirrorlink.android.commonapi.*;
+import com.mirrorlink.android.commonapi.ICommonAPIService;
+import com.mirrorlink.android.commonapi.IConnectionListener;
+import com.mirrorlink.android.commonapi.IConnectionManager;
+import com.mirrorlink.android.commonapi.IContextListener;
+import com.mirrorlink.android.commonapi.IContextManager;
+import com.mirrorlink.android.commonapi.IDeviceStatusListener;
+import com.mirrorlink.android.commonapi.IDeviceStatusManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -187,7 +194,6 @@ public final class MirrorLinkApplicationContext extends Application {
         if (mConnectionManagerReferenceList.size() == 0) {
             Log.v(TAG, "registerConnectionManager global ");
             try {
-                // TODO : check if mConnection or listener
                 mConnectionManager = mService.getConnectionManager(getPackageName(), listener);
             } catch (Exception e) {
                 Log.e(TAG, "Something went wrong: ", e);

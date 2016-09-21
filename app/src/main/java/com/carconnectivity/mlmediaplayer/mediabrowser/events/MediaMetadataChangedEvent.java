@@ -46,11 +46,6 @@ public final class MediaMetadataChangedEvent implements RockScoutEvent {
         this.metadata = metadata;
     }
 
-    /* TODO: why this is not implementing equals or some other interface? */
-    public boolean sameAsOther(MediaMetadataChangedEvent event) {
-        return this.metadata.sameAsOther(event.metadata);
-    }
-
     @Override
     public String toString() {
         return "MediaMetadataChangedEvent{" +

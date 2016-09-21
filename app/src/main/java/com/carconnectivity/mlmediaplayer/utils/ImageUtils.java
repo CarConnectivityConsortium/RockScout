@@ -47,10 +47,10 @@ public class ImageUtils {
         }
 
         final Bitmap bitmap
-                = Bitmap.createBitmap( drawable.getIntrinsicWidth()
-                                     , drawable.getIntrinsicHeight()
-                                     , Bitmap.Config.ARGB_8888
-                                     );
+                = Bitmap.createBitmap(drawable.getIntrinsicWidth()
+                , drawable.getIntrinsicHeight()
+                , Bitmap.Config.ARGB_8888
+        );
         final Canvas canvas = new Canvas(bitmap);
         drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
         drawable.draw(canvas);
@@ -72,14 +72,16 @@ public class ImageUtils {
         int boundTop = 0, boundBottom = 0, boundLeft = 0, boundRight = 0;
         int i = 0;
 
-        topScan: for (i = 0; i < pixels.length; i++) {
+        topScan:
+        for (i = 0; i < pixels.length; i++) {
             if (isTransparent(pixels[i], alphaThreshold) == false) {
                 boundTop = i / width;
                 break topScan;
             }
         }
 
-        bottomScan: for (i = pixels.length - 1; i >= 0; i--) {
+        bottomScan:
+        for (i = pixels.length - 1; i >= 0; i--) {
             if (isTransparent(pixels[i], alphaThreshold) == false) {
                 boundBottom = (pixels.length - i) / width;
                 break bottomScan;
@@ -87,7 +89,8 @@ public class ImageUtils {
         }
 
         /* for each x, x <- 0, scan downwards until not transparent pixel is reached */
-        leftScan: for (i = 0; i < width; i++) {
+        leftScan:
+        for (i = 0; i < width; i++) {
             for (int j = i; j < pixels.length; j += width) {
                 if (isTransparent(pixels[j], alphaThreshold) == false) {
                     boundLeft = j % width;
@@ -97,7 +100,8 @@ public class ImageUtils {
         }
 
         /* for each x, x <- width, scan upwards until not transparent pixel is reached */
-        rightScan: for (i = pixels.length - 1; i >= 0; i--) {
+        rightScan:
+        for (i = pixels.length - 1; i >= 0; i--) {
             for (int j = i; j >= 0; j -= width) {
                 if (isTransparent(pixels[j], alphaThreshold) == false) {
                     boundRight = width - (j % width);
@@ -106,14 +110,15 @@ public class ImageUtils {
             }
         }
 
-        return Bitmap.createBitmap( input, boundLeft, boundTop
-                                  , width - boundLeft - boundRight
-                                  , height - boundTop - boundBottom
-                                  );
+        return Bitmap.createBitmap(input, boundLeft, boundTop
+                , width - boundLeft - boundRight
+                , height - boundTop - boundBottom
+        );
     }
 
     /**
      * Creates new drawable with invisible pixels trimmed at the borders
+     *
      * @param input drawable to be trimmed
      * @return trimmed copy of the drawable
      */

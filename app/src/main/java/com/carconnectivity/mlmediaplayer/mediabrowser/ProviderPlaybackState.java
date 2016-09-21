@@ -30,6 +30,7 @@
 package com.carconnectivity.mlmediaplayer.mediabrowser;
 
 import android.media.session.PlaybackState;
+
 import com.carconnectivity.mlmediaplayer.mediabrowser.model.MediaButtonData;
 
 import java.util.ArrayList;
@@ -78,13 +79,13 @@ public class ProviderPlaybackState {
     public final List<MediaButtonData> mediaButtons;
 
     public ProviderPlaybackState
-            ( int state
-            , long position
-            , long lastPositionUpdateTime
-            , float playbackSpeed
-            , long activeQueueItemId
-            , MediaButtonData playbackStateButton
-            , List<MediaButtonData> mediaButtons
+            (int state
+                    , long position
+                    , long lastPositionUpdateTime
+                    , float playbackSpeed
+                    , long activeQueueItemId
+                    , MediaButtonData playbackStateButton
+                    , List<MediaButtonData> mediaButtons
             ) {
         if (playbackStateButton == null) {
             /* inferred from usage: there are no null checks, hence this should never be null */
@@ -110,9 +111,9 @@ public class ProviderPlaybackState {
                 = new MediaButtonData
                 (view, MediaButtonData.Type.PLAY, "play", null, null);
         return new ProviderPlaybackState
-                ( PlaybackState.STATE_NONE, 0L, 0L, 1.0f, 0L
-                , playButtonData
-                , new ArrayList<MediaButtonData>()
+                (PlaybackState.STATE_NONE, 0L, 0L, 1.0f, 0L
+                        , playButtonData
+                        , new ArrayList<MediaButtonData>()
                 );
     }
 

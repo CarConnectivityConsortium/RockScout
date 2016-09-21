@@ -43,14 +43,22 @@ import android.service.media.MediaBrowserService;
 import android.util.Log;
 import android.util.TypedValue;
 
+import com.carconnectivity.mlmediaplayer.R;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.DisableEventsEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderDiscoveredEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderDiscoveryFinished;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderInactiveDiscoveredEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderToDownloadDiscoveredEvent;
 import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by belickim on 16/04/15.
@@ -58,7 +66,6 @@ import java.util.*;
 public final class ProvidersManager {
     public static final String TAG = ProvidersManager.class.getSimpleName();
     public static final String ML_OFFLINE_PLAYBACK = "com.mirrorlink.android.rockscout.allow-offline-access";
-    public static final int DEFAULT_COLOR = 0x041424; /* TODO: fetch this from resources */
     public static final int TIMER_PERIOD = 120;
 
     private final Context mContext;
@@ -69,6 +76,7 @@ public final class ProvidersManager {
 
     private HashMap<ComponentName, ProviderDiscoveryData> mProvidersTestStatus;
     private Timer mDiscoveryCompletedCheckTimer;
+    private Set<ComponentName> mMediaBrowserPackages;
 
     public Context getContext() {
         return mContext;
@@ -85,14 +93,6 @@ public final class ProvidersManager {
     @SuppressWarnings("unused")
     public void onEvent(DisableEventsEvent event) {
         RsEventBus.unregister(this);
-    }
-
-    @SuppressWarnings("unused")
-    public void onEvent(ProviderDiscoveredEvent event) {
-        if (mProvidersTestStatus != null) {
-            final ComponentName name = event.provider.getUniqueName();
-            mProvidersTestStatus.put(name, new ProviderDiscoveryData(true));
-        }
     }
 
     private void checkIfTestConnectionsCompleted() {
@@ -112,7 +112,7 @@ public final class ProvidersManager {
         }
         final ProviderDiscoveryFinished finishedEvent
                 = new ProviderDiscoveryFinished(mProvidersTestStatus.size());
-        RsEventBus.postSticky(finishedEvent);
+        RsEventBus.post(finishedEvent);
         mProvidersTestStatus = null;
 
         if (mDiscoveryCompletedCheckTimer != null) {
@@ -123,11 +123,13 @@ public final class ProvidersManager {
 
     private List<ResolveInfo> getMediaBrowserPackages() {
         final Intent intent = new Intent(MediaBrowserService.SERVICE_INTERFACE);
-        return mManager.queryIntentServices(intent, 0);
+        List<ResolveInfo> resolveInfos = mManager.queryIntentServices(intent, 0);
+        mMediaBrowserPackages = getNames(resolveInfos);
+        return resolveInfos;
     }
 
     private boolean checkIfCanPlayOffline(ResolveInfo packageInfo) {
-        ApplicationInfo appInfo = null;
+        ApplicationInfo appInfo;
         try {
             appInfo = mManager.getApplicationInfo(packageInfo.serviceInfo.packageName, PackageManager.GET_META_DATA);
         } catch (PackageManager.NameNotFoundException e) {
@@ -199,11 +201,10 @@ public final class ProvidersManager {
                 it.remove();
                 mConnectedProviders.remove(name);
                 removed = true;
-                /* TODO: send an event here to notify launcher view */
             }
         }
 
-        if(removed) {
+        if (removed) {
             final ProviderDiscoveryFinished finishedEvent
                     = new ProviderDiscoveryFinished(mRecords.size());
             RsEventBus.postSticky(finishedEvent);
@@ -311,7 +312,7 @@ public final class ProvidersManager {
         if (result) {
             return value.data;
         } else {
-            return DEFAULT_COLOR;
+            return mContext.getResources().getColor(R.color.provider_default_theme_color);
         }
     }
 
@@ -319,12 +320,15 @@ public final class ProvidersManager {
         return getProvider(name).isConnected();
     }
 
-    public void addConnectedProvider(ComponentName componentName, boolean isPlaying) {
-        mConnectedProviders.put(componentName, isPlaying);
+    public void addTestedProvider(ComponentName componentName, boolean connected, boolean isPlaying) {
+        if (mProvidersTestStatus == null) return;
+        if (connected) {
+            mConnectedProviders.put(componentName, isPlaying);
+        }
+        mProvidersTestStatus.put(componentName, new ProviderDiscoveryData(true));
     }
 
     public void changeModePlayer(boolean mPlayerModeOnline) {
-        int count = 0;
         for (HashMap.Entry<ComponentName, Boolean> entry : mConnectedProviders.entrySet()
                 ) {
             Provider provider = getProvider(entry.getKey());
@@ -333,7 +337,6 @@ public final class ProvidersManager {
             ProviderViewActive viewOnline = getProviderView(entry.getKey());
             if (!mPlayerModeOnline && provider.canPlayOffline() ||
                     mPlayerModeOnline) {
-                count++;
                 RsEventBus.post(new ProviderDiscoveredEvent(viewOnline, isPlaying));
             } else {
                 ProviderViewInactive providerViewInactive = new ProviderViewInactive(viewOnline.getLabel(), viewOnline.getId(),
@@ -343,19 +346,18 @@ public final class ProvidersManager {
 
             entry.setValue(false);
         }
-
-        //download compatible apps from server
-        if (count <= 0) {
+        if (!mPlayerModeOnline) {
+            //download compatible apps from server
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    new ProviderToDownloadParser().download();
+                    new ProviderToDownloadParser(mMediaBrowserPackages).download();
                 }
             }).start();
         }
     }
 
-    public boolean isRecordsContainsProvider(ComponentName componentName){
+    public boolean isRecordsContainsProvider(ComponentName componentName) {
         return mRecords.containsKey(componentName);
     }
 

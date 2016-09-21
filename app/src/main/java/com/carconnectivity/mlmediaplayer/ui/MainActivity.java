@@ -30,14 +30,12 @@
 package com.carconnectivity.mlmediaplayer.ui;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.Instrumentation;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.media.session.PlaybackState;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -46,18 +44,18 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.carconnectivity.mlmediaplayer.R;
-import com.carconnectivity.mlmediaplayer.commonapi.MirrorLinkApplicationContext;
-import com.carconnectivity.mlmediaplayer.commonapi.MirrorLinkConnectionManager;
 import com.carconnectivity.mlmediaplayer.commonapi.events.MirrorLinkSessionChangedEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderPlaybackState;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewActive;
-import com.carconnectivity.mlmediaplayer.mediabrowser.SessionManager;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.ClearLauncherList;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.DisableEventsEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.FinishActivityEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.MediaButtonClickedEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.PlaybackStateChangedEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderDiscoveryFinished;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.NowPlayingProviderChangedEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderBrowseCancelEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.RefreshProvidersEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.TerminateEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.model.MediaButtonData;
+import com.carconnectivity.mlmediaplayer.mediabrowser.service.RockScoutService;
 import com.carconnectivity.mlmediaplayer.ui.launcher.LauncherFragment;
 import com.carconnectivity.mlmediaplayer.ui.navigator.NavigatorFragment;
 import com.carconnectivity.mlmediaplayer.ui.player.MediaPlayerFragment;
@@ -67,23 +65,17 @@ import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class MainActivity extends Activity implements InteractionListener {
-    private final static String TAG = MainActivity.class.getCanonicalName();
-    private final static String ML_TERMINATE_INTENT = "com.mirrorlink.android.app.TERMINATE";
-    private final static String ML_LAUNCH_INTENT = "com.mirrorlink.android.app.LAUNCH";
 
-    private SessionManager mManager;
+    private final static String TAG = MainActivity.class.getCanonicalName();
+    public final static String ML_TERMINATE_INTENT = "com.mirrorlink.android.app.TERMINATE";
+    public final static String ML_LAUNCH_INTENT = "com.mirrorlink.android.app.LAUNCH";
 
     private MediaPlayerFragment mPlayerFragment;
     private NavigatorFragment mNavigatorFragment;
     private LauncherFragment mLauncherFragment;
     private SplashScreenFragment mSplashFragment;
-
-    private MirrorLinkConnectionManager mMirrorLinkConnectionManager;
-    private boolean mFindProviders;
 
     private boolean mApplyTransition = true;
     private boolean mTerminateReceived = false;
@@ -92,13 +84,9 @@ public class MainActivity extends Activity implements InteractionListener {
 
     private boolean mHeadUnitIsConnected = false;
 
-    private Timer mTerminationTimer;
-    private Dialog mDialog;
-
-
-    public MirrorLinkApplicationContext getMirrorLinkApplicationContext() {
-        return (MirrorLinkApplicationContext) getApplicationContext();
-    }
+    private ProviderViewActive mPlayingProvider;
+    private boolean mOpenLauncherAfterCancelPlaying = false;
+    private boolean mOpenLauncherAfterCancelBrowsing = false;
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
@@ -118,109 +106,106 @@ public class MainActivity extends Activity implements InteractionListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate called with action: " + getIntent().getAction());
+        String action = getIntent().getAction();
+        Log.d(TAG, "onCreate called with action: " + action);
         setContentView(R.layout.activity_main);
 
-        FontOverride.forceRobotoFont(this);
+        checkAction(action);
 
-        /* Explicitly check and and handle TERMINATE event: */
-        final Intent intent = getIntent();
-        mTerminateReceived = intent.getAction().equals(ML_TERMINATE_INTENT);
-        final boolean mirrorLinkLaunch = intent.getAction().equals(ML_LAUNCH_INTENT);
+        FontOverride.forceRobotoFont(this);
 
         final String rootDirectoryName = getResources().getString(R.string.top_level);
 
         mLauncherFragment = LauncherFragment.newInstance();
         mNavigatorFragment = NavigatorFragment.newInstance(rootDirectoryName);
-        mPlayerFragment = new MediaPlayerFragment(); /* TODO: replace this with newInstance() */
+        mPlayerFragment = MediaPlayerFragment.newInstance();
         mSplashFragment = SplashScreenFragment.newInstance();
-
-        RsEventBus.register(this);
-
-        mManager = new SessionManager(this, getPackageManager());
-        mManager.findProviders();
-
-        final MirrorLinkApplicationContext mirrorLinkApplicationContext
-                = getMirrorLinkApplicationContext();
-        mMirrorLinkConnectionManager
-                = new MirrorLinkConnectionManager(mirrorLinkApplicationContext, this);
 
         getFragmentManager().beginTransaction()
                 .replace(R.id.container, mSplashFragment, "mSplashFragment")
                 .commit();
 
-        mFindProviders = false;
-        if (mirrorLinkLaunch == false && mTerminateReceived == false) {
-            mHeadUnitIsConnected = false;
-        }
+        RsEventBus.registerSticky(this);
+
+        Intent serviceIntent = new Intent(this, RockScoutService.class);
+        startService(serviceIntent);
     }
 
-    private void forceExit(){
-        Log.d(TAG, "forceExit()");
-        Intent homeIntent = new Intent(Intent.ACTION_MAIN);
-        homeIntent.addCategory(Intent.CATEGORY_HOME);
-        homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(homeIntent);
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        String action = intent.getAction();
+        Log.d(TAG, "onNewIntent called with action: " + action);
 
-        System.exit(0);
+        checkAction(action);
     }
 
-    @SuppressWarnings("unused")
-    public void onEvent(PlaybackStateChangedEvent event) {
-        Log.d(TAG, "PlaybackStateChangedEvent " + event.toString());
-        if (mTerminateReceived) {
-            final ProviderPlaybackState state = event.state;
-            if (state.state == PlaybackState.STATE_PLAYING) {
-                RsEventBus.postSticky(new TerminateEvent());
-            } else if (state.state == PlaybackState.STATE_PAUSED
-                    || state.state == PlaybackState.STATE_STOPPED) {
-                forceExit();
+    private void checkAction(String action) {
+        if (action != null) {
+            mTerminateReceived = action.equals(ML_TERMINATE_INTENT);
+            if (mTerminateReceived) {
+                RsEventBus.post(new TerminateEvent());
             }
         }
     }
 
     @SuppressWarnings("unused")
-    public void onEventMainThread(ProviderDiscoveryFinished event) {
-        Log.d(TAG, "ProviderDiscoveryFinished "+event.toString());
-
-        refreshAppList();
-
-        if (mTerminateReceived) {
-            mTerminationTimer = new Timer();
-
-            mTerminationTimer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            forceExit();
-                        }
-                    });
-                }
-            }, 1000);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    public void onEventMainThread(MirrorLinkSessionChangedEvent event) {
+    public void onEvent(MirrorLinkSessionChangedEvent event) {
         if (event.headUnitIsConnected) {
             mHeadUnitIsConnected = true;
         } else {
             mHeadUnitIsConnected = false;
         }
-
-        refreshAppList();
     }
 
-    private void refreshAppList() {
+    @SuppressWarnings("unused")
+    public void onEventMainThread(NowPlayingProviderChangedEvent event) {
+        if (event.provider == null) {
+            mOpenLauncherAfterCancelPlaying = true;
+            openLauncherAfterChangeMode();
+        }
+        mPlayingProvider = event.provider;
+    }
+
+    @SuppressWarnings("unused")
+    public void onEventMainThread(ProviderBrowseCancelEvent event) {
+        Log.d(TAG, "handle ProviderBrowseCancel");
+        mOpenLauncherAfterCancelBrowsing = true;
+        openLauncherAfterChangeMode();
+    }
+
+    @SuppressWarnings("unused")
+    public void onEventMainThread(ClearLauncherList event) {
+        if (mLauncherFragment == null) return;
         mLauncherFragment.clearList();
-        mManager.changeModePlayer(mHeadUnitIsConnected);
+    }
+
+    @SuppressWarnings("unused")
+    public void onEventMainThread(DisableEventsEvent event) {
+        RsEventBus.unregister(this);
+        finish();
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+    }
+
+    private void openLauncherAfterChangeMode() {
+        if (mInstanceStateSaved) return;
+        Fragment fragment = getCurrentFragment();
+        if (mOpenLauncherAfterCancelPlaying) {
+            if (fragment instanceof MediaPlayerFragment && mOpenLauncherAfterCancelPlaying) {
+                openLauncher(null);
+            }
+            mOpenLauncherAfterCancelPlaying = false;
+        }
+        if (mOpenLauncherAfterCancelBrowsing) {
+            if (fragment instanceof NavigatorFragment && mOpenLauncherAfterCancelBrowsing) {
+                openLauncher(null);
+            }
+            mOpenLauncherAfterCancelBrowsing = false;
+        }
     }
 
     @Override
@@ -231,39 +216,26 @@ public class MainActivity extends Activity implements InteractionListener {
         if ((getFragmentManager().getBackStackEntryCount() == 0) && !mSplashFragment.isAdded()) {
             showLauncher();
         }
-        if (mFindProviders) {
-            mManager.refreshProviders();
-            mFindProviders = false;
-        }
-        mManager.tryReconnect();
+        openLauncherAfterChangeMode();
+        RsEventBus.postSticky(new RefreshProvidersEvent());
     }
-
 
     @Override
     public void onPause() {
         Log.d(TAG, "onPause");
         super.onPause();
-        mFindProviders = true;
-        mManager.disconnect();
     }
 
     @Override
     public void onStop() {
         Log.d(TAG, "onStop");
         super.onStop();
-        mFindProviders = true;
-        mManager.disconnect();
     }
 
     @Override
     protected void onDestroy() {
         Log.d(TAG, "onDestroy");
         super.onDestroy();
-        mFindProviders = true;
-        mManager.disconnect();
-        RsEventBus.post(new DisableEventsEvent());
-        RsEventBus.unregister(this);
-        mMirrorLinkConnectionManager.disconnectFromApiService();
     }
 
     @Override
@@ -282,23 +254,31 @@ public class MainActivity extends Activity implements InteractionListener {
     }
 
     @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        RsEventBus.post(new FinishActivityEvent());
+    }
+
+    @Override
     public void onBackPressed() {
         boolean useDefaultBehavior = true;
+
         final Fragment currentFragment = getCurrentFragment();
         if (currentFragment != null && currentFragment instanceof BackButtonHandler) {
             BackButtonHandler handlerFragment = (BackButtonHandler) currentFragment;
             useDefaultBehavior = handlerFragment.handleBackButtonPress();
         }
-        if (mMirrorLinkConnectionManager.isInDriveMode()) {
-            useDefaultBehavior = false;
-        }
 
         if (useDefaultBehavior) {
-            super.onBackPressed();
+            if (currentFragment instanceof LauncherFragment) {
+                RsEventBus.post(new FinishActivityEvent());
+            } else {
+                super.onBackPressed();
+            }
         }
     }
 
-    private Fragment reinstantiateFragment(Fragment detachedFragment) {
+    private Fragment reinstateFragment(Fragment detachedFragment) {
         if (detachedFragment.isDetached() == false)
             return detachedFragment;
 
@@ -317,7 +297,7 @@ public class MainActivity extends Activity implements InteractionListener {
 
             return newNavigator;
         } else if (detachedFragment instanceof MediaPlayerFragment) {
-            return new MediaPlayerFragment(); /* TODO: replace this with newInstance() */
+            return MediaPlayerFragment.newInstance();
         } else if (detachedFragment instanceof SplashScreenFragment) {
             return SplashScreenFragment.newInstance();
         }
@@ -325,7 +305,6 @@ public class MainActivity extends Activity implements InteractionListener {
         throw new IllegalArgumentException
                 ("Failed to create new instance. Unsupported fragment type.");
     }
-
 
     private void switchFragment(Fragment fragment) {
         if (mInstanceStateSaved) {
@@ -337,7 +316,7 @@ public class MainActivity extends Activity implements InteractionListener {
             /* This is a workaround for a bug in Android:
              *   https://code.google.com/p/android/issues/detail?id=42601
              */
-            fragment = reinstantiateFragment(fragment);
+            fragment = reinstateFragment(fragment);
         }
         Fragment currentFragment = getCurrentFragment();
         boolean shouldBeAddedToBackStack
@@ -356,11 +335,11 @@ public class MainActivity extends Activity implements InteractionListener {
         transaction.replace(R.id.container, fragment);
         transaction.attach(fragment);
 
-        if(fragment instanceof MediaPlayerFragment){
+        if (fragment instanceof MediaPlayerFragment) {
             if (currentFragment instanceof LauncherFragment) {
-                shouldBeAddedToBackStack=true;
+                shouldBeAddedToBackStack = true;
             } else if (currentFragment instanceof NavigatorFragment) {
-                shouldBeAddedToBackStack=true;
+                shouldBeAddedToBackStack = true;
             }
         }
 
@@ -385,12 +364,12 @@ public class MainActivity extends Activity implements InteractionListener {
 
     public void openMediaPlayer(View caller) {
         if (mPlayerFragment == null)
-            mPlayerFragment = new MediaPlayerFragment();
+            mPlayerFragment = MediaPlayerFragment.newInstance();
         switchFragment(mPlayerFragment);
     }
 
     public ProviderViewActive getNowPlayingProvider() {
-        return mManager.getNowPlayingProviderView();
+        return mPlayingProvider;
     }
 
     @Override
@@ -457,23 +436,9 @@ public class MainActivity extends Activity implements InteractionListener {
         return R.xml.transition_fade_out;
     }
 
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        String action = intent.getAction();
-        Log.d(TAG, "onNewIntent called with action: " + action);
-
-        final boolean mirrorLinkLaunch = action.equals(ML_LAUNCH_INTENT);
-        mTerminateReceived = action.equals(ML_TERMINATE_INTENT);
-
-        if (mirrorLinkLaunch == false && mTerminateReceived == false) {
-            mHeadUnitIsConnected = false;
-        }
-    }
-
     // Unfortunately we need to resort to this little hack to override
-    // Android's default TAB focus navigation for the launcher and the
-    // Navigator
+// Android's default TAB focus navigation for the launcher and the
+// Navigator
     private final Instrumentation mInstrumentation = new Instrumentation();
 
     private void injectKeyEvent(final int keycode) {
@@ -577,7 +542,7 @@ public class MainActivity extends Activity implements InteractionListener {
 
         final MediaButtonData.Type buttonType = buttonTypeFromKey(keycode);
         if (buttonType != null) {
-            final ProviderViewActive provider = mManager.getNowPlayingProviderView();
+            final ProviderViewActive provider = getNowPlayingProvider();
             final MediaButtonData mediaButtonData
                     = new MediaButtonData(provider, buttonType, null, null, null);
             RsEventBus.post(new MediaButtonClickedEvent(mediaButtonData));

@@ -92,11 +92,11 @@ public class MediaButtonData {
     public final Bundle extras;
 
     public MediaButtonData
-            ( ProviderViewActive provider
-            , Type type
-            , String action
-            , Drawable icon
-            , Bundle extras
+            (ProviderViewActive provider
+                    , Type type
+                    , String action
+                    , Drawable icon
+                    , Bundle extras
             ) {
         this.provider = provider;
         this.type = type;

@@ -45,7 +45,7 @@ public final class IconCache {
     }
 
     public void addResource(int id, Drawable icon) {
-        mDrawables.put(id, new WeakReference<Drawable>(icon));
+        mDrawables.put(id, new WeakReference<>(icon));
     }
 
     public boolean hasResource(int id) {

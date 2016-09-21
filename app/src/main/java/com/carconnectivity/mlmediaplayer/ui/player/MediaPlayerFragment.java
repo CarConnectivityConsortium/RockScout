@@ -36,6 +36,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.media.session.PlaybackState;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,10 +46,17 @@ import android.view.animation.RotateAnimation;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.carconnectivity.mlmediaplayer.R;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderPlaybackState;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewActive;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.*;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.MediaButtonClickedEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.MediaExtrasChangedEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.MediaMetadataChangedEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.NowPlayingProviderChangedEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.PlaybackStateChangedEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProgressUpdateEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderConnectErrorEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.model.MediaButtonData;
 import com.carconnectivity.mlmediaplayer.mediabrowser.model.TrackMetadata;
 import com.carconnectivity.mlmediaplayer.ui.BackButtonHandler;
@@ -105,11 +113,15 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
 
     private ProviderViewActive mNowPlayingProvider;
 
-    public MediaPlayerFragment() { }
+    public static MediaPlayerFragment newInstance() {
+        MediaPlayerFragment fragment = new MediaPlayerFragment();
+        return fragment;
+    }
 
     @Override
     public View onCreateView
-                (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView");
         mRootView = inflater.inflate(R.layout.c4_fragment_media_player, container, false);
 
         mAlbumArt = (ImageView) mRootView.findViewById(R.id.album_art);
@@ -163,7 +175,8 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
         return mRootView;
     }
 
-    private void initializeView(){
+    private void initializeView() {
+        Log.d(TAG, "initializeView");
         if (mRootView == null) return;
         final Resources resources = getResources();
 
@@ -199,14 +212,15 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
 
     @Override
     public void onResume() {
+        Log.d(TAG, "onResume");
         super.onResume();
         customizeTheme(mNowPlayingProvider);
     }
 
     @Override
     public void onPause() {
+        Log.d(TAG, "onPause");
         super.onPause();
-        cancelProgressTimer();
     }
 
     @SuppressWarnings("unused")
@@ -220,10 +234,6 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
     public void onEvent(NowPlayingProviderChangedEvent event) {
         mNowPlayingProvider = event.provider;
         customizeTheme(mNowPlayingProvider);
-
-        if(event.provider == null) {
-            ((MainActivity) getActivity()).openLauncher(null);
-        }
     }
 
     @SuppressWarnings("unused")
@@ -238,22 +248,23 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
     }
 
     private void updateMetadata(TrackMetadata metadata) {
+        Log.d(TAG, "updateMetadata=" + (metadata != null ? metadata.toString() : "null"));
         String title = "";
         String artist = "";
         long duration = 0;
 
         if (mSongTitle == null) return;
 
-        if (metadata == null || metadata.isTitleEmpty()) {
-            if(mCurrentPlaybackState != null && !mCurrentPlaybackState.mediaButtons.isEmpty()) {
+        if (metadata == null) {
+            title = getResources().getString(R.string.select_track_to_start);
+        } else if (metadata != null && metadata.isTitleEmpty()) {
+            if (mCurrentPlaybackState != null && mCurrentPlaybackState.state != PlaybackState.STATE_PLAYING) {
                 title = getResources().getString(R.string.press_play_to_start);
-            } else {
-                title = getResources().getString(R.string.select_track_to_start);
             }
         } else {
             title = metadata.title;
             artist = metadata.artist;
-            if(metadata.artBmp != null) {
+            if (metadata.artBmp != null) {
                 loadNewBitmap(metadata.artBmp);
             } else {
                 loadNewBitmap(metadata.artUri);
@@ -275,11 +286,6 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
     }
 
     @SuppressWarnings("unused")
-    public void onEvent(ProviderConnectedEvent event) {
-        customizeTheme(mNowPlayingProvider);
-    }
-
-    @SuppressWarnings("unused")
     public void onEvent(PlaybackStateChangedEvent event) {
         /* Use originating provider as current provider if current is not set. */
         if (mNowPlayingProvider == null) {
@@ -293,9 +299,14 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
         switch (mCurrentPlaybackState.state) {
             case PlaybackState.STATE_PLAYING:
                 scheduleProgressTimer
-                        ( event.provider, event.state.position
-                        , event.state.lastPositionUpdateTime
+                        (event.provider, event.state.position
+                                , event.state.lastPositionUpdateTime
                         );
+                break;
+            case PlaybackState.STATE_SKIPPING_TO_NEXT:
+            case PlaybackState.STATE_SKIPPING_TO_PREVIOUS:
+                cancelProgressTimer();
+                setProgress(0);
                 break;
             case PlaybackState.STATE_BUFFERING:
             case PlaybackState.STATE_CONNECTING:
@@ -306,10 +317,10 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
             default:
                 cancelProgressTimer();
                 setProgress
-                        ( PlaybackUtils.calculateProgressPercentage
-                                ( event.state.position
-                                , event.state.lastPositionUpdateTime
-                                , mCurrentTrackDuration
+                        (PlaybackUtils.calculateProgressPercentage
+                                (event.state.position
+                                        , event.state.lastPositionUpdateTime
+                                        , mCurrentTrackDuration
                                 )
                         );
                 break;
@@ -323,6 +334,10 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
 
     @SuppressWarnings("unused")
     public void onEventMainThread(ProgressUpdateEvent event) {
+        if (mNowPlayingProvider == null) {
+            cancelProgressTimer();
+            return;
+        }
         if (mNowPlayingProvider.hasSameIdAs(event.provider)) {
             setProgress(event.progress);
         }
@@ -330,9 +345,9 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
 
     @SuppressWarnings("unused")
     public void onEvent(MediaButtonClickedEvent event) {
-        switch(event.mediaButtonData.type) {
+        switch (event.mediaButtonData.type) {
             case QUEUE:
-                ((MainActivity)getActivity()).openNavigator(getView());
+                ((MainActivity) getActivity()).openNavigator(getView());
                 break;
             case MORE_ACTIONS_ON:
                 enableSecondaryToolbar();
@@ -346,6 +361,7 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
     }
 
     private void customizeTheme(ProviderViewActive providerView) {
+        Log.d(TAG, "customizeTheme: providerView=" + (providerView != null ? providerView.toString() : "null"));
         if (providerView == null) {
             Log.w(TAG, "Provider view is null, cannot customize theme.");
             return;
@@ -449,14 +465,14 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
         }
         // 5. Finally update prepared media button list with actions based on secondary toolbar flag
         final int startIdx = mSecondaryToolbarShown ? maxVal - 1 : 0;
-        for (int i=startIdx; i<mediaButtonDataList.size(); i++) {
+        for (int i = startIdx; i < mediaButtonDataList.size(); i++) {
             if (buttonList.hasNext()) {
                 buttonList.next().setMediaButtonData(mediaButtonDataList.get(i));
             } else {
                 break;
             }
         }
-        while (buttonList.hasNext()){
+        while (buttonList.hasNext()) {
             buttonList.next().setMediaButtonData(MediaButtonData.createEmptyMediaButtonData());
         }
         // 6. Update media buttons color and visibility
@@ -465,6 +481,7 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
     }
 
     private void showSecondaryToolBar(boolean show) {
+        Log.d(TAG, "showSecondaryToolBar: show=" + show);
         // Change colors of toolbar
         if (show) {
             mToolbarTopImage.setImageTintList(mSecondaryToolbarColor);
@@ -493,6 +510,10 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
         cancelProgressTimer();
         mProgressTimer = new ProgressTimer();
 
+        if (lastUpdateTime == 0) {
+            lastUpdateTime = SystemClock.elapsedRealtime();
+        }
+
         mProgressTimer.setPosition(pos, lastUpdateTime);
         mProgressTimer.setDuration(mCurrentTrackDuration);
         mProgressTimer.start(currentProvider);
@@ -507,6 +528,7 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
     }
 
     private static final int MAX_LEVEL_VALUE = 10000;
+
     private void setProgress(float progress) {
         Drawable bar = mProgressBar.getDrawable();
         if (bar == null) return;
@@ -516,12 +538,14 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
         } else if (progress >= 1) {
             bar.setLevel(MAX_LEVEL_VALUE);
         } else {
-            bar.setLevel((int)(progress * MAX_LEVEL_VALUE));
+            bar.setLevel((int) (progress * MAX_LEVEL_VALUE));
         }
     }
 
     private boolean mWaitIndicatorEnabled = false;
+
     private void enableWaitIndicator(boolean enable) {
+        Log.d(TAG, "enableWaitIndicator: enable=" + enable);
         if (mWaitIndicatorEnabled != enable) {
             mWaitIndicatorEnabled = enable;
             if (mMediaButton3.getBackgroundImage().getAnimation() != null) {
@@ -573,12 +597,14 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         RsEventBus.register(this);
     }
 
     @Override
     public void onDestroy() {
+        Log.d(TAG, "onDestroy");
         super.onDestroy();
         mRootView = null;
         cancelProgressTimer();
@@ -587,10 +613,9 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
 
     @Override
     public boolean handleBackButtonPress() {
-        if(getFragmentManager().getBackStackEntryCount()!=0){
+        if (getFragmentManager().getBackStackEntryCount() != 0) {
             getFragmentManager().popBackStack();
-        }
-        else {
+        } else {
             ((MainActivity) getActivity()).openLauncher(null);
         }
         return false;
