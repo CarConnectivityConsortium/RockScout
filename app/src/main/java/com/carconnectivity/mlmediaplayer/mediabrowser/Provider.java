@@ -286,6 +286,10 @@ final class Provider {
         private final boolean mShowPlayer;
         MediaController mController;
         String mLastSubscription;
+
+        //Deezer not full children list -- workaround
+        private boolean deezerFirstSubscription = true;
+
         MediaBrowser.SubscriptionCallback mSubscriptionCallback
                 = new MediaBrowser.SubscriptionCallback() {
             @Override
@@ -295,7 +299,11 @@ final class Provider {
                 ArrayList<MediaItemView> views = convertToViews(children);
                 final ProviderBrowseSuccessfulEvent event
                         = new ProviderBrowseSuccessfulEvent(getView(), parentId, views);
-                RsEventBus.postSticky(event);
+                if(isDeezerAndFirstSubscription()){
+                    getBrowser().subscribe(mLastSubscription, mSubscriptionCallback);
+                }else{
+                    RsEventBus.postSticky(event);
+                }
             }
 
             @Override
@@ -304,6 +312,14 @@ final class Provider {
                 RsEventBus.postSticky(new ProviderBrowseErrorEvent(id));
             }
         };
+
+        private boolean isDeezerAndFirstSubscription(){
+            if(deezerFirstSubscription && mName.getPackageName().equals("deezer.android.app")){
+                deezerFirstSubscription = false;
+                return true;
+            }
+            return false;
+        }
 
         public ConnectionCallback(boolean showPlayer) {
             super(false);

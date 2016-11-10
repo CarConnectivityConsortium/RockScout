@@ -40,11 +40,9 @@ import com.carconnectivity.mlmediaplayer.commonapi.events.AudioStartBlockingEven
 import com.carconnectivity.mlmediaplayer.commonapi.events.AudioStopBlockingEvent;
 import com.carconnectivity.mlmediaplayer.commonapi.events.ConnectionMirrorLinkServiceEvent;
 import com.carconnectivity.mlmediaplayer.commonapi.events.DriveModeStatusChangedEvent;
-import com.carconnectivity.mlmediaplayer.commonapi.events.MirrorLinkNotSupportedEvent;
 import com.carconnectivity.mlmediaplayer.commonapi.events.MirrorLinkSessionChangedEvent;
 import com.carconnectivity.mlmediaplayer.commonapi.events.PlaybackFailedEvent;
 import com.carconnectivity.mlmediaplayer.commonapi.events.PrepareForPlaybackEvent;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.PlaybackStateChangedEvent;
 import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
 import com.mirrorlink.android.commonapi.Defs;
 import com.mirrorlink.android.commonapi.IConnectionListener;
@@ -53,6 +51,7 @@ import com.mirrorlink.android.commonapi.IContextListener;
 import com.mirrorlink.android.commonapi.IContextManager;
 import com.mirrorlink.android.commonapi.IDeviceStatusListener;
 import com.mirrorlink.android.commonapi.IDeviceStatusManager;
+
 
 /**
  * Responsible for connection with MirrorLink, handling blocks
@@ -67,8 +66,8 @@ public final class MirrorLinkConnectionManager {
 
     private Handler mHandler;
 
-    private volatile boolean mConnectionMirrorLinkStatus = false;
-    private volatile boolean mStateStatus = false;
+    private volatile boolean mMirrorLinkActive = false;
+    private volatile boolean mPlaybackStatus = false;
     private volatile boolean mAudioBlocked = false;
     private volatile boolean mInDriveMode = false;
     public static volatile boolean mIsMirrorLinkSupported = false;
@@ -100,7 +99,7 @@ public final class MirrorLinkConnectionManager {
         RsEventBus.register(this);
         if (mMirrorLinkApplicationContext.getService() == null) {
             if (!mMirrorLinkApplicationContext.connect()) {             // correct -> !mMirrorLinkApplicationContext.connect()
-                RsEventBus.postSticky(new MirrorLinkNotSupportedEvent());
+                RsEventBus.postSticky(new MirrorLinkSessionChangedEvent(mMirrorLinkActive));
             }
         }
     }
@@ -179,7 +178,7 @@ public final class MirrorLinkConnectionManager {
     @SuppressWarnings("unused")
     public void onEvent(AudioContextChangedEvent event) {
         if (!mIsMirrorLinkSupported) return;
-        if (!mConnectionMirrorLinkStatus) return;
+        if (!mMirrorLinkActive) return;
 
         States playbackStatus = STATES.get(event.state.state);
         if (playbackStatus == null) return;
@@ -211,8 +210,8 @@ public final class MirrorLinkConnectionManager {
 
     void setMirrorLinkConnected(boolean connected) {
         if (mIsMirrorLinkSupported) {
-            mConnectionMirrorLinkStatus = connected;
-            RsEventBus.postSticky(new MirrorLinkSessionChangedEvent(mConnectionMirrorLinkStatus));
+            mMirrorLinkActive = connected;
+            RsEventBus.postSticky(new MirrorLinkSessionChangedEvent(mMirrorLinkActive));
         }
     }
 
@@ -229,6 +228,7 @@ public final class MirrorLinkConnectionManager {
                     setMirrorLinkConnected(mirrorLinkSessionIsEstablished);
                 }
             });
+            setAudioContext(mPlaybackStatus);
         }
 
         @Override
@@ -260,10 +260,11 @@ public final class MirrorLinkConnectionManager {
     IContextListener mContextListener = new IContextListener.Stub() {
         @Override
         public void onAudioBlocked(final int reason) throws RemoteException {
+            Log.d(TAG, "onAudioBlocked");
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    performAudioUpdate(mStateStatus, true);
+                    performAudioUpdate(mPlaybackStatus, true);
                 }
             });
         }
@@ -278,10 +279,11 @@ public final class MirrorLinkConnectionManager {
 
         @Override
         public void onAudioUnblocked() throws RemoteException {
+            Log.d(TAG, "onAudioUnblocked");
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    performAudioUpdate(mStateStatus, false);
+                    performAudioUpdate(mPlaybackStatus, false);
                 }
             });
         }
@@ -296,7 +298,7 @@ public final class MirrorLinkConnectionManager {
         if (mAudioBlocked != audioBlocked) {
             mAudioBlocked = audioBlocked;
             if (mAudioBlocked) {
-                RsEventBus.postSticky(new AudioStartBlockingEvent(mStateStatus));
+                RsEventBus.postSticky(new AudioStartBlockingEvent());
             } else {
                 RsEventBus.postSticky(new AudioStopBlockingEvent());
             }
@@ -304,17 +306,8 @@ public final class MirrorLinkConnectionManager {
     }
 
     private void updatePlaybackStatus(boolean playbackStatus) {
-        // 1. Update on MirrorLink side. If we are playing we need to inform
-        //    the server, even if we are blocked.
-        //    Blocking should trigger a PlaybackState change with PlaybackStatus
-        //    set to false and this is when setAudioContext(false) becomes
-        //    relevant
-        mStateStatus = playbackStatus;
-        setAudioContext(mStateStatus);
-        // 2. Account for playback resuming within audio being blocked
-        //    No need to post the stop but record the current blocked state.
-        if (mAudioBlocked && mStateStatus) {
-            mAudioBlocked = false;
+        if (mPlaybackStatus != playbackStatus) {
+            setAudioContext(playbackStatus);
         }
     }
 }

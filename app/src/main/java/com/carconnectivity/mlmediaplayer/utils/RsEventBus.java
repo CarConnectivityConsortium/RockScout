@@ -71,4 +71,8 @@ public class RsEventBus {
     public static void unregister(Object subscriber) {
         mBus.unregister(subscriber);
     }
+
+    public static void removeAllStickyEvents() {
+        mBus.removeAllStickyEvents();
+    }
 }

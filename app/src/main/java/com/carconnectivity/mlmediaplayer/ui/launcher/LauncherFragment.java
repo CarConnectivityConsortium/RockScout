@@ -112,7 +112,7 @@ public class LauncherFragment extends Fragment {
     }
 
     @SuppressWarnings("unused")
-    public void onEvent(DriveModeStatusChangedEvent event) {
+    public void onEventMainThread(DriveModeStatusChangedEvent event) {
         enablePagination(event.isDriveModeActive);
     }
 
@@ -144,13 +144,13 @@ public class LauncherFragment extends Fragment {
     }
 
     @SuppressWarnings("unused")
-    public void onEvent(NowPlayingProviderChangedEvent event) {
+    public void onEventMainThread(NowPlayingProviderChangedEvent event) {
         mNowPlayingProvider = event.provider;
         initializeNowPlayingProviderDisplay(getView());
     }
 
     @SuppressWarnings("unused")
-    public void onEvent(MirrorLinkSessionChangedEvent event) {
+    public void onEventMainThread(MirrorLinkSessionChangedEvent event) {
         if (event.headUnitIsConnected) {
             mHeadUnitIsConnected = true;
         } else {
@@ -360,7 +360,7 @@ public class LauncherFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = new WeakReference<InteractionListener>((InteractionListener) activity);
+            mListener = new WeakReference<>((InteractionListener) activity);
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");

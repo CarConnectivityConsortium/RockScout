@@ -35,16 +35,12 @@ import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
  * Created by tomasz.pazdalski on 2015-05-13.
  */
 public final class AudioStartBlockingEvent implements RockScoutEvent {
-    public final boolean previousState;
 
-    public AudioStartBlockingEvent(boolean previousState) {
-        this.previousState = previousState;
+    public AudioStartBlockingEvent() {
     }
 
     @Override
     public String toString() {
-        return "AudioStartBlockingEvent{" +
-                "previousState=" + previousState +
-                '}';
+        return "AudioStartBlockingEvent{}";
     }
 }

@@ -53,6 +53,7 @@ import com.carconnectivity.mlmediaplayer.mediabrowser.model.SlotReservation;
 import com.carconnectivity.mlmediaplayer.mediabrowser.model.TrackMetadata;
 import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
 
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -325,21 +326,26 @@ public final class ProviderMediaController extends MediaController.Callback {
     @SuppressWarnings("unused")
     public void onEvent(AudioStartBlockingEvent event) {
         /* setting this to false will disable handling media buttons after audio blocking */
+        Log.d(TAG,"AudioStartBlockingEvent: " + event.toString());
         mHandleMediaButtonDataEvents = true;
-        if (mMediaController != null) {
+        if (mMediaController != null && isPlaying()) {
+                mResumePlaybackOnUnblock = true;
+            final MediaController.TransportControls controls
+                    = mMediaController.getTransportControls();
             forcePause();
-            mResumePlaybackOnUnblock = event.previousState;
         }
     }
 
     @SuppressWarnings("unused")
     public void onEvent(AudioStopBlockingEvent event) {
+        Log.d(TAG,"AudioStopBlockingEvent: mIsListening" + mIsListening + " mResumePlaybackOnUnblock" + mResumePlaybackOnUnblock);
         mHandleMediaButtonDataEvents = true;
         if (mIsListening == false) return;
         if (mResumePlaybackOnUnblock && mMediaController != null) {
             final MediaController.TransportControls controls
                     = mMediaController.getTransportControls();
             controls.play();
+            mResumePlaybackOnUnblock = false;
         }
     }
 

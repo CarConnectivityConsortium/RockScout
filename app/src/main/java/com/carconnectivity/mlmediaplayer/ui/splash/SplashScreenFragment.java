@@ -124,7 +124,7 @@ public class SplashScreenFragment extends Fragment implements BackButtonHandler 
     }
 
     @SuppressWarnings("unused")
-    public void onEvent(ShowLauncherFragment event) {
+    public void onEventMainThread(ShowLauncherFragment event) {
         if (event.show && mListener != null) {
             mTimer.cancel();
             if (mLaunchedAlreadyPlaying) {
@@ -144,7 +144,7 @@ public class SplashScreenFragment extends Fragment implements BackButtonHandler 
     }
 
     @SuppressWarnings("unused")
-    public void onEvent(ProviderDiscoveryFinished event) {
+    public void onEventMainThread(ProviderDiscoveryFinished event) {
         mDiscoveryOver = true;
         checkAndHide();
     }

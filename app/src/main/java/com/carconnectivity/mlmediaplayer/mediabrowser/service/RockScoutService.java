@@ -141,7 +141,7 @@ public class RockScoutService extends Service {
             mManager.refreshProviders();
             mManager.tryConnectIfDisconnected();
         } else {
-            stopSelf();
+            exit();
         }
     }
 
@@ -158,7 +158,7 @@ public class RockScoutService extends Service {
         launcherRefreshApps();
 
         if (mTerminateReceived) {
-            stopSelf();
+            exit();
         }
     }
 
@@ -170,7 +170,7 @@ public class RockScoutService extends Service {
     @SuppressWarnings("unused")
     public void onEvent(FinishActivityEvent event) {
         RsEventBus.post(new TerminateEvent());
-        stopSelf();
+        exit();
     }
 
     private void startNotification() {
@@ -196,6 +196,11 @@ public class RockScoutService extends Service {
 
         Notification notification = builder.build();
         startForeground(NOTIFICATION_ID, notification);
+    }
+
+    private void exit(){
+        stopSelf();
+        RsEventBus.removeAllStickyEvents();
     }
 }
 
