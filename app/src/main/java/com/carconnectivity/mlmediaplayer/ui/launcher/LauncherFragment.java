@@ -321,13 +321,12 @@ public class LauncherFragment extends Fragment {
         Log.d(TAG, "handleGridsVisibility");
         if (mProviderGrid == null) return;
 
-        showWarningVisibility(false);
-        mProviderGrid.setVisibility(View.VISIBLE);
-        if (mHeadUnitIsConnected) {
-            if (activeCount <= 0) {
-                showWarningVisibility(true);
-                mProviderGrid.setVisibility(View.INVISIBLE);
-            }
+        if (activeCount <= 0) {
+            showWarningVisibility(true);
+            mProviderGrid.setVisibility(View.INVISIBLE);
+        } else {
+            showWarningVisibility(false);
+            mProviderGrid.setVisibility(View.VISIBLE);
         }
     }
 

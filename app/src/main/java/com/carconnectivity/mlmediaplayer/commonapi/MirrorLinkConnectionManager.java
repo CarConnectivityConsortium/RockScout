@@ -309,14 +309,12 @@ public final class MirrorLinkConnectionManager {
         //    Blocking should trigger a PlaybackState change with PlaybackStatus
         //    set to false and this is when setAudioContext(false) becomes
         //    relevant
-        if (mStateStatus != playbackStatus) {
-            mStateStatus = playbackStatus;
-            setAudioContext(mStateStatus);
-            // 2. Account for playback resuming within audio being blocked
-            //    No need to post the stop but record the current blocked state.
-            if (mAudioBlocked && mStateStatus) {
-                mAudioBlocked = false;
-            }
+        mStateStatus = playbackStatus;
+        setAudioContext(mStateStatus);
+        // 2. Account for playback resuming within audio being blocked
+        //    No need to post the stop but record the current blocked state.
+        if (mAudioBlocked && mStateStatus) {
+            mAudioBlocked = false;
         }
     }
 }

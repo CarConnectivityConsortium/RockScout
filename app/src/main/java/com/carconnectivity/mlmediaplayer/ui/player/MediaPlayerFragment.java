@@ -258,7 +258,7 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
         if (metadata == null) {
             title = getResources().getString(R.string.select_track_to_start);
         } else if (metadata != null && metadata.isTitleEmpty()) {
-            if (mCurrentPlaybackState != null && mCurrentPlaybackState.state != PlaybackState.STATE_PLAYING) {
+            if (mCurrentPlaybackState != null && checkIfWeCanPlay(mCurrentPlaybackState.state)) {
                 title = getResources().getString(R.string.press_play_to_start);
             }
         } else {
@@ -278,6 +278,14 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
         if (mProgressTimer != null) {
             mProgressTimer.setDuration(mCurrentTrackDuration);
         }
+    }
+
+    private boolean checkIfWeCanPlay(int state){
+        if(PlaybackState.STATE_PAUSED == state ||
+                PlaybackState.STATE_STOPPED == state){
+            return true;
+        }
+        return false;
     }
 
     @SuppressWarnings("unused")

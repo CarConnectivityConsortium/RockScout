@@ -33,6 +33,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.pm.ServiceInfo;
@@ -64,9 +65,12 @@ import java.util.TimerTask;
  * Created by belickim on 16/04/15.
  */
 public final class ProvidersManager {
+
     public static final String TAG = ProvidersManager.class.getSimpleName();
     public static final String ML_OFFLINE_PLAYBACK = "com.mirrorlink.android.rockscout.allow-offline-access";
     public static final int TIMER_PERIOD = 120;
+    private static final String GOOGLE_PLAY_STORE_PACKAGE_NAME_OLD = "com.google.market";
+    private static final String GOOGLE_PLAY_STORE_PACKAGE_NAME_NEW = "com.android.vending";
 
     private final Context mContext;
     private final PackageManager mManager;
@@ -346,7 +350,7 @@ public final class ProvidersManager {
 
             entry.setValue(false);
         }
-        if (!mPlayerModeOnline) {
+        if (!mPlayerModeOnline && checkIfGooglePlayIsInstalled()) {
             //download compatible apps from server
             new Thread(new Runnable() {
                 @Override
@@ -359,6 +363,21 @@ public final class ProvidersManager {
 
     public boolean isRecordsContainsProvider(ComponentName componentName) {
         return mRecords.containsKey(componentName);
+    }
+
+    private boolean checkIfGooglePlayIsInstalled() {
+        try {
+            mManager.getPackageInfo(GOOGLE_PLAY_STORE_PACKAGE_NAME_OLD, 0);
+            return true;
+        } catch (PackageManager.NameNotFoundException e) {
+        }
+        try {
+            mManager.getPackageInfo(GOOGLE_PLAY_STORE_PACKAGE_NAME_NEW, 0);
+            return true;
+        } catch (PackageManager.NameNotFoundException e) {
+        }
+
+        return false;
     }
 
     private class ProviderRecord {
