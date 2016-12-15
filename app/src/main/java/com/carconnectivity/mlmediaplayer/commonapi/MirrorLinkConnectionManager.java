@@ -177,6 +177,7 @@ public final class MirrorLinkConnectionManager {
 
     @SuppressWarnings("unused")
     public void onEvent(AudioContextChangedEvent event) {
+        Log.d(TAG, "mIsMirrorLinkSupported:" + mIsMirrorLinkSupported + ", mMirrorLinkActive:" + mMirrorLinkActive);
         if (!mIsMirrorLinkSupported) return;
         if (!mMirrorLinkActive) return;
 
@@ -197,6 +198,7 @@ public final class MirrorLinkConnectionManager {
     }
 
     private void setAudioContext(boolean isPlaying) {
+        Log.d(TAG, "setAudioContext isPlaying" + isPlaying);
         try {
             final IContextManager manager = mMirrorLinkApplicationContext.getContextManager();
             if (manager != null) {
@@ -209,6 +211,7 @@ public final class MirrorLinkConnectionManager {
     }
 
     void setMirrorLinkConnected(boolean connected) {
+        Log.d(TAG, "setMirrorLinkConnected connected:" + connected);
         if (mIsMirrorLinkSupported) {
             mMirrorLinkActive = connected;
             RsEventBus.postSticky(new MirrorLinkSessionChangedEvent(mMirrorLinkActive));
@@ -290,11 +293,13 @@ public final class MirrorLinkConnectionManager {
     };
 
     private void performAudioUpdate(boolean playbackStatus, boolean audioBlocked) {
+        Log.d(TAG, "performAudioUpdate playbackStatus:" + playbackStatus + ", audioBlocked:" + audioBlocked);
         updateAudioBlockingStatus(audioBlocked);
         updatePlaybackStatus(playbackStatus);
     }
 
     private void updateAudioBlockingStatus(boolean audioBlocked) {
+        Log.d(TAG, "updateAudioBlockingStatus");
         if (mAudioBlocked != audioBlocked) {
             mAudioBlocked = audioBlocked;
             if (mAudioBlocked) {
@@ -306,7 +311,9 @@ public final class MirrorLinkConnectionManager {
     }
 
     private void updatePlaybackStatus(boolean playbackStatus) {
+        Log.d(TAG, "updatePlaybackStatus playbackStatus:" + playbackStatus);
         if (mPlaybackStatus != playbackStatus) {
+            mPlaybackStatus = playbackStatus;
             setAudioContext(playbackStatus);
         }
     }

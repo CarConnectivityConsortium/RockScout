@@ -33,7 +33,6 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.app.Instrumentation;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -42,6 +41,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 
 import com.carconnectivity.mlmediaplayer.R;
 import com.carconnectivity.mlmediaplayer.commonapi.events.MirrorLinkSessionChangedEvent;
@@ -62,6 +62,7 @@ import com.carconnectivity.mlmediaplayer.ui.player.MediaPlayerFragment;
 import com.carconnectivity.mlmediaplayer.ui.splash.SplashScreenFragment;
 import com.carconnectivity.mlmediaplayer.utils.FontOverride;
 import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
+import com.carconnectivity.mlmediaplayer.utils.pagination.PaginatedAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -169,7 +170,6 @@ public class MainActivity extends Activity implements InteractionListener {
 
     @SuppressWarnings("unused")
     public void onEventMainThread(ProviderBrowseCancelEvent event) {
-        Log.d(TAG, "handle ProviderBrowseCancel");
         mOpenLauncherAfterCancelBrowsing = true;
         openLauncherAfterChangeMode();
     }
@@ -436,102 +436,54 @@ public class MainActivity extends Activity implements InteractionListener {
         return R.xml.transition_fade_out;
     }
 
-    // Unfortunately we need to resort to this little hack to override
-// Android's default TAB focus navigation for the launcher and the
-// Navigator
-    private final Instrumentation mInstrumentation = new Instrumentation();
-
-    private void injectKeyEvent(final int keycode) {
-        Thread thread = new Thread() {
-            @Override
-            public void run() {
-                mInstrumentation.sendKeySync(new KeyEvent(KeyEvent.ACTION_DOWN, keycode));
-                mInstrumentation.sendKeySync(new KeyEvent(KeyEvent.ACTION_UP, keycode));
-            }
-        };
-        thread.start();
-    }
-
     // This is a hack that allows to get sane navigation inside ListViews and GridViews using
     // rotary knob rotation
     private boolean handleListFragments(int keycode, KeyEvent event) {
         final View focusedView = getWindow().getDecorView().findFocus();
-        if ((focusedView != null)
-                && (focusedView instanceof android.widget.AbsListView)
-                && event.getAction() == KeyEvent.ACTION_DOWN) {
-            if ((getCurrentFragment() instanceof NavigatorFragment) && (focusedView instanceof android.widget.ListView)) {
-                final android.widget.ListView listView = (android.widget.ListView) focusedView;
-                final com.carconnectivity.mlmediaplayer.ui.navigator.NavigatorListAdapter adapter = (com.carconnectivity.mlmediaplayer.ui.navigator.NavigatorListAdapter) listView.getAdapter();
-                final int selectedPosition = listView.getSelectedItemPosition();
-                final int itemsCount = listView.getCount();
-                boolean paginateUp = false;
-                boolean paginateDown = false;
+        if (focusedView != null) {
+            if (focusedView instanceof AbsListView &&
+                    ((AbsListView) focusedView).getAdapter() instanceof PaginatedAdapter) {
+                final AbsListView absListView = ((AbsListView) focusedView);
+                final PaginatedAdapter paginatedAdapter = (PaginatedAdapter) absListView.getAdapter();
+
+                final int selectedPosition = absListView.getSelectedItemPosition();
+                final int itemsCount = absListView.getCount();
+
                 if (keycode == KeyEvent.KEYCODE_TAB) {
-                    if (event.hasNoModifiers()) {
-                        if (selectedPosition < (itemsCount - 1)) {
-                            injectKeyEvent(KeyEvent.KEYCODE_DPAD_DOWN);
-                            return true;
-                        } else {
-                            paginateDown = true;
-                        }
-                    } else {
-                        if (selectedPosition > 0) {
-                            injectKeyEvent(KeyEvent.KEYCODE_DPAD_UP);
-                            return true;
-                        } else {
-                            paginateUp = true;
-                        }
-                    }
-                } else if (keycode == KeyEvent.KEYCODE_DPAD_DOWN) {
-                    if (adapter.usePagination() && (selectedPosition == (itemsCount - 1))) {
-                        paginateDown = true;
-                    }
-                } else if (keycode == KeyEvent.KEYCODE_DPAD_UP) {
-                    if (adapter.usePagination() && (selectedPosition == 0)) {
-                        paginateUp = true;
-                    }
-                }
-                if (paginateDown) {
-                    if (adapter.usePagination()) {
-                        final int page = adapter.getCurrentPage();
-                        if (page < (adapter.getPagesCount() - 1)) {
-                            adapter.goToPage(page + 1);
-                            listView.setSelection(0);
-                            ((NavigatorFragment) getCurrentFragment()).refreshPaginationController();
-                            return true;
-                        }
-                    }
-                } else if (paginateUp) {
-                    if (adapter.usePagination()) {
-                        final int page = adapter.getCurrentPage();
-                        if (page > 0) {
-                            adapter.goToPage(page - 1);
-                            listView.setSelection(listView.getCount() - 1);
-                            ((NavigatorFragment) getCurrentFragment()).refreshPaginationController();
-                            return true;
-                        }
-                    }
-                }
-            } else {
-                if (keycode == KeyEvent.KEYCODE_TAB) {
-                    final android.widget.AbsListView absListView = (android.widget.AbsListView) focusedView;
-                    final int selectedPosition = absListView.getSelectedItemPosition();
-                    final int itemsCount = absListView.getCount();
+                    //knob rotate events
                     if (event.hasNoModifiers()) {
                         if (selectedPosition < (itemsCount - 1)) {
                             absListView.setSelection(selectedPosition + 1);
+                            return true;
+                        } else if (paginatedAdapter.goToNextPage(true)) {
                             return true;
                         }
                     } else {
                         if (selectedPosition > 0) {
                             absListView.setSelection(selectedPosition - 1);
                             return true;
+                        } else if (paginatedAdapter.goToPrevPage(true)) {
+                            return true;
                         }
+                    }
+                } else {
+                    //up and down dpad events
+                    switch (keycode) {
+                        case KeyEvent.KEYCODE_DPAD_UP:
+                            if (paginatedAdapter.goToPrevPage(false)) {
+                                return true;
+                            }
+                            break;
+                        case KeyEvent.KEYCODE_DPAD_DOWN:
+                            if (paginatedAdapter.goToNextPage(false)) {
+                                return true;
+                            }
+                            break;
                     }
                 }
             }
         }
-        return false;
+        return super.onKeyDown(keycode, event);
     }
 
     @Override
@@ -556,7 +508,7 @@ public class MainActivity extends Activity implements InteractionListener {
         return super.onKeyDown(keycode, event);
     }
 
-    private static boolean isDiagonalShift(int keycode) {
+    private boolean isDiagonalShift(int keycode) {
         switch (keycode) {
             case 188: // up-right diagonal
             case 189: // up-left diagonal

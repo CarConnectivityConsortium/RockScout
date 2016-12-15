@@ -43,6 +43,7 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.ScrollView;
 
@@ -83,8 +84,8 @@ public class UiUtilities {
         listView.setOnTouchListener(generateOnTouchListener(context));
     }
 
-    public static void disableInertialScrolling(ScrollView scrollView, Context context) {
-        scrollView.setOnTouchListener(generateOnTouchListener(context));
+    public static void disableInertialScrolling(GridView gridView, Context context) {
+        gridView.setOnTouchListener(generateOnTouchListener(context));
     }
 
     public static boolean isContrastRequirementMet(int colorA, int colorB) {

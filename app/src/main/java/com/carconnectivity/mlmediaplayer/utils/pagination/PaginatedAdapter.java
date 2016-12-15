@@ -33,6 +33,10 @@ package com.carconnectivity.mlmediaplayer.utils.pagination;
  * Created by belickim on 18/05/15.
  */
 public interface PaginatedAdapter {
+    boolean goToNextPage(boolean selectFirstItem);
+
+    boolean goToPrevPage(boolean selectLastItem);
+
     void goToPage(int pageNumber);
 
     int getPagesCount();

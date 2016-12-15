@@ -166,6 +166,9 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
     public void refreshPaginationController() {
         Log.d(TAG, "refreshPaginationController");
         mPaginationController.setNumbers();
+        if(mAdapter != null){
+            mAdapter.notifyDataSetChanged();
+        }
     }
 
     private void changeBrowsedProvider(ProviderViewActive provider) {

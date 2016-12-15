@@ -151,10 +151,9 @@ public class LauncherFragment extends Fragment {
 
     @SuppressWarnings("unused")
     public void onEventMainThread(MirrorLinkSessionChangedEvent event) {
-        if (event.headUnitIsConnected) {
-            mHeadUnitIsConnected = true;
-        } else {
-            mHeadUnitIsConnected = false;
+        mHeadUnitIsConnected = event.headUnitIsConnected;
+        if (!mHeadUnitIsConnected) {
+            enablePagination(false);
         }
         hideNotSupportedDialog();
     }
@@ -167,7 +166,7 @@ public class LauncherFragment extends Fragment {
 
         mFocusListener = UiUtilities.defaultOnFocusChangeListener((MainActivity) getActivity());
 
-        mProviderGrid = (GridView) root.findViewById(R.id.grid_active);
+        mProviderGrid = (GridView) root.findViewById(R.id.gridView);
 
         mSelectAppHint = (TextView) root.findViewById(R.id.text_select_hint);
         mNoAppsWarning = (TextView) root.findViewById(R.id.no_auto_apps_warning);
@@ -197,8 +196,8 @@ public class LauncherFragment extends Fragment {
             selector.setTintMode(PorterDuff.Mode.MULTIPLY);
             selector.setTint(color);
 
-            ScrollView scrollView = (ScrollView) root.findViewById(R.id.scrollview);
-            UiUtilities.setScrollBarTint(scrollView, getResources(), color);
+            GridView gridView = (GridView) root.findViewById(R.id.gridView);
+            UiUtilities.setScrollBarTint(gridView, getResources(), color);
 
             mPaginationController.changeActiveColor(color);
         }
@@ -220,10 +219,7 @@ public class LauncherFragment extends Fragment {
                     final boolean showPlayer = (noCurrentProvider && hasSomethingToPlay) || isNowPlaying;
                     onProviderSelected(viewOnline, showPlayer);
                 } else if (providerView instanceof ProviderViewInactive) {
-                    final Resources resources = getResources();
-                    final String appName = resources.getString(R.string.app_name);
-                    final String rawMessage = resources.getString(R.string.ml_not_connected);
-                    final String message = String.format(rawMessage, appName);
+                    final String message = getResources().getString(R.string.ml_not_connected);
 
                     mDialog = UiUtilities.showDialog(getActivity(), message);
                 } else if (providerView instanceof ProviderViewToDownload) {
@@ -264,8 +260,8 @@ public class LauncherFragment extends Fragment {
         Log.d(TAG, "initializeScrollView");
         if (root == null) return;
 
-        final ScrollView scrollView = (ScrollView) root.findViewById(R.id.scrollview);
-        UiUtilities.disableInertialScrolling(scrollView, getActivity());
+        final GridView gridView = (GridView) root.findViewById(R.id.gridView);
+        UiUtilities.disableInertialScrolling(gridView, getActivity());
     }
 
     private void initializeNowPlayingProviderDisplay(View root) {
@@ -300,6 +296,14 @@ public class LauncherFragment extends Fragment {
         });
         providerButton.invalidate();
         providerButton.setOnFocusChangeListener(mFocusListener);
+    }
+
+    public void refreshPaginationController() {
+        Log.d(TAG, "refreshPaginationController");
+        mPaginationController.setNumbers();
+        if(mProviderAdapter != null){
+            mProviderAdapter.notifyDataSetChanged();
+        }
     }
 
     private void showSelectAppHint(boolean visible) {

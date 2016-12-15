@@ -44,12 +44,14 @@ public class RsEventBus {
     private static final EventBus mBus = new EventBus();
 
     public static void register(Object subscriber) {
+        Log.d(TAG, "Register subscriber: " + subscriber.getClass().getSimpleName());
         if (!mBus.isRegistered(subscriber)) {
             mBus.register(subscriber);
         }
     }
 
     public static void registerSticky(Object subscriber) {
+        Log.d(TAG, "Register sticky subscriber: " + subscriber.getClass().getSimpleName());
         if (!mBus.isRegistered(subscriber)) {
             mBus.registerSticky(subscriber);
         }
@@ -69,10 +71,12 @@ public class RsEventBus {
     }
 
     public static void unregister(Object subscriber) {
+        Log.d(TAG, "Unregister subscriber: " + subscriber.getClass().getSimpleName());
         mBus.unregister(subscriber);
     }
 
     public static void removeAllStickyEvents() {
+        Log.d(TAG, "removeAllStickyEvents");
         mBus.removeAllStickyEvents();
     }
 }

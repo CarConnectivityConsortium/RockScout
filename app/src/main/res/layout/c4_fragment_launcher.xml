@@ -92,45 +92,27 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="@color/c4_list_background"
                 android:orientation="horizontal">
-                <!-- The TextView is just a placeholder to position the ListView -->
-                <TextView
-                    android:layout_width="50dp"
-                    android:layout_height="match_parent"
-                    android:background="@color/c4_list_background" />
 
-                <ScrollView
-                    android:id="@+id/scrollview"
+                <!-- The View is just a placeholder to position the GridView -->
+                <View
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent" />
+
+                <GridView
+                    android:id="@+id/gridView"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/c4_list_background"
+                    android:layout_height="wrap_content"
                     android:fadeScrollbars="false"
+                    android:listSelector="@drawable/grid_selector"
+                    android:numColumns="2"
                     android:paddingLeft="54dp"
                     android:scrollbarStyle="insideInset"
                     android:scrollbarThumbVertical="@drawable/c4_list_scrollbar"
-                    android:verticalScrollbarPosition="left">
-
-                    <LinearLayout
-                        android:id="@+id/launcher_list"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="0dp"
-                        android:divider="@drawable/c4_launcher_divider"
-                        android:orientation="vertical"
-                        android:showDividers="middle">
-
-                        <com.carconnectivity.mlmediaplayer.ui.widgets.NonScrollableGridView
-                            android:id="@+id/grid_active"
-                            class="com.carconnectivity.mlmediaplayer.ui.widgets.NonScrollableGridView"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:listSelector="@drawable/grid_selector"
-                            android:numColumns="2"
-                            android:smoothScrollbar="false"
-                            android:visibility="gone" />
-
-                    </LinearLayout>
-                </ScrollView>
+                    android:smoothScrollbar="false"
+                    android:verticalScrollbarPosition="left"
+                    android:visibility="gone" />
             </LinearLayout>
 
             <TextView

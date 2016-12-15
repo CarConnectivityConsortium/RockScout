@@ -235,6 +235,7 @@ final class Provider {
 
         @Override
         public void onConnected() {
+            Log.d(TAG, "TestConnectionCallback onConnected: " + mName);
             final MediaBrowser browser = getBrowser();
             final MediaSession.Token token = browser.getSessionToken();
             if (token != null) {
