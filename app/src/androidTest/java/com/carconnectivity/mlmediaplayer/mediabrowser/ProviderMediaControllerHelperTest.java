@@ -29,7 +29,11 @@
 
 package com.carconnectivity.mlmediaplayer.mediabrowser;
 
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.media.session.PlaybackState;
+import android.service.media.MediaBrowserService;
 import android.test.AndroidTestCase;
 
 import com.carconnectivity.mlmediaplayer.mediabrowser.model.MediaButtonData;
@@ -43,42 +47,65 @@ import java.util.List;
 
 public class ProviderMediaControllerHelperTest extends AndroidTestCase {
 
-    public void testCreation() {
-        ProviderMediaControllerHelper test =
-                new ProviderMediaControllerHelper(getContext(), getContext().getPackageName());
+    private List<ResolveInfo> getMediaBrowserPackages() {
+        PackageManager mManager = getContext().getPackageManager();
+
+        final Intent intent = new Intent(MediaBrowserService.SERVICE_INTERFACE);
+        List<ResolveInfo> resolveInfo = mManager.queryIntentServices(intent, 0);
+        if (resolveInfo.size() == 0) {
+            throw new IllegalStateException("Media browser packages can not be empty. " +
+                    "You must install at least one provider to run testing");
+        }
+        return resolveInfo;
+    }
+
+    public void testCreation(){
+        ProvidersManager providersManager = new ProvidersManager(getContext(), getContext().getPackageManager());
+        List<ResolveInfo> resolveInfo = getMediaBrowserPackages();
+        ProviderViewActive providerViewActive = new ProviderViewActive(new Provider(providersManager, resolveInfo.get(0), false), null, null, null, 0, 0, null);
+        ProviderMediaControllerHelper test = new ProviderMediaControllerHelper(getContext(), providerViewActive);
         assertNotNull(test);
     }
 
     public void testResolvePlaybackButtonNoState() {
+        ProvidersManager providersManager = new ProvidersManager(getContext(), getContext().getPackageManager());
+        List<ResolveInfo> resolveInfo = getMediaBrowserPackages();
+
+        ProviderViewActive providerViewActive = new ProviderViewActive(new Provider(providersManager, resolveInfo.get(0), false), null, null, null, 0, 0, null);
         ProviderMediaControllerHelper test =
-                new ProviderMediaControllerHelper(getContext(), getContext().getPackageName());
+                new ProviderMediaControllerHelper(getContext(), providerViewActive);
         assertNotNull(test);
         // Test default state (no params)
         PlaybackState.Builder builder = new PlaybackState.Builder();
         MediaButtonData result = test.resolvePlaybackButton(builder.build());
-        assertEquals(result.getType(), Type.PLAY);
+        assertEquals(result.type, Type.PLAY);
         // Test all actions added
         Long actions = PlaybackState.ACTION_PLAY;
         actions |= PlaybackState.ACTION_PAUSE;
         actions |= PlaybackState.ACTION_STOP;
         builder.setActions(actions);
         result = test.resolvePlaybackButton(builder.build());
-        assertEquals(result.getType(), Type.PLAY);
+        assertEquals(result.type, Type.PLAY);
     }
 
     public void testResolvePlaybackButtonStatePlayingNoActions() {
-        ProviderMediaControllerHelper test =
-                new ProviderMediaControllerHelper(getContext(), getContext().getPackageName());
+        ProvidersManager providersManager = new ProvidersManager(getContext(), getContext().getPackageManager());
+        List<ResolveInfo> resolveInfo = getMediaBrowserPackages();
+        ProviderViewActive providerViewActive = new ProviderViewActive(new Provider(providersManager, resolveInfo.get(0), false), null, null, null, 0, 0, null);
+        ProviderMediaControllerHelper test = new ProviderMediaControllerHelper(getContext(), providerViewActive);
         assertNotNull(test);
+
         PlaybackState.Builder builder = new PlaybackState.Builder();
         builder.setState(PlaybackState.STATE_PLAYING, 1000, 1.0f);
         MediaButtonData result = test.resolvePlaybackButton(builder.build());
-        assertEquals(result.getType(), Type.PAUSE);
+        assertEquals(result.type, Type.PAUSE);
     }
 
     public void testResolvePlaybackButtonStatePlayingWithActions() {
-        ProviderMediaControllerHelper test =
-                new ProviderMediaControllerHelper(getContext(), getContext().getPackageName());
+        ProvidersManager providersManager = new ProvidersManager(getContext(), getContext().getPackageManager());
+        List<ResolveInfo> resolveInfo = getMediaBrowserPackages();
+        ProviderViewActive providerViewActive = new ProviderViewActive(new Provider(providersManager, resolveInfo.get(0), false), null, null, null, 0, 0, null);
+        ProviderMediaControllerHelper test = new ProviderMediaControllerHelper(getContext(), providerViewActive);
         assertNotNull(test);
         PlaybackState.Builder builder = new PlaybackState.Builder();
         builder.setState(PlaybackState.STATE_PLAYING, 1000, 1.0f);
@@ -86,35 +113,35 @@ public class ProviderMediaControllerHelperTest extends AndroidTestCase {
         Long actions = PlaybackState.ACTION_PLAY;
         builder.setActions(actions);
         MediaButtonData result = test.resolvePlaybackButton(builder.build());
-        assertEquals(result.getType(), Type.PAUSE);
+        assertEquals(result.type, Type.PAUSE);
 
         actions = PlaybackState.ACTION_PAUSE;
         builder.setActions(actions);
         result = test.resolvePlaybackButton(builder.build());
-        assertEquals(result.getType(), Type.PAUSE);
+        assertEquals(result.type, Type.PAUSE);
 
         actions = PlaybackState.ACTION_STOP;
         builder.setActions(actions);
         result = test.resolvePlaybackButton(builder.build());
-        assertEquals(result.getType(), Type.STOP);
+        assertEquals(result.type, Type.STOP);
 
         actions = PlaybackState.ACTION_PAUSE;
         actions |= PlaybackState.ACTION_STOP;
         builder.setActions(actions);
         result = test.resolvePlaybackButton(builder.build());
-        assertEquals(result.getType(), Type.STOP);
+        assertEquals(result.type, Type.PAUSE);
 
         actions = PlaybackState.ACTION_PLAY;
         actions |= PlaybackState.ACTION_STOP;
         builder.setActions(actions);
         result = test.resolvePlaybackButton(builder.build());
-        assertEquals(result.getType(), Type.STOP);
+        assertEquals(result.type, Type.STOP);
 
         actions = PlaybackState.ACTION_PAUSE;
         actions |= PlaybackState.ACTION_PLAY;
         builder.setActions(actions);
         result = test.resolvePlaybackButton(builder.build());
-        assertEquals(result.getType(), Type.PAUSE);
+        assertEquals(result.type, Type.PAUSE);
     }
 
     private class TestSubCase {
@@ -559,9 +586,10 @@ public class ProviderMediaControllerHelperTest extends AndroidTestCase {
     };
 
     public void testResolveMediaButtons() {
-        ProviderMediaControllerHelper test =
-                new ProviderMediaControllerHelper(getContext(), getContext().getPackageName());
-        assertNotNull(test);
+        ProvidersManager providersManager = new ProvidersManager(getContext(), getContext().getPackageManager());
+        List<ResolveInfo> resolveInfo = getMediaBrowserPackages();
+        ProviderViewActive providerViewActive = new ProviderViewActive(new Provider(providersManager, resolveInfo.get(0), false), null, null, null, 0, 0, null);
+        ProviderMediaControllerHelper test = new ProviderMediaControllerHelper(getContext(), providerViewActive);
         // Input: reservations, general actions, custom actions
         // Output: media button list
         for (TestSubCase subCase : TEST_SUB_CASES) {
@@ -577,7 +605,7 @@ public class ProviderMediaControllerHelperTest extends AndroidTestCase {
             List<Type> result = new ArrayList<>();
             List<MediaButtonData> mediaButtonList = test.resolveMediaButtons(subCase.slotReservations, builder.build());
             for (MediaButtonData button : mediaButtonList) {
-                result.add(button.getType());
+                result.add(button.type);
             }
             assertEquals(subCase.name, subCase.expectedResult.size(), result.size());
             for (int i=0; i<subCase.expectedResult.size(); i++) {

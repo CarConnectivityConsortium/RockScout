@@ -133,8 +133,34 @@ public class NavigatorListAdapter extends BaseAdapter implements PaginatedAdapte
         notifyDataSetChanged();
     }
 
-    public boolean usePagination() {
-        return mUsePagination;
+    @Override
+    public boolean goToNextPage(boolean selectFirstItem) {
+        if (mOwner == null || mOwner.getSelectedItemPosition() != mOwner.getCount() - 1) {
+            return false;
+        }
+
+        if (mItems != null &&
+                mUsePagination && mItems.goToPage(mItems.getCurrentPage() + 1)) {
+            ((NavigatorFragment) mParentFragment).refreshPaginationController();
+            mOwner.setSelection(0);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean goToPrevPage(boolean selectLastItem) {
+        if (mOwner == null || mOwner.getSelectedItemPosition() != 0) {
+            return false;
+        }
+
+        if (mItems != null &&
+                mUsePagination && mItems.goToPage(mItems.getCurrentPage() - 1)) {
+            ((NavigatorFragment) mParentFragment).refreshPaginationController();
+            mOwner.setSelection(mItems.getCurrentItemsCount() - 1);
+            return true;
+        }
+        return false;
     }
 
     @Override

@@ -122,7 +122,7 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
     }
 
     @SuppressWarnings("unused")
-    public void onEvent(BrowseDirectoryEvent event) {
+    public void onEventMainThread(BrowseDirectoryEvent event) {
         changeState(State.LOADING);
     }
 
@@ -132,7 +132,7 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
     }
 
     @SuppressWarnings("unused")
-    public void onEvent(MirrorLinkSessionChangedEvent event) {
+    public void onEventMainThread(MirrorLinkSessionChangedEvent event) {
         enablePagination(event.headUnitIsConnected);
     }
 
@@ -142,7 +142,7 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
     }
 
     @SuppressWarnings("unused")
-    public void onEvent(ProviderBrowseSuccessfulEvent event) {
+    public void onEventMainThread(ProviderBrowseSuccessfulEvent event) {
         final String currentDirectoryId = mCrumbs.getTopItem().id;
         if (currentDirectoryId != null && currentDirectoryId.equals(event.parentId) == false) {
             Log.d(TAG, "Got browse response with unexpected parent id.");
@@ -166,6 +166,9 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
     public void refreshPaginationController() {
         Log.d(TAG, "refreshPaginationController");
         mPaginationController.setNumbers();
+        if(mAdapter != null){
+            mAdapter.notifyDataSetChanged();
+        }
     }
 
     private void changeBrowsedProvider(ProviderViewActive provider) {
@@ -183,18 +186,18 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
     }
 
     @SuppressWarnings("unused")
-    public void onEvent(ProviderBrowseErrorEvent event) {
+    public void onEventMainThread(ProviderBrowseErrorEvent event) {
         changeState(State.FAILED);
     }
 
     @SuppressWarnings("unused")
-    public void onEvent(ProviderConnectErrorEvent event) {
+    public void onEventMainThread(ProviderConnectErrorEvent event) {
         changeState(State.FAILED);
     }
 
 
     @SuppressWarnings("unused")
-    public void onEvent(NowPlayingProviderChangedEvent event) {
+    public void onEventMainThread(NowPlayingProviderChangedEvent event) {
         mNowPlayingProvider = event.provider;
 
         if (event.provider == null) {

@@ -105,7 +105,7 @@ public class LauncherProviderGridAdapter extends BaseAdapter implements Paginate
             ArrayList<ProviderView> initialItems = new ArrayList();
             initialItems.add(provider);
             final int pageSize = mUsePagination ? PAGE_SIZE : MAX_UNPAGINATED_ITEMS;
-            mItems = new PaginatedCollection<ProviderView>(initialItems, pageSize, mProvidersOrder);
+            mItems = new PaginatedCollection<>(initialItems, pageSize, mProvidersOrder);
         } else if (mItems.contains(provider) == false) {
             mItems.add(provider);
             notifyDataSetChanged();
@@ -115,6 +115,69 @@ public class LauncherProviderGridAdapter extends BaseAdapter implements Paginate
     public void removeItems() {
         mItems = null;
         notifyDataSetChanged();
+    }
+
+    @Override
+    public boolean goToNextPage(boolean selectFirstItem) {
+        if (mOwner == null) {
+            return false;
+        }
+
+        int selectedItemPosition = mOwner.getSelectedItemPosition();
+        int nextSelectedItem;
+        if (selectedItemPosition == mOwner.getCount() - 2) {
+            nextSelectedItem = 0;
+        } else if (selectedItemPosition == mOwner.getCount() - 1) {
+            nextSelectedItem = 1;
+        } else {
+            return false;
+        }
+
+        if (selectFirstItem) {
+            nextSelectedItem = 0;
+        }
+
+        if (mItems != null &&
+                mUsePagination && mItems.goToPage(mItems.getCurrentPage() + 1)) {
+            ((LauncherFragment) mParentFragment).refreshPaginationController();
+            if (mItems.getCurrentItemsCount() >= nextSelectedItem) {
+                mOwner.setSelection(nextSelectedItem);
+            } else {
+                mOwner.setSelection(0);
+            }
+
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean goToPrevPage(boolean selectLastItem) {
+        if (mOwner == null) {
+            return false;
+        }
+
+        int selectedItemPosition = mOwner.getSelectedItemPosition();
+        int nextSelectedItem;
+        if (selectedItemPosition == 0) {
+            nextSelectedItem = 2;
+        } else if (selectedItemPosition == 1) {
+            nextSelectedItem = 3;
+        } else {
+            return false;
+        }
+
+        if (selectLastItem) {
+            nextSelectedItem = 3;
+        }
+
+        if (mItems != null &&
+                mUsePagination && mItems.goToPage(mItems.getCurrentPage() - 1)) {
+            ((LauncherFragment) mParentFragment).refreshPaginationController();
+            mOwner.setSelection(nextSelectedItem);
+            return true;
+        }
+        return false;
     }
 
     @Override

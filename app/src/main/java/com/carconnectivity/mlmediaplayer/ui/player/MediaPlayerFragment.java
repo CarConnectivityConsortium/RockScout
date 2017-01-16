@@ -112,6 +112,7 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
     private View mRootView;
 
     private ProviderViewActive mNowPlayingProvider;
+    private boolean mCustomTitle = false;
 
     public static MediaPlayerFragment newInstance() {
         MediaPlayerFragment fragment = new MediaPlayerFragment();
@@ -224,20 +225,20 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
     }
 
     @SuppressWarnings("unused")
-    public void onEvent(ProviderConnectErrorEvent event) {
+    public void onEventMainThread(ProviderConnectErrorEvent event) {
         final String title = getResources().getString(R.string.items_missing);
         final TrackMetadata metadata = new TrackMetadata(title, "", 0L, null, null);
         updateMetadata(metadata);
     }
 
     @SuppressWarnings("unused")
-    public void onEvent(NowPlayingProviderChangedEvent event) {
+    public void onEventMainThread(NowPlayingProviderChangedEvent event) {
         mNowPlayingProvider = event.provider;
         customizeTheme(mNowPlayingProvider);
     }
 
     @SuppressWarnings("unused")
-    public void onEvent(MediaMetadataChangedEvent event) {
+    public void onEventMainThread(MediaMetadataChangedEvent event) {
         if (mNowPlayingProvider == null) {
             mNowPlayingProvider = event.provider;
         }
@@ -256,12 +257,13 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
         if (mSongTitle == null) return;
 
         if (metadata == null) {
+            mCustomTitle = true;
             title = getResources().getString(R.string.select_track_to_start);
         } else if (metadata != null && metadata.isTitleEmpty()) {
-            if (mCurrentPlaybackState != null && mCurrentPlaybackState.state != PlaybackState.STATE_PLAYING) {
-                title = getResources().getString(R.string.press_play_to_start);
-            }
+            mCustomTitle = true;
+            title = changeTitleBasedOnStateAndMetadataIsEmpty();
         } else {
+            mCustomTitle = false;
             title = metadata.title;
             artist = metadata.artist;
             if (metadata.artBmp != null) {
@@ -272,7 +274,7 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
             duration = metadata.duration;
         }
 
-        mSongTitle.setText(UiUtilities.trimLabelText(title));
+        setTitle(title);
         mSongArtist.setText(UiUtilities.trimLabelText(artist));
         mCurrentTrackDuration = duration;
         if (mProgressTimer != null) {
@@ -280,13 +282,36 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
         }
     }
 
-    @SuppressWarnings("unused")
-    public void onEvent(MediaExtrasChangedEvent event) {
-        customizeTheme(mNowPlayingProvider);
+    private void setTitle(String title){
+        mSongTitle.setText(UiUtilities.trimLabelText(title));
     }
 
     @SuppressWarnings("unused")
-    public void onEvent(PlaybackStateChangedEvent event) {
+    public void onEventMainThread(MediaExtrasChangedEvent event) {
+        customizeTheme(mNowPlayingProvider);
+    }
+
+    private String changeTitleBasedOnStateAndMetadataIsEmpty() {
+        String title = "";
+        if (mSongTitle != null && mCurrentPlaybackState != null && mCustomTitle) {
+            switch (mCurrentPlaybackState.state) {
+                case PlaybackState.STATE_PLAYING:
+                case PlaybackState.STATE_BUFFERING:
+                case PlaybackState.STATE_CONNECTING:
+                    setTitle(title);
+                    break;
+                case PlaybackState.STATE_STOPPED:
+                case PlaybackState.STATE_PAUSED:
+                    title = getResources().getString(R.string.press_play_to_start);
+                    setTitle(title);
+                    break;
+            }
+        }
+        return title;
+    }
+
+    @SuppressWarnings("unused")
+    public void onEventMainThread(PlaybackStateChangedEvent event) {
         /* Use originating provider as current provider if current is not set. */
         if (mNowPlayingProvider == null) {
             mNowPlayingProvider = event.provider;
@@ -296,6 +321,9 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
         if (mNowPlayingProvider.hasSameIdAs(event.provider) == false) return;
 
         mCurrentPlaybackState = event.state;
+
+        changeTitleBasedOnStateAndMetadataIsEmpty();
+
         switch (mCurrentPlaybackState.state) {
             case PlaybackState.STATE_PLAYING:
                 scheduleProgressTimer
@@ -344,7 +372,7 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
     }
 
     @SuppressWarnings("unused")
-    public void onEvent(MediaButtonClickedEvent event) {
+    public void onEventMainThread(MediaButtonClickedEvent event) {
         switch (event.mediaButtonData.type) {
             case QUEUE:
                 ((MainActivity) getActivity()).openNavigator(getView());
