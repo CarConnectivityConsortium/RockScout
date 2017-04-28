@@ -38,8 +38,7 @@ import android.media.session.PlaybackState;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.carconnectivity.mlmediaplayer.commonapi.events.AudioStartBlockingEvent;
-import com.carconnectivity.mlmediaplayer.commonapi.events.AudioStopBlockingEvent;
+import com.carconnectivity.mlmediaplayer.commonapi.events.AudioBlockingEvent;
 import com.carconnectivity.mlmediaplayer.commonapi.events.PlaybackFailedEvent;
 import com.carconnectivity.mlmediaplayer.commonapi.events.PrepareForPlaybackEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.MediaButtonClickedEvent;
@@ -52,7 +51,6 @@ import com.carconnectivity.mlmediaplayer.mediabrowser.model.MediaButtonData;
 import com.carconnectivity.mlmediaplayer.mediabrowser.model.SlotReservation;
 import com.carconnectivity.mlmediaplayer.mediabrowser.model.TrackMetadata;
 import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
-
 
 import java.util.HashSet;
 import java.util.List;
@@ -323,22 +321,16 @@ public final class ProviderMediaController extends MediaController.Callback {
         }
     }
 
-    @SuppressWarnings("unused")
-    public void onEvent(AudioStartBlockingEvent event) {
+    public void startAudioBlocking() {
         /* setting this to false will disable handling media buttons after audio blocking */
-        Log.d(TAG,"AudioStartBlockingEvent: " + event.toString());
         mHandleMediaButtonDataEvents = true;
         if (mMediaController != null && isPlaying()) {
-                mResumePlaybackOnUnblock = true;
-            final MediaController.TransportControls controls
-                    = mMediaController.getTransportControls();
+            mResumePlaybackOnUnblock = true;
             forcePause();
         }
     }
 
-    @SuppressWarnings("unused")
-    public void onEvent(AudioStopBlockingEvent event) {
-        Log.d(TAG,"AudioStopBlockingEvent: mIsListening" + mIsListening + " mResumePlaybackOnUnblock" + mResumePlaybackOnUnblock);
+    public void stopAudioBlocking() {
         mHandleMediaButtonDataEvents = true;
         if (mIsListening == false) return;
         if (mResumePlaybackOnUnblock && mMediaController != null) {
@@ -346,6 +338,15 @@ public final class ProviderMediaController extends MediaController.Callback {
                     = mMediaController.getTransportControls();
             controls.play();
             mResumePlaybackOnUnblock = false;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public void onEvent(AudioBlockingEvent event) {
+        if (event.isAudioBlocked) {
+            startAudioBlocking();
+        } else {
+            stopAudioBlocking();
         }
     }
 

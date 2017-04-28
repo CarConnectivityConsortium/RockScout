@@ -27,26 +27,15 @@
  * in or in connection to any CCC products, software and/or services.
  */
 
-package com.carconnectivity.mlmediaplayer.mediabrowser.events;
+package com.carconnectivity.mlmediaplayer.commonapi.events;
 
 import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
 
-/**
- * Created by sebastian.sokolowski on 16.03.16.
- */
-public final class MainActivityCallbackEvent implements RockScoutEvent {
-    public enum CALLBACK {onCreate, onResume, onPause, onStop, onDestroy}
+public final class AudioBlockingEvent implements RockScoutEvent {
 
-    public final CALLBACK callback;
+    public boolean isAudioBlocked;
 
-    public MainActivityCallbackEvent(CALLBACK callback) {
-        this.callback = callback;
-    }
-
-    @Override
-    public String toString() {
-        return "MainActivityCallbackEvent{" +
-                "callback=" + callback +
-                '}';
+    public AudioBlockingEvent(boolean audioBlocked) {
+        this.isAudioBlocked = audioBlocked;
     }
 }

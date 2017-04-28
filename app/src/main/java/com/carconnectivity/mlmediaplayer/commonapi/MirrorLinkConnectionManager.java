@@ -35,9 +35,8 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.util.SparseArray;
 
+import com.carconnectivity.mlmediaplayer.commonapi.events.AudioBlockingEvent;
 import com.carconnectivity.mlmediaplayer.commonapi.events.AudioContextChangedEvent;
-import com.carconnectivity.mlmediaplayer.commonapi.events.AudioStartBlockingEvent;
-import com.carconnectivity.mlmediaplayer.commonapi.events.AudioStopBlockingEvent;
 import com.carconnectivity.mlmediaplayer.commonapi.events.ConnectionMirrorLinkServiceEvent;
 import com.carconnectivity.mlmediaplayer.commonapi.events.DriveModeStatusChangedEvent;
 import com.carconnectivity.mlmediaplayer.commonapi.events.MirrorLinkSessionChangedEvent;
@@ -68,7 +67,6 @@ public final class MirrorLinkConnectionManager {
 
     private volatile boolean mMirrorLinkActive = false;
     private volatile boolean mPlaybackStatus = false;
-    private volatile boolean mAudioBlocked = false;
     private volatile boolean mInDriveMode = false;
     public static volatile boolean mIsMirrorLinkSupported = false;
 
@@ -165,14 +163,14 @@ public final class MirrorLinkConnectionManager {
     @SuppressWarnings("unused")
     public void onEvent(PrepareForPlaybackEvent event) {
         /* This should force setting audio context before any actual playback is done. */
-        performAudioUpdate(true, mAudioBlocked);
+        updatePlaybackStatus(true);
     }
 
     @SuppressWarnings("unused")
     public void onEvent(PlaybackFailedEvent event) {
         /* This should remove audio context if playback failed,
          * audio context was previously set by PrepareForPlaybackEvent. */
-        performAudioUpdate(false, mAudioBlocked);
+        updatePlaybackStatus(false);
     }
 
     @SuppressWarnings("unused")
@@ -194,7 +192,7 @@ public final class MirrorLinkConnectionManager {
                 newStatus = false;
                 break;
         }
-        performAudioUpdate(newStatus, mAudioBlocked);
+        updatePlaybackStatus(newStatus);
     }
 
     private void setAudioContext(boolean isPlaying) {
@@ -231,6 +229,7 @@ public final class MirrorLinkConnectionManager {
                     setMirrorLinkConnected(mirrorLinkSessionIsEstablished);
                 }
             });
+
             setAudioContext(mPlaybackStatus);
         }
 
@@ -267,7 +266,7 @@ public final class MirrorLinkConnectionManager {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    performAudioUpdate(mPlaybackStatus, true);
+                    RsEventBus.postSticky(new AudioBlockingEvent(true));
                 }
             });
         }
@@ -286,35 +285,15 @@ public final class MirrorLinkConnectionManager {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    performAudioUpdate(mPlaybackStatus, false);
+                    RsEventBus.postSticky(new AudioBlockingEvent(false));
                 }
             });
         }
     };
 
-    private void performAudioUpdate(boolean playbackStatus, boolean audioBlocked) {
-        Log.d(TAG, "performAudioUpdate playbackStatus:" + playbackStatus + ", audioBlocked:" + audioBlocked);
-        updateAudioBlockingStatus(audioBlocked);
-        updatePlaybackStatus(playbackStatus);
-    }
-
-    private void updateAudioBlockingStatus(boolean audioBlocked) {
-        Log.d(TAG, "updateAudioBlockingStatus");
-        if (mAudioBlocked != audioBlocked) {
-            mAudioBlocked = audioBlocked;
-            if (mAudioBlocked) {
-                RsEventBus.postSticky(new AudioStartBlockingEvent());
-            } else {
-                RsEventBus.postSticky(new AudioStopBlockingEvent());
-            }
-        }
-    }
-
     private void updatePlaybackStatus(boolean playbackStatus) {
         Log.d(TAG, "updatePlaybackStatus playbackStatus:" + playbackStatus);
-        if (mPlaybackStatus != playbackStatus) {
-            mPlaybackStatus = playbackStatus;
-            setAudioContext(playbackStatus);
-        }
+        mPlaybackStatus = playbackStatus;
+        setAudioContext(playbackStatus);
     }
 }

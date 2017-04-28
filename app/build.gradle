@@ -38,8 +38,8 @@ android {
         targetSdkVersion 22
         // Fetch the version according to git latest tag and "how far are we from last tag"
         def longVersionName = "git -c ${rootDir} describe --tags --dirty".execute().text.trim()
-        versionCode 37
-        versionName "v1.35"
+        versionCode 38
+        versionName "v1.36"
         targetSdkVersion 22
 
     }
