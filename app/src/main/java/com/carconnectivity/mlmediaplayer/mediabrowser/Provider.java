@@ -30,12 +30,15 @@
 package com.carconnectivity.mlmediaplayer.mediabrowser;
 
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.pm.ResolveInfo;
 import android.content.pm.ServiceInfo;
 import android.media.browse.MediaBrowser;
 import android.media.session.MediaController;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -288,8 +291,10 @@ final class Provider {
         MediaController mController;
         String mLastSubscription;
 
-        //Deezer not full children list -- workaround
+        // Deezer not full children list -- workaround
         private boolean deezerFirstSubscription = true;
+        private int deezerSubscribeCount = 0;
+        private Handler deezerHandler = null;
 
         MediaBrowser.SubscriptionCallback mSubscriptionCallback
                 = new MediaBrowser.SubscriptionCallback() {
@@ -300,9 +305,24 @@ final class Provider {
                 ArrayList<MediaItemView> views = convertToViews(children);
                 final ProviderBrowseSuccessfulEvent event
                         = new ProviderBrowseSuccessfulEvent(getView(), parentId, views);
-                if(isDeezerAndFirstSubscription()){
-                    getBrowser().subscribe(mLastSubscription, mSubscriptionCallback);
-                }else{
+
+                // Deezer not full children list -- workaround
+                if (isDeezerAndFirstSubscription() && deezerSubscribeCount <= 5 && children.size() <= 2) {
+                    if (deezerHandler == null) {
+                        deezerHandler = new Handler();
+                        deezerHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                deezerHandler = null;
+                                getBrowser().subscribe(mLastSubscription, mSubscriptionCallback);
+                                deezerSubscribeCount++;
+                            }
+                        }, 1000);
+                    }
+                } else {
+                    deezerFirstSubscription = false;
+                    deezerSubscribeCount = 0;
+
                     RsEventBus.postSticky(event);
                 }
             }
@@ -314,10 +334,20 @@ final class Provider {
             }
         };
 
-        private boolean isDeezerAndFirstSubscription(){
-            if(deezerFirstSubscription && mName.getPackageName().equals("deezer.android.app")){
-                deezerFirstSubscription = false;
-                return true;
+        /**
+         * Deezer not full children list -- workaround
+         *
+         * Check internet connection improve exit from workaround as soon as possible, because
+         * offline Deezer show only two children.
+         * @return
+         */
+        private boolean isDeezerAndFirstSubscription() {
+            ConnectivityManager cm = (ConnectivityManager) mManager.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo netInfo = cm.getActiveNetworkInfo();
+            if (netInfo != null && netInfo.isConnected()) {
+                if (deezerFirstSubscription && mName.getPackageName().equals("deezer.android.app")) {
+                    return true;
+                }
             }
             return false;
         }
@@ -380,6 +410,8 @@ final class Provider {
         public void onConnectionFailed() {
             Log.d(TAG, "ConnectionCallback onConnectionFailed " + mName);
             mConnected = false;
+            deezerFirstSubscription = true;
+            deezerSubscribeCount = 0;
             mMediaController.stopListening();
             RsEventBus.post(new DisconnectFromProviderEvent(mName));
         }
@@ -388,6 +420,8 @@ final class Provider {
         public void onConnectionSuspended() {
             Log.d(TAG, "ConnectionCallback onConnectionSuspended " + mName);
             mConnected = false;
+            deezerFirstSubscription = true;
+            deezerSubscribeCount = 0;
             mMediaController.stopListening();
             RsEventBus.post(new DisconnectFromProviderEvent(mName));
         }

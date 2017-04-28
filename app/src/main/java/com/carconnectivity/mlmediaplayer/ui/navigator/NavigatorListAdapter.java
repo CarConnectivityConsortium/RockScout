@@ -33,6 +33,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,6 +55,7 @@ import java.util.Collection;
  * Created by belickim on 22/04/15.
  */
 public class NavigatorListAdapter extends BaseAdapter implements PaginatedAdapter {
+    private final static String TAG = NavigatorListAdapter.class.getSimpleName();
     public final static int PAGE_SIZE = 4;
     public final static int MAX_UNPAGINATED_ITEMS = 1024;
 
@@ -119,7 +121,7 @@ public class NavigatorListAdapter extends BaseAdapter implements PaginatedAdapte
         //set icon from bitmap or uri
         if (displayIconBitmap != null) {
             viewHolder.appIcon.setImageBitmap(displayIconBitmap);
-        } else if (displayIconUri != null) {
+        } else if (displayIconUri != null && !displayIconUri.toString().isEmpty()) {
             final Context context = mParentFragment.getActivity().getApplicationContext();
             final String rawUri = displayIconUri.toString();
             Picasso.with(context).load(rawUri).into(viewHolder.appIcon);

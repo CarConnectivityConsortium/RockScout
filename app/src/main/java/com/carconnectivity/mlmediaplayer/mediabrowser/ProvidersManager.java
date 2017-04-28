@@ -33,13 +33,13 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.pm.ServiceInfo;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.service.media.MediaBrowserService;
 import android.util.Log;
 import android.util.TypedValue;
@@ -58,8 +58,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Created by belickim on 16/04/15.
@@ -79,8 +77,9 @@ public final class ProvidersManager {
     private final HashMap<ComponentName, Boolean> mConnectedProviders;
 
     private HashMap<ComponentName, ProviderDiscoveryData> mProvidersTestStatus;
-    private Timer mDiscoveryCompletedCheckTimer;
+    private Handler mDiscoveryCompletedCheckHandler;
     private Set<ComponentName> mMediaBrowserPackages;
+    private boolean mPlayerModeOnline = false;
 
     public Context getContext() {
         return mContext;
@@ -119,9 +118,8 @@ public final class ProvidersManager {
         RsEventBus.post(finishedEvent);
         mProvidersTestStatus = null;
 
-        if (mDiscoveryCompletedCheckTimer != null) {
-            mDiscoveryCompletedCheckTimer.cancel();
-            mDiscoveryCompletedCheckTimer = null;
+        if (mDiscoveryCompletedCheckHandler != null) {
+            mDiscoveryCompletedCheckHandler = null;
         }
     }
 
@@ -160,13 +158,21 @@ public final class ProvidersManager {
     }
 
     private void startDiscoveryFinishedCheck() {
-        mDiscoveryCompletedCheckTimer = new Timer();
-        mDiscoveryCompletedCheckTimer.schedule(new TimerTask() {
+        if (mDiscoveryCompletedCheckHandler != null) {
+            return;
+        }
+
+        mDiscoveryCompletedCheckHandler = new Handler();
+        mDiscoveryCompletedCheckHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 checkIfTestConnectionsCompleted();
+
+                if (mDiscoveryCompletedCheckHandler != null) {
+                    mDiscoveryCompletedCheckHandler.postDelayed(this, TIMER_PERIOD);
+                }
             }
-        }, 0, TIMER_PERIOD);
+        }, TIMER_PERIOD);
     }
 
     public void findProviders() {
@@ -325,32 +331,21 @@ public final class ProvidersManager {
     }
 
     public void addTestedProvider(ComponentName componentName, boolean connected, boolean isPlaying) {
-        if (mProvidersTestStatus == null) return;
         if (connected) {
             mConnectedProviders.put(componentName, isPlaying);
+            notifyAboutNewProvider(componentName, isPlaying);
         }
+        if (mProvidersTestStatus == null) return;
         mProvidersTestStatus.put(componentName, new ProviderDiscoveryData(true));
     }
 
-    public void changeModePlayer(boolean mPlayerModeOnline) {
+    public void changeModePlayer(boolean playerModeOnline) {
+        mPlayerModeOnline = playerModeOnline;
         for (HashMap.Entry<ComponentName, Boolean> entry : mConnectedProviders.entrySet()
                 ) {
-            Provider provider = getProvider(entry.getKey());
-            boolean isPlaying = entry.getValue();
-
-            ProviderViewActive viewOnline = getProviderView(entry.getKey());
-            if (!mPlayerModeOnline && provider.canPlayOffline() ||
-                    mPlayerModeOnline) {
-                RsEventBus.post(new ProviderDiscoveredEvent(viewOnline, isPlaying));
-            } else {
-                ProviderViewInactive providerViewInactive = new ProviderViewInactive(viewOnline.getLabel(), viewOnline.getId(),
-                        viewOnline.getIconDrawable());
-                RsEventBus.post(new ProviderInactiveDiscoveredEvent(providerViewInactive));
-            }
-
-            entry.setValue(false);
+            notifyAboutNewProvider(entry.getKey(), entry.getValue());
         }
-        if (!mPlayerModeOnline && checkIfGooglePlayIsInstalled()) {
+        if (!playerModeOnline && checkIfGooglePlayIsInstalled()) {
             //download compatible apps from server
             new Thread(new Runnable() {
                 @Override
@@ -361,8 +356,22 @@ public final class ProvidersManager {
         }
     }
 
-    public boolean isRecordsContainsProvider(ComponentName componentName) {
-        return mRecords.containsKey(componentName);
+    private void notifyAboutNewProvider(ComponentName componentName, boolean isPlaying) {
+        Provider provider = getProvider(componentName);
+
+        ProviderViewActive viewOnline = getProviderView(componentName);
+        if (!mPlayerModeOnline && provider.canPlayOffline() ||
+                mPlayerModeOnline) {
+            RsEventBus.post(new ProviderDiscoveredEvent(viewOnline, isPlaying));
+        } else {
+            ProviderViewInactive providerViewInactive = new ProviderViewInactive(viewOnline.getLabel(), viewOnline.getId(),
+                    viewOnline.getIconDrawable());
+            RsEventBus.post(new ProviderInactiveDiscoveredEvent(providerViewInactive));
+        }
+
+        if (isPlaying) {
+            mConnectedProviders.put(componentName, false);
+        }
     }
 
     private boolean checkIfGooglePlayIsInstalled() {

@@ -34,6 +34,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
@@ -63,7 +64,7 @@ public class RockScoutService extends Service {
     private final static int NOTIFICATION_ID = 1212;
     private MirrorLinkConnectionManager mMirrorLinkConnectionManager;
     private SessionManager mManager;
-    private Handler mHandler;
+    private Handler mProvidersHandler;
 
     private boolean mHeadUnitIsConnected = false;
     private boolean mTerminateReceived = false;
@@ -81,7 +82,11 @@ public class RockScoutService extends Service {
 
         startNotification();
 
-        mHandler = new Handler(Looper.getMainLooper());
+        HandlerThread providersThread = new HandlerThread("ProvidersThread");
+        providersThread.start();
+        mProvidersHandler = new Handler(providersThread.getLooper());
+
+        Handler mHandler = new Handler(Looper.getMainLooper());
         mMirrorLinkConnectionManager
                 = new MirrorLinkConnectionManager(getMirrorLinkApplicationContext(), mHandler);
         mManager = new SessionManager(this, getPackageManager());
@@ -97,7 +102,12 @@ public class RockScoutService extends Service {
             launcherRefreshApps();
         } else {
             if (!mProviderDiscoveryStarted) {
-                mManager.findProviders();
+                mProvidersHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mManager.findProviders();
+                    }
+                });
                 mProviderDiscoveryStarted = true;
             }
         }
@@ -138,7 +148,13 @@ public class RockScoutService extends Service {
     public void onEvent(RefreshProvidersEvent event) {
         if (!mProviderDiscoveryFinished) return;
         if (!mTerminateReceived) {
-            mManager.refreshProviders();
+            mProvidersHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    mManager.refreshProviders();
+                }
+            });
+
             mManager.tryConnectIfDisconnected();
         } else {
             exit();
@@ -198,7 +214,7 @@ public class RockScoutService extends Service {
         startForeground(NOTIFICATION_ID, notification);
     }
 
-    private void exit(){
+    private void exit() {
         stopSelf();
         RsEventBus.removeAllStickyEvents();
     }

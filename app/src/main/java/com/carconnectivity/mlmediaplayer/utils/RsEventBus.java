@@ -31,7 +31,6 @@ package com.carconnectivity.mlmediaplayer.utils;
 
 import android.util.Log;
 
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.AnimateAlphaEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProgressUpdateEvent;
 import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
 
@@ -58,8 +57,7 @@ public class RsEventBus {
     }
 
     public static void post(RockScoutEvent event) {
-        if (event instanceof AnimateAlphaEvent == false &&
-                event instanceof ProgressUpdateEvent == false) {
+        if (event instanceof ProgressUpdateEvent == false) {
             Log.d(TAG, "Post event: " + event.getClass().getSimpleName() + " - " + event);
         }
         mBus.post(event);

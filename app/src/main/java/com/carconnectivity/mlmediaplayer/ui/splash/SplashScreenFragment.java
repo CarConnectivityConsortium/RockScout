@@ -35,10 +35,12 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
 import android.widget.FrameLayout;
 
 import com.carconnectivity.mlmediaplayer.R;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.AnimateAlphaEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderConnectedEvent;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderDiscoveryFinished;
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ShowLauncherFragment;
@@ -47,22 +49,15 @@ import com.carconnectivity.mlmediaplayer.ui.InteractionListener;
 import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
 
 import java.lang.ref.WeakReference;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class SplashScreenFragment extends Fragment implements BackButtonHandler {
     private static final String TAG = SplashScreenFragment.class.getSimpleName();
-    public static final int TIMER_PERIOD = 5;
-    public static final float ALPHA_STEP = 0.001f;
-
-    private FrameLayout mSplashImage;
-    private float mSplashAlpha;
-    private Timer mTimer;
+    private final long DURATION_OF_ANIMATION = 5000;
 
     private WeakReference<InteractionListener> mListener;
 
     private boolean mDiscoveryOver = false;
-    private boolean mTimerFinished = false;
+    private boolean mAnimationFinished = false;
     private boolean mLaunchedAlreadyPlaying = false;
     private boolean mSplashShown = true;
 
@@ -111,8 +106,8 @@ public class SplashScreenFragment extends Fragment implements BackButtonHandler 
     }
 
     private void checkAndHide() {
-        if (mDiscoveryOver && mTimerFinished && mListener != null
-                && mSplashShown) {
+        if (mDiscoveryOver && mAnimationFinished &&
+                mListener != null && mSplashShown) {
             if (mLaunchedAlreadyPlaying) {
                 mListener.get().showMediaPlayer();
             } else {
@@ -126,7 +121,6 @@ public class SplashScreenFragment extends Fragment implements BackButtonHandler 
     @SuppressWarnings("unused")
     public void onEventMainThread(ShowLauncherFragment event) {
         if (event.show && mListener != null) {
-            mTimer.cancel();
             if (mLaunchedAlreadyPlaying) {
                 mListener.get().showMediaPlayer();
             } else {
@@ -149,34 +143,37 @@ public class SplashScreenFragment extends Fragment implements BackButtonHandler 
         checkAndHide();
     }
 
-    @SuppressWarnings("unused")
-    public void onEventMainThread(AnimateAlphaEvent event) {
-        mSplashImage.setAlpha(mSplashAlpha);
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View root = inflater.inflate(R.layout.c4_fragment_splash, container, false);
 
-        mSplashImage = (FrameLayout) root.findViewById(R.id.splash_screen_image);
-        mSplashAlpha = 0.0f;
+        final FrameLayout mSplashImage = (FrameLayout) root.findViewById(R.id.splash_screen_image);
+        mSplashImage.setLayerType(View.LAYER_TYPE_HARDWARE, null);
 
-        mTimer = new Timer();
-        mTimer.schedule(new TimerTask() {
+        Animation fadeInAnimation = new AlphaAnimation(0, 1);
+        fadeInAnimation.setDuration(DURATION_OF_ANIMATION);
+        fadeInAnimation.setInterpolator(new LinearInterpolator());
+        fadeInAnimation.setAnimationListener(new Animation.AnimationListener() {
             @Override
-            public void run() {
-                mSplashAlpha += ALPHA_STEP; /* TODO: nonlinear easing would look much better */
-                if (mSplashAlpha < 1.0f) {
-                    RsEventBus.post(new AnimateAlphaEvent(mSplashAlpha));
-                } else {
-                    mTimerFinished = true;
-                    mTimer.cancel();
-                    checkAndHide();
-                }
-            }
-        }, 0, TIMER_PERIOD);
+            public void onAnimationStart(Animation animation) {
 
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                mAnimationFinished = true;
+                checkAndHide();
+                mSplashImage.setLayerType(View.LAYER_TYPE_NONE, null);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+
+        mSplashImage.setAnimation(fadeInAnimation);
         return root;
     }
 
