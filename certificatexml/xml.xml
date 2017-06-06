@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!--
   ~ Copyright Car Connectivity Consortium
   ~
@@ -27,48 +27,50 @@
   ~ distribute, make available and communicate to public the Feedback
   ~ in or in connection to any CCC products, software and/or services.
   -->
-
 <certificate>
-  <version>
-    <majorVersion>1</majorVersion>
-    <minorVersion>0</minorVersion>
-  </version>
-  <appIdentifier>6Pz3exE-7SVTJXzMKgtMYeK3ppF0er0pnvqL4AHUZf4</appIdentifier>
-  <appListEntry>
-    <name>RockScout</name>
-    <providerName>Car Connectivity Consortium</providerName>
-    <providerURL>http://www.mirrorlink.com</providerURL>
-    <description>RockScout</description>
-    <appInfo>
-      <appCategory>0x00030001</appCategory>
-    </appInfo>
-    <displayInfo>
-      <contentCategory>0x00000020</contentCategory>
-      <orientation>landscape</orientation>
-    </displayInfo>
-    <audioInfo>
-      <audioType>all</audioType>
-      <contentCategory>0x80000000</contentCategory>
-    </audioInfo>
-  </appListEntry>
-  <appCertInfoEntry>
-    <appUUID>uuid:2fac1234-31f8-11b4-a222-08002b34cff3</appUUID>
-    <entity>
-      <name>DEVELOPER</name>
-      <targetList>
-        <target/>
-      </targetList>
-      <restricted>EU,EPE,CAN,USA,AMERICA,AUS,KOR,JPN,CHN,HKG,TPE,IND,APAC,AFRICA,WORLD</restricted>
-      <nonRestricted>EU,EPE,CAN,USA,AMERICA,AUS,KOR,JPN,CHN,HKG,TPE,IND,APAC,AFRICA,WORLD</nonRestricted>
-    </entity>
-    <properties/>
-  </appCertInfoEntry>
-  <serverProperties>
-    <platform>
-      <platformID>Android</platformID>
-      <blacklistedPlatformVersions/>
-      <runtimeID>Native</runtimeID>
-      <blacklistedRuntimeVersions/>
-    </platform>
-  </serverProperties>
+    <version>
+        <majorVersion>1</majorVersion>
+        <minorVersion>0</minorVersion>
+    </version>
+    <appIdentifier>3BpAdRHd75A-VyFB42bdHWSI1LRIzhsbWOp-zOXL57Y</appIdentifier>
+    <appListEntry>
+        <name>RockScout</name>
+        <providerName>Car Connectivity Consortium</providerName>
+        <providerURL>http://www.mirrorlink.com</providerURL>
+        <description>RockScout</description>
+        <appInfo>
+            <appCategory>0x00030001</appCategory>
+        </appInfo>
+        <displayInfo>
+            <contentCategory>0x00000020</contentCategory>
+            <orientation>landscape</orientation>
+        </displayInfo>
+        <audioInfo>
+            <audioType>all</audioType>
+            <contentCategory>0x80000000</contentCategory>
+        </audioInfo>
+    </appListEntry>
+    <appCertInfoEntry>
+        <appUUID>uuid:2fac1234-31f8-11b4-a222-08002b34cff3</appUUID>
+        <entity>
+            <name>DEVELOPER</name>
+            <targetList>
+                <target/>
+            </targetList>
+            <restricted>EU,EPE,CAN,USA,AMERICA,AUS,KOR,JPN,CHN,HKG,TPE,IND,APAC,AFRICA,WORLD</restricted>
+            <nonRestricted>EU,EPE,CAN,USA,AMERICA,AUS,KOR,JPN,CHN,HKG,TPE,IND,APAC,AFRICA,WORLD</nonRestricted>
+            <serviceList>
+                <service/>
+            </serviceList>
+        </entity>
+        <properties/>
+    </appCertInfoEntry>
+    <serverProperties>
+        <platform>
+            <platformID>Android</platformID>
+            <blacklistedPlatformVersions/>
+            <runtimeID>Native</runtimeID>
+            <blacklistedRuntimeVersions/>
+        </platform>
+    </serverProperties>
 </certificate>
