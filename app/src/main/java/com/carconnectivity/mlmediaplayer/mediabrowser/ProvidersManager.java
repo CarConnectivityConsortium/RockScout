@@ -69,28 +69,30 @@ public final class ProvidersManager {
     public static final int TIMER_PERIOD = 120;
     private static final String GOOGLE_PLAY_STORE_PACKAGE_NAME_OLD = "com.google.market";
     private static final String GOOGLE_PLAY_STORE_PACKAGE_NAME_NEW = "com.android.vending";
-
+    private static final String CAR_THEME_KEY = "com.google.android.gms.car.application.theme";
+    private static final String CAR_NOTIFICATION_SMALL_ICON = "com.google.android.gms.car.notification.SmallIcon";
     private final Context mContext;
     private final PackageManager mManager;
-
     private final HashMap<ComponentName, ProviderRecord> mRecords;
     private final HashMap<ComponentName, Boolean> mConnectedProviders;
-
+    private final ProvidersToDownloadManager mProvidersToDownloadManager;
     private HashMap<ComponentName, ProviderDiscoveryData> mProvidersTestStatus;
     private Handler mDiscoveryCompletedCheckHandler;
     private Set<ComponentName> mMediaBrowserPackages;
     private boolean mPlayerModeOnline = false;
-
-    public Context getContext() {
-        return mContext;
-    }
 
     public ProvidersManager(Context context, PackageManager manager) {
         mContext = context;
         mManager = manager;
         mRecords = new HashMap<>();
         mConnectedProviders = new HashMap<>();
+        mMediaBrowserPackages = new HashSet<>();
+        mProvidersToDownloadManager = new ProvidersToDownloadManager(context, mMediaBrowserPackages);
         RsEventBus.register(this);
+    }
+
+    public Context getContext() {
+        return mContext;
     }
 
     @SuppressWarnings("unused")
@@ -126,7 +128,8 @@ public final class ProvidersManager {
     private List<ResolveInfo> getMediaBrowserPackages() {
         final Intent intent = new Intent(MediaBrowserService.SERVICE_INTERFACE);
         List<ResolveInfo> resolveInfos = mManager.queryIntentServices(intent, 0);
-        mMediaBrowserPackages = getNames(resolveInfos);
+        mMediaBrowserPackages.clear();
+        mMediaBrowserPackages.addAll(getNames(resolveInfos));
         return resolveInfos;
     }
 
@@ -292,8 +295,6 @@ public final class ProvidersManager {
         return new ProviderViewActive(provider, label, name, icon, colorPrimaryDark, colorAccent, notificationDrawable);
     }
 
-    private static final String CAR_THEME_KEY = "com.google.android.gms.car.application.theme";
-
     private int resolveAndroidAutoThemeId(ApplicationInfo appInfo) {
         if (appInfo == null) return 0;
         if (appInfo.metaData == null) return 0;
@@ -305,8 +306,6 @@ public final class ProvidersManager {
         }
         return result;
     }
-
-    private static final String CAR_NOTIFICATION_SMALL_ICON = "com.google.android.gms.car.notification.SmallIcon";
 
     private int resolveAndroidAutoNotificationIcon(ApplicationInfo appInfo) {
         if (appInfo == null) return 0;
@@ -346,13 +345,8 @@ public final class ProvidersManager {
             notifyAboutNewProvider(entry.getKey(), entry.getValue());
         }
         if (!playerModeOnline && checkIfGooglePlayIsInstalled()) {
-            //download compatible apps from server
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    new ProviderToDownloadParser(mMediaBrowserPackages).download();
-                }
-            }).start();
+            mProvidersToDownloadManager.getCachedProviders();
+            mProvidersToDownloadManager.refreshProviders();
         }
     }
 

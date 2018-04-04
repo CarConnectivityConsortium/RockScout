@@ -33,7 +33,6 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -42,7 +41,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.GridView;
+import android.widget.ImageButton;
+import android.widget.TextView;
+
 import com.carconnectivity.mlmediaplayer.R;
 import com.carconnectivity.mlmediaplayer.commonapi.events.DriveModeStatusChangedEvent;
 import com.carconnectivity.mlmediaplayer.commonapi.events.MirrorLinkSessionChangedEvent;
@@ -50,7 +54,12 @@ import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderView;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewActive;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewInactive;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewToDownload;
-import com.carconnectivity.mlmediaplayer.mediabrowser.events.*;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.FinishActivityEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.NowPlayingProviderChangedEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderDiscoveredEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderInactiveDiscoveredEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProviderToDownloadDiscoveredEvent;
+import com.carconnectivity.mlmediaplayer.mediabrowser.events.StartBrowsingEvent;
 import com.carconnectivity.mlmediaplayer.ui.InteractionListener;
 import com.carconnectivity.mlmediaplayer.ui.MainActivity;
 import com.carconnectivity.mlmediaplayer.utils.RsEventBus;
@@ -82,6 +91,10 @@ public class LauncherFragment extends Fragment {
 
     private View.OnFocusChangeListener mFocusListener;
 
+    public LauncherFragment() {
+        // Required empty public constructor
+    }
+
     public static LauncherFragment newInstance() {
         LauncherFragment fragment = new LauncherFragment();
         fragment.mListProviders = new ArrayList<>();
@@ -90,6 +103,11 @@ public class LauncherFragment extends Fragment {
         RsEventBus.registerSticky(fragment);
 
         return fragment;
+    }
+
+    private static void setGridAdapter(GridView grid, LauncherProviderGridAdapter adapter) {
+        grid.setAdapter(adapter);
+        adapter.setOwner(grid);
     }
 
     @Override
@@ -105,10 +123,6 @@ public class LauncherFragment extends Fragment {
             mProviderAdapter.removeItems();
             handleGridsVisibility(0);
         }
-    }
-
-    public LauncherFragment() {
-        // Required empty public constructor
     }
 
     @SuppressWarnings("unused")
@@ -301,7 +315,7 @@ public class LauncherFragment extends Fragment {
     public void refreshPaginationController() {
         Log.d(TAG, "refreshPaginationController");
         mPaginationController.setNumbers();
-        if(mProviderAdapter != null){
+        if (mProviderAdapter != null) {
             mProviderAdapter.notifyDataSetChanged();
         }
     }
@@ -353,11 +367,6 @@ public class LauncherFragment extends Fragment {
 
         mProviderAdapter.notifyDataSetChanged();
         handleGridsVisibility(activeProviders.size());
-    }
-
-    private static void setGridAdapter(GridView grid, LauncherProviderGridAdapter adapter) {
-        grid.setAdapter(adapter);
-        adapter.setOwner(grid);
     }
 
     @Override

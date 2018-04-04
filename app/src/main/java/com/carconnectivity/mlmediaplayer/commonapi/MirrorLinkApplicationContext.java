@@ -51,16 +51,35 @@ public final class MirrorLinkApplicationContext extends Application {
     public static final String TAG = MirrorLinkApplicationContext.class.getSimpleName();
 
     private static volatile ICommonAPIService mService = null;
+    ServiceConnectedCallback serviceConnectedCallback = new ServiceConnectedCallback() {
+        @Override
+        public void connected(ICommonAPIService service) {
+            mService = service;
+            RsEventBus.postSticky(new ConnectionMirrorLinkServiceEvent(true));
+            try {
+                mService.applicationStarted(getPackageName(), 1);
+            } catch (RemoteException e) {
+                Log.e(TAG, "Something went wrong: ", e);
+            }
+        }
+    };
     private MlServerApiServiceConnection mlsConnection = null;
-
     private IDeviceStatusManager mDeviceStatusManager;
     private IConnectionManager mConnectionManager = null;
     private IContextManager mContextManager = null;
+    ServiceDisconnectedCallback serviceDisconnectedCallback = new ServiceDisconnectedCallback() {
+        @Override
+        public void disconnected() {
+            mService = null;
+            RsEventBus.postSticky(new ConnectionMirrorLinkServiceEvent(false));
 
+            mConnectionManager = null;
+            mContextManager = null;
+        }
+    };
     private List<IDeviceStatusListener> mDeviceStatusListeners = new ArrayList<>();
     private List<IConnectionListener> mConnectionApplicationListeners = new ArrayList<>();
     private List<IContextListener> mContextApplicationListeners = new ArrayList<>();
-
     private List<Object> mDeviceStatusManagerReferenceList = new ArrayList<>();
     private List<Object> mConnectionManagerReferenceList = new ArrayList<>();
     private List<Object> mContextManagerReferenceList = new ArrayList<>();
@@ -86,30 +105,6 @@ public final class MirrorLinkApplicationContext extends Application {
     public IDeviceStatusManager getDeviceStatusManager() {
         return mDeviceStatusManager;
     }
-
-    ServiceConnectedCallback serviceConnectedCallback = new ServiceConnectedCallback() {
-        @Override
-        public void connected(ICommonAPIService service) {
-            mService = service;
-            RsEventBus.postSticky(new ConnectionMirrorLinkServiceEvent(true));
-            try {
-                mService.applicationStarted(getPackageName(), 1);
-            } catch (RemoteException e) {
-                Log.e(TAG, "Something went wrong: ", e);
-            }
-        }
-    };
-
-    ServiceDisconnectedCallback serviceDisconnectedCallback = new ServiceDisconnectedCallback() {
-        @Override
-        public void disconnected() {
-            mService = null;
-            RsEventBus.postSticky(new ConnectionMirrorLinkServiceEvent(false));
-
-            mConnectionManager = null;
-            mContextManager = null;
-        }
-    };
 
     public boolean connect() {
         Log.v(TAG, "Connect to service");

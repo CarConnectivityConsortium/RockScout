@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
   ~ Copyright Car Connectivity Consortium
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,36 +28,36 @@
   -->
 
 <resources>
-  <string name="ml_unsupported">A telefon és MirrorLink nem kompatibilis. A részletekért kérjuk látogassa meg a www.mirrorlink.com weblapot.</string>
-  <string name="ml_not_connected">A telefon nincs a MirrorLink fejkészülékhez csatlakoztatva.</string>
-  <string name="notification_access">Az alkalmazás helyes működéséhez kérem engedélyezze a Notification Access beállítást. Szeretné most megtenni?</string>
-  <string name="items_missing">Média nem található.</string>
-  <string name="play">Lejátszás</string>
-  <string name="pause">Megállítás</string>
-  <string name="next">Következő</string>
-  <string name="previous">Előző</string>
-  <string name="playlist">Lejátszási lista</string>
-  <string name="more">Több</string>
-  <string name="menu">Menü</string>
-  <string name="listenNow">Lehallgatás most</string>
-  <string name="active">Aktív</string>
-  <string name="inactive">Elérhetetlen</string>
-  <string name="disabled">Elérhetetlen</string>
-  <string name="track">Zeneszám</string>
-  <string name="artist">Előadó</string>
-  <string name="album">Album</string>
-  <string name="browse">Böngészés</string>
-  <string name="back">Vissza</string>
-  <string name="providers_list">Média ellátók listája</string>
-  <string name="open_navigator">Navigácio megnyitása</string>
-  <string name="now_playing">Most játszódik</string>
-  <string name="mirrorlink_dialog_title">Figyelem</string>
-  <string name="mirrorlink_dialog_message">A MirrorLink teknológia ezen a telefonon nem támogatott.\n\nA RockScout a telefonon használható de az autó fejkészüléken nem.</string>
-  <string name="no_auto_compatible_app">A telefonján nincs \'Android Media Browse Service\' kompatibilis média lejátszó.\n\n Kérem telepítsen egy támogatott média lejátszót, hogy a RockScout használható legyen.</string>
-  <string name="press_play_to_start">Nyomja meg a lejátszás gombot </string>
-  <string name="select_track_to_start">Válaszd ki a lejátszani kívánt sávot</string>
-  <string name="launcher">Indító</string>
-  <string name="top_level">Felső szint</string>
-  <string name="splash_subtitle">powered by MirrorLink</string>
-  <string name="select_source_hint">Válaszd ki a lejátszani kívánt eszközt</string>
+    <string name="ml_unsupported">A telefon és MirrorLink nem kompatibilis. A részletekért kérjuk látogassa meg a www.mirrorlink.com weblapot.</string>
+    <string name="ml_not_connected">A telefon nincs a MirrorLink fejkészülékhez csatlakoztatva.</string>
+    <string name="notification_access">Az alkalmazás helyes működéséhez kérem engedélyezze a Notification Access beállítást. Szeretné most megtenni?</string>
+    <string name="items_missing">Média nem található.</string>
+    <string name="play">Lejátszás</string>
+    <string name="pause">Megállítás</string>
+    <string name="next">Következő</string>
+    <string name="previous">Előző</string>
+    <string name="playlist">Lejátszási lista</string>
+    <string name="more">Több</string>
+    <string name="menu">Menü</string>
+    <string name="listenNow">Lehallgatás most</string>
+    <string name="active">Aktív</string>
+    <string name="inactive">Elérhetetlen</string>
+    <string name="disabled">Elérhetetlen</string>
+    <string name="track">Zeneszám</string>
+    <string name="artist">Előadó</string>
+    <string name="album">Album</string>
+    <string name="browse">Böngészés</string>
+    <string name="back">Vissza</string>
+    <string name="providers_list">Média ellátók listája</string>
+    <string name="open_navigator">Navigácio megnyitása</string>
+    <string name="now_playing">Most játszódik</string>
+    <string name="mirrorlink_dialog_title">Figyelem</string>
+    <string name="mirrorlink_dialog_message">A MirrorLink teknológia ezen a telefonon nem támogatott.\n\nA RockScout a telefonon használható de az autó fejkészüléken nem.</string>
+    <string name="no_auto_compatible_app">A telefonján nincs \'Android Media Browse Service\' kompatibilis média lejátszó.\n\n Kérem telepítsen egy támogatott média lejátszót, hogy a RockScout használható legyen.</string>
+    <string name="press_play_to_start">Nyomja meg a lejátszás gombot </string>
+    <string name="select_track_to_start">Válaszd ki a lejátszani kívánt sávot</string>
+    <string name="launcher">Indító</string>
+    <string name="top_level">Felső szint</string>
+    <string name="splash_subtitle">powered by MirrorLink</string>
+    <string name="select_source_hint">Válaszd ki a lejátszani kívánt eszközt</string>
 </resources>

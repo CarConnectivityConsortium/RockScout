@@ -63,9 +63,9 @@ public class LauncherProviderGridAdapter extends BaseAdapter implements Paginate
 
     final private boolean mUsePagination;
     final private Fragment mParentFragment;
+    private final Comparator<ProviderView> mProvidersOrder;
     private GridView mOwner;
     private PaginatedCollection<ProviderView> mItems;
-    private final Comparator<ProviderView> mProvidersOrder;
 
     public LauncherProviderGridAdapter(Fragment parent, List<ProviderView> initialItems, boolean usePagination) {
         mUsePagination = usePagination;

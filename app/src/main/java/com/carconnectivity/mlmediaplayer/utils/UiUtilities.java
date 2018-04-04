@@ -45,7 +45,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.GridView;
 import android.widget.ListView;
-import android.widget.ScrollView;
 
 import com.carconnectivity.mlmediaplayer.R;
 import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewActive;
@@ -61,6 +60,7 @@ import java.util.TimerTask;
 public class UiUtilities {
 
     private static final String TAG = UiUtilities.class.getSimpleName();
+    private static final int MAX_TEXT_LENGTH = 30;
 
     private static View.OnTouchListener generateOnTouchListener(Context context) {
         final GestureDetector detector
@@ -190,8 +190,6 @@ public class UiUtilities {
 
         return dialog;
     }
-
-    private static final int MAX_TEXT_LENGTH = 30;
 
     /**
      * Check text max size, if exceeded add "..." at the end.

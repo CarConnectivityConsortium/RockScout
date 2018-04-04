@@ -71,7 +71,8 @@ public class MediaItemView {
     }
 
     public String getDisplayLabel() {
-        final String rawTitle = mItem.getDescription().getTitle().toString();
+        final CharSequence charSequenceTitle = mItem.getDescription().getTitle();
+        final String rawTitle = charSequenceTitle != null ? charSequenceTitle.toString() : "";
         return UiUtilities.trimLabelText(rawTitle);
     }
 }

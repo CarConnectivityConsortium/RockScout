@@ -69,22 +69,16 @@ import com.carconnectivity.mlmediaplayer.utils.pagination.PaginationController;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public final class NavigatorFragment extends Fragment implements BackButtonHandler {
+
     private static final String TAG = NavigatorFragment.class.getSimpleName();
     private static final String PROVIDER_NAME_KEY
             = NavigatorFragment.class.getSimpleName() + ".provider_name";
     private static final String BREAD_CRUMBS_KEY
             = NavigatorFragment.class.getSimpleName() + ".bread_crumbs";
-
-    /**
-     * Think of this fragment as of simple state machine, each visual change
-     * should be tied to changing the state.
-     */
-    private enum State {
-        CREATED, LOADING, LOADED, FAILED
-    }
-
+    private static final long SHOW_MISSING_DELAY = TimeUnit.SECONDS.toMillis(20);
     private State mState;
 
     private ProviderViewActive mNowPlayingProvider;
@@ -103,8 +97,24 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
     private TextView mDirectoryNameLabel;
     private TextView mNoResultsLabel;
     private ProgressBar mWaitIndicator;
+    private final CountDownTimer mWaitForResultsTimer
+            = new CountDownTimer(SHOW_MISSING_DELAY, SHOW_MISSING_DELAY) {
 
+        @Override
+        public void onTick(long millisUntilFinished) {
+        }
+
+        @Override
+        public void onFinish() {
+            changeState(State.FAILED);
+        }
+    };
     private View.OnFocusChangeListener mFocusListener;
+    private ProviderBrowseSuccessfulEvent mLastProviderBrowseSuccessfulEvent;
+
+    public NavigatorFragment() {
+        // Required empty public constructor
+    }
 
     public static NavigatorFragment newInstance(String topLevelName) {
         NavigatorFragment fragment = new NavigatorFragment();
@@ -117,8 +127,9 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
         return fragment;
     }
 
-    public NavigatorFragment() {
-        // Required empty public constructor
+    private static void setListAdapter(ListView list, NavigatorListAdapter adapter) {
+        list.setAdapter(adapter);
+        adapter.setOwner(list);
     }
 
     @SuppressWarnings("unused")
@@ -157,6 +168,7 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
         if (event.items.size() == 0) {
             changeState(State.FAILED);
         } else {
+            mLastProviderBrowseSuccessfulEvent = event;
             changeState(State.LOADED);
         }
 
@@ -166,7 +178,7 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
     public void refreshPaginationController() {
         Log.d(TAG, "refreshPaginationController");
         mPaginationController.setNumbers();
-        if(mAdapter != null){
+        if (mAdapter != null) {
             mAdapter.notifyDataSetChanged();
         }
     }
@@ -194,7 +206,6 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
     public void onEventMainThread(ProviderConnectErrorEvent event) {
         changeState(State.FAILED);
     }
-
 
     @SuppressWarnings("unused")
     public void onEventMainThread(NowPlayingProviderChangedEvent event) {
@@ -226,8 +237,6 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
 
     private void changeState(State state) {
         Log.d(TAG, "changeState: state" + (state != null ? state.name() : "null"));
-        if (state == mState)
-            return;
 
         switch (state) {
             case LOADING:
@@ -279,6 +288,7 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
 
     public void clearCrumbs() {
         Log.d(TAG, "clearCrumbs");
+        mLastProviderBrowseSuccessfulEvent = null;
         mCrumbs.reset();
     }
 
@@ -312,6 +322,7 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
         if (bundle.containsKey(BREAD_CRUMBS_KEY)) {
             final String json = bundle.getString(BREAD_CRUMBS_KEY);
             mCrumbs = BreadCrumbs.fromJson(json);
+            mLastProviderBrowseSuccessfulEvent = null;
             mRestoredProviderName = bundle.getString(PROVIDER_NAME_KEY);
         }
     }
@@ -334,6 +345,7 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
 
     private void pushNewLevel(String displayName, String id) {
         Log.d(TAG, "pushNewLevel");
+        mLastProviderBrowseSuccessfulEvent = null;
         mCrumbs.push(displayName, id);
         mDirectoryNameLabel.setText(displayName);
         browseDirectory(id);
@@ -341,6 +353,7 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
 
     private void popLevel() {
         Log.d(TAG, "popLevel");
+        mLastProviderBrowseSuccessfulEvent = null;
         mCrumbs.goBack();
         mDirectoryNameLabel.setText(mCrumbs.getTopItem().displayName);
         browseDirectory(mCrumbs.getTopItem().id);
@@ -420,14 +433,13 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
         }
 
         changeState(State.LOADING);
-        browseCurrentDirectory();
+        if (mLastProviderBrowseSuccessfulEvent != null) {
+            onEventMainThread(mLastProviderBrowseSuccessfulEvent);
+        } else {
+            browseCurrentDirectory();
+        }
 
         return root;
-    }
-
-    private static void setListAdapter(ListView list, NavigatorListAdapter adapter) {
-        list.setAdapter(adapter);
-        adapter.setOwner(list);
     }
 
     private void playMediaItem(String mediaId, Bundle bundle) {
@@ -510,20 +522,6 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
             UiUtilities.setVisibility(mWaitIndicator, enable);
     }
 
-    private static final int SHOW_MISSING_DELAY = 5000; /* ms */
-    private final CountDownTimer mWaitForResultsTimer
-            = new CountDownTimer(SHOW_MISSING_DELAY, SHOW_MISSING_DELAY) {
-
-        @Override
-        public void onTick(long millisUntilFinished) {
-        }
-
-        @Override
-        public void onFinish() {
-            changeState(State.FAILED);
-        }
-    };
-
     private void startTimer() {
         mWaitForResultsTimer.cancel();
         mWaitForResultsTimer.start();
@@ -531,5 +529,13 @@ public final class NavigatorFragment extends Fragment implements BackButtonHandl
 
     private void stopTimer() {
         mWaitForResultsTimer.cancel();
+    }
+
+    /**
+     * Think of this fragment as of simple state machine, each visual change
+     * should be tied to changing the state.
+     */
+    private enum State {
+        CREATED, LOADING, LOADED, FAILED
     }
 }

@@ -28,13 +28,13 @@
   -->
 
 <resources>
+
     <style name="AppTheme" parent="android:Theme.Black.NoTitleBar.Fullscreen">
         <item name="android:typeface">sans</item>
         <item name="android:alertDialogTheme">@style/AppCompatAlertDialogStyle</item>
     </style>
 
-    <style name="AppCompatAlertDialogStyle"
-           parent="android:Theme.Material.Dialog.Alert">
+    <style name="AppCompatAlertDialogStyle" parent="android:Theme.Material.Dialog.Alert">
         <item name="android:colorAccent">#ea9000</item>
         <item name="android:textSize">20sp</item>
     </style>

@@ -33,7 +33,6 @@ import android.app.Fragment;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,10 +54,9 @@ import java.util.Collection;
  * Created by belickim on 22/04/15.
  */
 public class NavigatorListAdapter extends BaseAdapter implements PaginatedAdapter {
-    private final static String TAG = NavigatorListAdapter.class.getSimpleName();
     public final static int PAGE_SIZE = 4;
     public final static int MAX_UNPAGINATED_ITEMS = 1024;
-
+    private final static String TAG = NavigatorListAdapter.class.getSimpleName();
     final private Fragment mParentFragment;
     private ListView mOwner;
     private PaginatedCollection<MediaItemView> mItems;

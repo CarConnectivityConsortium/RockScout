@@ -27,36 +27,23 @@
  * in or in connection to any CCC products, software and/or services.
  */
 
-apply plugin: 'com.android.application'
+package com.carconnectivity.mlmediaplayer.mediabrowser.retrofit.model;
 
-android {
-    compileSdkVersion 22
-    buildToolsVersion "23.0.3"
-    defaultConfig {
-        applicationId "com.carconnectivity.mlmediaplayer"
-        minSdkVersion 21
-        targetSdkVersion 22
-        versionCode 39
-        versionName "v1.37"
-    }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
-}
+import org.simpleframework.xml.ElementList;
+import org.simpleframework.xml.Root;
 
-dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.squareup.picasso:picasso:2.5.2'
-    compile 'de.greenrobot:eventbus:2.4.0'
-    compile 'com.google.code.gson:gson:2.3.1'
+import java.util.List;
 
-    compile 'com.squareup.retrofit2:retrofit:2.3.0'
-    compile('com.squareup.retrofit2:converter-simplexml:2.3.0') {
-        exclude module: 'stax-api'
-        exclude module: 'stax'
-        exclude module: 'xpp3'
+/**
+ * @author Comarch S.A.
+ */
+@Root(name = "apps")
+public class ProvidersToDownloadModel {
+
+    @ElementList(inline = true)
+    List<ProviderToDownloadModel> providerToDownloadModelList;
+
+    public List<ProviderToDownloadModel> getProviderToDownloadModelList() {
+        return providerToDownloadModelList;
     }
 }

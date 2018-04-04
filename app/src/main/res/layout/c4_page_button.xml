@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright Car Connectivity Consortium
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,38 +28,39 @@
   -->
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
     <ImageView
+        android:id="@+id/page_button_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/c4_media_button"
-        android:tintMode="multiply"
-        android:id="@+id/page_button_background"
         android:padding="10dp"
-        />
+        android:src="@drawable/c4_media_button"
+        android:tintMode="multiply" />
+
     <Button
+        android:id="@+id/page_button_button"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@xml/action_bar_btn_selector"
         android:text="2"
         android:textColor="@color/c4_list_background"
-        android:textSize="32dp"
-        android:id="@+id/page_button_button"
-        />
+        android:textSize="32dp" />
+
     <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:src="@drawable/ic_btn_provider_chevron_reversed"
-        android:tint="@color/c4_list_background"
-        android:padding="32dp"
         android:id="@+id/page_button_previous_icon"
-        />
-    <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/ic_btn_provider_chevron"
-        android:tint="@color/c4_list_background"
         android:padding="32dp"
+        android:src="@drawable/ic_btn_provider_chevron_reversed"
+        android:tint="@color/c4_list_background" />
+
+    <ImageView
         android:id="@+id/page_button_next_icon"
-        />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="32dp"
+        android:src="@drawable/ic_btn_provider_chevron"
+        android:tint="@color/c4_list_background" />
 </FrameLayout>

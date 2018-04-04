@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
   ~ Copyright Car Connectivity Consortium
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,36 +28,36 @@
   -->
 
 <resources>
-  <string name="ml_unsupported">Questo dispositivo non è compatibile con MirrorLink, prego visitare www.mirrorlink.com per maggiori informazioni.</string>
-  <string name="ml_not_connected">Il telefono non è connesso al ricevitore MirrorLink.</string>
-  <string name="notification_access">Per il corretto funzionamento di questa applicazione, l\'impostazione di accesso alle notifiche deve essere abilitata. Desidera abilitarla ora?</string>
-  <string name="items_missing">Impossibile trovare file media.</string>
-  <string name="play">Riproduci</string>
-  <string name="pause">Pausa</string>
-  <string name="next">Prossimo</string>
-  <string name="previous">Precedente</string>
-  <string name="playlist">Lista brani</string>
-  <string name="more">Espandi</string>
-  <string name="menu">Menu</string>
-  <string name="listenNow">Ascolta Ora</string>
-  <string name="active">Attivo</string>
-  <string name="inactive">Inattivo</string>
-  <string name="disabled">Disabilitato</string>
-  <string name="track">Brano</string>
-  <string name="artist">Artista</string>
-  <string name="album">Album</string>
-  <string name="browse">Naviga</string>
-  <string name="back">Indietro</string>
-  <string name="providers_list">Elenco sorgenti media</string>
-  <string name="open_navigator">Navigatore</string>
-  <string name="now_playing">In ascolto</string>
-  <string name="mirrorlink_dialog_title">Attenzione</string>
-  <string name="mirrorlink_dialog_message">Questo dispositivo non supporta la tecnologia MirrorLink.\n\nÈ possibile utilizzare RockScout sullo smartphone ma non sul ricevitore MirrorLink della sua auto.</string>
-  <string name="no_auto_compatible_app">Non sono presenti applicazioni \'Android Media Browse Service\' compatibili sul suo dispositivo.\n\nPer poter utilizzare RockScout è necessario installare una delle applicazioni supportate.</string>
-  <string name="press_play_to_start">Premere \'Riproduci\' per iniziare</string>
-  <string name="select_track_to_start">Seleziona traccia per cominciare</string>
-  <string name="launcher">Avvio</string>
-  <string name="top_level">Livello superiore</string>
-  <string name="select_source_hint">Selezionare una sorgente da cui riprodurre:</string>
-  <string name="splash_subtitle">Tecnologia MirrorLink</string>
+    <string name="ml_unsupported">Questo dispositivo non è compatibile con MirrorLink, prego visitare www.mirrorlink.com per maggiori informazioni.</string>
+    <string name="ml_not_connected">Il telefono non è connesso al ricevitore MirrorLink.</string>
+    <string name="notification_access">Per il corretto funzionamento di questa applicazione, l\'impostazione di accesso alle notifiche deve essere abilitata. Desidera abilitarla ora?</string>
+    <string name="items_missing">Impossibile trovare file media.</string>
+    <string name="play">Riproduci</string>
+    <string name="pause">Pausa</string>
+    <string name="next">Prossimo</string>
+    <string name="previous">Precedente</string>
+    <string name="playlist">Lista brani</string>
+    <string name="more">Espandi</string>
+    <string name="menu">Menu</string>
+    <string name="listenNow">Ascolta Ora</string>
+    <string name="active">Attivo</string>
+    <string name="inactive">Inattivo</string>
+    <string name="disabled">Disabilitato</string>
+    <string name="track">Brano</string>
+    <string name="artist">Artista</string>
+    <string name="album">Album</string>
+    <string name="browse">Naviga</string>
+    <string name="back">Indietro</string>
+    <string name="providers_list">Elenco sorgenti media</string>
+    <string name="open_navigator">Navigatore</string>
+    <string name="now_playing">In ascolto</string>
+    <string name="mirrorlink_dialog_title">Attenzione</string>
+    <string name="mirrorlink_dialog_message">Questo dispositivo non supporta la tecnologia MirrorLink.\n\nÈ possibile utilizzare RockScout sullo smartphone ma non sul ricevitore MirrorLink della sua auto.</string>
+    <string name="no_auto_compatible_app">Non sono presenti applicazioni \'Android Media Browse Service\' compatibili sul suo dispositivo.\n\nPer poter utilizzare RockScout è necessario installare una delle applicazioni supportate.</string>
+    <string name="press_play_to_start">Premere \'Riproduci\' per iniziare</string>
+    <string name="select_track_to_start">Seleziona traccia per cominciare</string>
+    <string name="launcher">Avvio</string>
+    <string name="top_level">Livello superiore</string>
+    <string name="select_source_hint">Selezionare una sorgente da cui riprodurre:</string>
+    <string name="splash_subtitle">Tecnologia MirrorLink</string>
 </resources>

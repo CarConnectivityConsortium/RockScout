@@ -28,5 +28,5 @@
   -->
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_focused="true" android:drawable="@drawable/c4_button_focus" />
+    <item android:drawable="@drawable/c4_button_focus" android:state_focused="true" />
 </selector>

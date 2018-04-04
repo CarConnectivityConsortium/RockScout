@@ -110,6 +110,7 @@ public class Defs {
         public static final String HEIGHT = "HEIGHT";
 
     }
+
     /**
      * 3.2 ServiceInformation Bundle property names.
      * <br>
@@ -137,6 +138,7 @@ public class Defs {
          */
         public static final String SERVICE_NAME = "SERVICE_NAME";
     }
+
     /**
      * 3.3 Action Bundle property names.
      * <br>
@@ -230,20 +232,20 @@ public class Defs {
      */
     public static final class VirtualKeyboardSupport {
         /**
-         * Flag, to indicate the availability of a virtual keyboard 
-         * from the MirrorLink Server. 
+         * Flag, to indicate the availability of a virtual keyboard
+         * from the MirrorLink Server.
          * boolean
          */
         public static final String AVAILABLE = "AVAILABLE";
         /**
-         * Flag, to indicate whether the virtual keyboard supports 
-         * touch events. 
+         * Flag, to indicate whether the virtual keyboard supports
+         * touch events.
          * boolean
          */
         public static final String TOUCH_SUPPORT = "TOUCH_SUPPORT";
         /**
-         * Flag, to indicate whether the virtual keyboard supports 
-         * knob events. 
+         * Flag, to indicate whether the virtual keyboard supports
+         * knob events.
          * boolean
          */
         public static final String KNOB_SUPPORT = "KNOB_SUPPORT";
@@ -277,6 +279,7 @@ public class Defs {
          */
         public static final String ADVERTISED_AS_CERTIFIEDAPP = "ADVERTISED_AS_CERTIFIEDAPP";
     }
+
     /**
      * 4.3.3 CertificateInformation Bundle property names and values
      */
@@ -340,41 +343,64 @@ public class Defs {
         /**
          * AudioConnections MEDIA_AUDIO_OUT values.
          */
-        /** Not established */
+        /**
+         * Not established
+         */
         public static final int MEDIA_OUT_NONE = 0x00;
-        /** BT A2DP */
+        /**
+         * BT A2DP
+         */
         public static final int MEDIA_OUT_BT_AD2DP = 0x01;
-        /** RTP */
+        /**
+         * RTP
+         */
         public static final int MEDIA_OUT_RTP = 0x02;
 
         /**
          * AudioConnections MEDIA_AUDIO_IN values.
          */
-        /** Not established */
+        /**
+         * Not established
+         */
         public static final int MEDIA_IN_NONE = 0x00;
-        /** RTP */
+        /**
+         * RTP
+         */
         public static final int MEDIA_IN_RTP = 0x02;
 
         /**
          * AudioConnections VOICE_CONTROL values.
          */
-        /** Not established */
+        /**
+         * Not established
+         */
         public static final int VOICE_CONTROL_NONE = 0x00;
-        /** BT HFP + BVRA (Voice Control is outside MirrorLink Server’s responsibility; application must use existing platform APIs) */
+        /**
+         * BT HFP + BVRA (Voice Control is outside MirrorLink Server’s responsibility; application must use existing platform APIs)
+         */
         public static final int VOICE_CONTROL_BT_HFP = 0x01;
-        /** RTP */
+        /**
+         * RTP
+         */
         public static final int VOICE_CONTROL_RTP = 0x02;
 
         /**
          * AudioConnections PHONE_AUDIO values.
          */
-        /** Not established */
+        /**
+         * Not established
+         */
         public static final int INCALL_AUDIO_NONE = 0x00;
-        /** BT HFP */
+        /**
+         * BT HFP
+         */
         public static final int INCALL_AUDIO_BT_HFP = 0x01;
-        /** RTP */
+        /**
+         * RTP
+         */
         public static final int INCALL_AUDIO_RTP = 0x02;
     }
+
     /**
      * 4.4.5 RemoteDisplayConnection Bundle property names and values.
      */
@@ -413,7 +439,7 @@ public class Defs {
         public static final String SERVER_PIXEL_WIDTH = "SERVER_PIXEL_WIDTH";
         /**
          * Vertical resolution in pixel, after the MirrorLink Server has scaled the application
-         * framebuffer. 
+         * framebuffer.
          * uint16 packaged as an int
          */
         public static final String SERVER_PIXEL_HEIGHT = "SERVER_PIXEL_HEIGHT";
@@ -460,13 +486,14 @@ public class Defs {
          */
         public static final String DISTANCE = "DISTANCE";
         /**
-         * Number of application-level pixels, which will fit into 1 mm of Client Display space. 
+         * Number of application-level pixels, which will fit into 1 mm of Client Display space.
          * float
          * <br>
          * Note: This value is the same for the horizontal and vertical dimension.
          */
         public static final String APP_PIXELS_PER_CLIENT_MM = "APP_PIXELS_PER_CLIENT_MM";
     }
+
     /**
      * 4.5.3 IDisplayManager.getClientPixelFormat fields.
      */
@@ -564,81 +591,82 @@ public class Defs {
         /**
          * KNOB_KEY_SUPPORT values.
          */
-        public static final int KNOB_KEY_SUPPORT_SHIFT_Y_0  = 0x00000002;
+        public static final int KNOB_KEY_SUPPORT_SHIFT_Y_0 = 0x00000002;
         public static final int KNOB_KEY_SUPPORT_SHIFT_XY_0 = 0x00000004;
-        public static final int KNOB_KEY_SUPPORT_PUSH_Z_0   = 0x00000008;
-        public static final int KNOB_KEY_SUPPORT_PULL_Z_0   = 0x00000010;
+        public static final int KNOB_KEY_SUPPORT_PUSH_Z_0 = 0x00000008;
+        public static final int KNOB_KEY_SUPPORT_PULL_Z_0 = 0x00000010;
         public static final int KNOB_KEY_SUPPORT_ROTATE_X_0 = 0x00000020;
         public static final int KNOB_KEY_SUPPORT_ROTATE_Y_0 = 0x00000040;
         public static final int KNOB_KEY_SUPPORT_ROTATE_Z_0 = 0x00000080;
-        public static final int KNOB_KEY_SUPPORT_SHIFT_X_1  = 0x00000100;
-        public static final int KNOB_KEY_SUPPORT_SHIFT_Y_1  = 0x00000200;
+        public static final int KNOB_KEY_SUPPORT_SHIFT_X_1 = 0x00000100;
+        public static final int KNOB_KEY_SUPPORT_SHIFT_Y_1 = 0x00000200;
         public static final int KNOB_KEY_SUPPORT_SHIFT_XY_1 = 0x00000400;
-        public static final int KNOB_KEY_SUPPORT_PUSH_Z_1   = 0x00000800;
-        public static final int KNOB_KEY_SUPPORT_PULL_Z_1   = 0x00001000;
+        public static final int KNOB_KEY_SUPPORT_PUSH_Z_1 = 0x00000800;
+        public static final int KNOB_KEY_SUPPORT_PULL_Z_1 = 0x00001000;
         public static final int KNOB_KEY_SUPPORT_ROTATE_X_1 = 0x00002000;
         public static final int KNOB_KEY_SUPPORT_ROTATE_Y_1 = 0x00004000;
         public static final int KNOB_KEY_SUPPORT_ROTATE_Z_1 = 0x00008000;
-        public static final int KNOB_KEY_SUPPORT_SHIFT_X_2  = 0x00010000;
-        public static final int KNOB_KEY_SUPPORT_SHIFT_Y_2  = 0x00020000;
+        public static final int KNOB_KEY_SUPPORT_SHIFT_X_2 = 0x00010000;
+        public static final int KNOB_KEY_SUPPORT_SHIFT_Y_2 = 0x00020000;
         public static final int KNOB_KEY_SUPPORT_SHIFT_XY_2 = 0x00040000;
-        public static final int KNOB_KEY_SUPPORT_PUSH_Z_2   = 0x00080000;
-        public static final int KNOB_KEY_SUPPORT_PULL_Z_2   = 0x00100000;
+        public static final int KNOB_KEY_SUPPORT_PUSH_Z_2 = 0x00080000;
+        public static final int KNOB_KEY_SUPPORT_PULL_Z_2 = 0x00100000;
         public static final int KNOB_KEY_SUPPORT_ROTATE_X_2 = 0x00200000;
         public static final int KNOB_KEY_SUPPORT_ROTATE_Y_2 = 0x00400000;
         public static final int KNOB_KEY_SUPPORT_ROTATE_Z_2 = 0x00800000;
-        public static final int KNOB_KEY_SUPPORT_SHIFT_X_3  = 0x01000000;
-        public static final int KNOB_KEY_SUPPORT_SHIFT_Y_3  = 0x02000000;
+        public static final int KNOB_KEY_SUPPORT_SHIFT_X_3 = 0x01000000;
+        public static final int KNOB_KEY_SUPPORT_SHIFT_Y_3 = 0x02000000;
         public static final int KNOB_KEY_SUPPORT_SHIFT_XY_3 = 0x04000000;
-        public static final int KNOB_KEY_SUPPORT_PUSH_Z_3   = 0x08000000;
-        public static final int KNOB_KEY_SUPPORT_PULL_Z_3   = 0x10000000;
+        public static final int KNOB_KEY_SUPPORT_PUSH_Z_3 = 0x08000000;
+        public static final int KNOB_KEY_SUPPORT_PULL_Z_3 = 0x10000000;
         public static final int KNOB_KEY_SUPPORT_ROTATE_X_3 = 0x20000000;
         public static final int KNOB_KEY_SUPPORT_ROTATE_Y_3 = 0x40000000;
         public static final int KNOB_KEY_SUPPORT_ROTATE_Z_3 = 0x80000000;
         /**
          * DEVICE_KEY_SUPPORT values.
          */
-        public static final int DEVICE_KEY_SUPPORT_PHONE_CALL  = 0x00000001;
-        public static final int DEVICE_KEY_SUPPORT_PHONE_END   = 0x00000002;
-        public static final int DEVICE_KEY_SUPPORT_SOFT_LEFT   = 0x00000004;
+        public static final int DEVICE_KEY_SUPPORT_PHONE_CALL = 0x00000001;
+        public static final int DEVICE_KEY_SUPPORT_PHONE_END = 0x00000002;
+        public static final int DEVICE_KEY_SUPPORT_SOFT_LEFT = 0x00000004;
         public static final int DEVICE_KEY_SUPPORT_SOFT_MIDDLE = 0x00000008;
-        public static final int DEVICE_KEY_SUPPORT_SOFT_RIGHT  = 0x00000010;
+        public static final int DEVICE_KEY_SUPPORT_SOFT_RIGHT = 0x00000010;
         public static final int DEVICE_KEY_SUPPORT_APPLICATION = 0x00000020;
-        public static final int DEVICE_KEY_SUPPORT_OK          = 0x00000040;
-        public static final int DEVICE_KEY_SUPPORT_DELETE      = 0x00000080;
-        public static final int DEVICE_KEY_SUPPORT_ZOOM_IN     = 0x00000100;
-        public static final int DEVICE_KEY_SUPPORT_ZOOM_OUT    = 0x00000200;
-        public static final int DEVICE_KEY_SUPPORT_CLEAR       = 0x00000400;
-        public static final int DEVICE_KEY_SUPPORT_FORWARD     = 0x00000800;
-        public static final int DEVICE_KEY_SUPPORT_BACKWARD    = 0x00001000;
-        public static final int DEVICE_KEY_SUPPORT_HOME        = 0x00002000;
-        public static final int DEVICE_KEY_SUPPORT_SEARCH      = 0x00004000;
-        public static final int DEVICE_KEY_SUPPORT_MENU        = 0x00008000;
-        public static final int DEVICE_KEY_SUPPORT_ALL         = 0x00007fff;
+        public static final int DEVICE_KEY_SUPPORT_OK = 0x00000040;
+        public static final int DEVICE_KEY_SUPPORT_DELETE = 0x00000080;
+        public static final int DEVICE_KEY_SUPPORT_ZOOM_IN = 0x00000100;
+        public static final int DEVICE_KEY_SUPPORT_ZOOM_OUT = 0x00000200;
+        public static final int DEVICE_KEY_SUPPORT_CLEAR = 0x00000400;
+        public static final int DEVICE_KEY_SUPPORT_FORWARD = 0x00000800;
+        public static final int DEVICE_KEY_SUPPORT_BACKWARD = 0x00001000;
+        public static final int DEVICE_KEY_SUPPORT_HOME = 0x00002000;
+        public static final int DEVICE_KEY_SUPPORT_SEARCH = 0x00004000;
+        public static final int DEVICE_KEY_SUPPORT_MENU = 0x00008000;
+        public static final int DEVICE_KEY_SUPPORT_ALL = 0x00007fff;
         /**
          * MULTIMEDIA_KEY_SUPPORT values.
          */
-        public static final int MULTIMEDIA_KEY_SUPPORT_PLAY     = 0x00000001;
-        public static final int MULTIMEDIA_KEY_SUPPORT_PAUSE    = 0x00000002;
-        public static final int MULTIMEDIA_KEY_SUPPORT_STOP     = 0x00000004;
-        public static final int MULTIMEDIA_KEY_SUPPORT_FORWARD  = 0x00000008;
-        public static final int MULTIMEDIA_KEY_SUPPORT_REWIND   = 0x00000010;
-        public static final int MULTIMEDIA_KEY_SUPPORT_NEXT     = 0x00000020;
+        public static final int MULTIMEDIA_KEY_SUPPORT_PLAY = 0x00000001;
+        public static final int MULTIMEDIA_KEY_SUPPORT_PAUSE = 0x00000002;
+        public static final int MULTIMEDIA_KEY_SUPPORT_STOP = 0x00000004;
+        public static final int MULTIMEDIA_KEY_SUPPORT_FORWARD = 0x00000008;
+        public static final int MULTIMEDIA_KEY_SUPPORT_REWIND = 0x00000010;
+        public static final int MULTIMEDIA_KEY_SUPPORT_NEXT = 0x00000020;
         public static final int MULTIMEDIA_KEY_SUPPORT_PREVIOUS = 0x00000040;
-        public static final int MULTIMEDIA_KEY_SUPPORT_MUTE     = 0x00000080;
-        public static final int MULTIMEDIA_KEY_SUPPORT_UNMUTE   = 0x00000100;
-        public static final int MULTIMEDIA_KEY_SUPPORT_PHOTO    = 0x00000200;
+        public static final int MULTIMEDIA_KEY_SUPPORT_MUTE = 0x00000080;
+        public static final int MULTIMEDIA_KEY_SUPPORT_UNMUTE = 0x00000100;
+        public static final int MULTIMEDIA_KEY_SUPPORT_PHOTO = 0x00000200;
         /**
          * TOUCH_SUPPORT values.
          */
-        public static final int TOUCH_SUPPORT_NONE                     = 0x00;
-        public static final int TOUCH_SUPPORT_SINGLE                   = 0x01;
+        public static final int TOUCH_SUPPORT_NONE = 0x00;
+        public static final int TOUCH_SUPPORT_SINGLE = 0x01;
         /**
          * The multi touch value will be a number greater or equal than 2. It will represent the
          * number of touches supported.
          */
-        public static final int TOUCH_SUPPORT_MULTI                    = 0xFF;
+        public static final int TOUCH_SUPPORT_MULTI = 0xFF;
     }
+
     /**
      * 4.6.4 EventMapping Bundle property names and values.
      */
@@ -679,6 +707,7 @@ public class Defs {
          */
         public static final String CONTENT_CATEGORY = "CONTENT_CATEGORY";
     }
+
     /**
      * 4.9.3 BlockingInformation values.
      */
@@ -696,20 +725,20 @@ public class Defs {
          */
         /**
          * Not allowed content category.
-         *
+         * <p/>
          * An application will receive this blocking notification if it has previously set the
          * framebuffer context information via {@link
          * IContextManager#setFramebufferContextInformation} with the handleBlocking parameter
          * set to true.
-         *
+         * <p/>
          * On reception of the callback with this reason number, the application MUST immediately
          * update its user interface and the application category. If no action is taken straight
          * away, the server may choose to handle the blocking itself.
-         *
+         * <p/>
          * An application that does handle blocking will receive the {@link
          * IContextListener#onFramebufferUnblocked} once the Client stops sending blocking
          * notifications between two consecutive framebuffer update requests.
-         *
+         * <p/>
          * An application may receive repeated {@link IContextListener#onFramebufferBlocked}
          * callbacks, with the same reason, if the Client keeps sending the blocking requests.
          *
@@ -719,20 +748,20 @@ public class Defs {
 
         /**
          * Not allowed application category.
-         *
+         * <p/>
          * An application will receive this blocking notification if it has previously set the
          * framebuffer context information via {@link
          * IContextManager#setFramebufferContextInformation} with the handleBlocking parameter
          * set to true.
-         *
+         * <p/>
          * On reception of the callback with this reason number, the application MUST immediately
          * update its user interface and the application category. If no action is taken straight
          * away, the server may choose to handle the blocking itself.
-         *
+         * <p/>
          * An application that does handle blocking will receive the {@link
          * IContextListener#onFramebufferUnblocked} once the Client stops sending blocking
          * notifications between two consecutive framebuffer update requests.
-         *
+         * <p/>
          * An application may receive repeated {@link IContextListener#onFramebufferBlocked}
          * callbacks, with the same reason, if the Client keeps sending the blocking requests.
          *
@@ -742,12 +771,12 @@ public class Defs {
 
         /**
          * Not sufficient content trust level.
-         *
+         * <p/>
          * An application will not receive this blocking notification, even if it has previously set
          * the framebuffer context information via {@link
          * IContextManager#setFramebufferContextInformation} with the handleBlocking parameter
          * set to true.
-         *
+         * <p/>
          * The server will handle this itself and switch applications, as the code means the
          * application is non-certified.
          *
@@ -757,12 +786,12 @@ public class Defs {
 
         /**
          * Not sufficient application trust level.
-         *
+         * <p/>
          * An application will not receive this blocking notification, even if it has previously set
          * the framebuffer context information via {@link
          * IContextManager#setFramebufferContextInformation} with the handleBlocking parameter
          * set to true.
-         *
+         * <p/>
          * The server will handle this itself and switch applications, as the code means the
          * application is non-certified.
          *
@@ -772,12 +801,12 @@ public class Defs {
 
         /**
          * Content rules not followed.
-         *
+         * <p/>
          * An application will not receive this blocking notification, even if it has previously set
          * the framebuffer context information via {@link
          * IContextManager#setFramebufferContextInformation} with the handleBlocking parameter
          * set to true.
-         *
+         * <p/>
          * The server will handle this itself and switch applications, as the code means the
          * application is non-certified.
          *
@@ -787,12 +816,12 @@ public class Defs {
 
         /**
          * Not allowed application ID.
-         *
+         * <p/>
          * An application will not receive this blocking notification, even if it has previously set
          * the framebuffer context information via {@link
          * IContextManager#setFramebufferContextInformation} with the handleBlocking parameter
          * set to true.
-         *
+         * <p/>
          * The server will handle this itself and switch applications, as the MirrorLink Client uses
          * this flag if it blocks an application for certificate status reasons.
          *
@@ -802,19 +831,19 @@ public class Defs {
 
         /**
          * UI not in focus on remote display.
-         *
+         * <p/>
          * This notifies the application that the user currently cannot interact with the
          * application using touch and/or knob events, but the application is still visible.
-         *
+         * <p/>
          * An application will receive this blocking notification if it has previously set the
          * framebuffer context information via {@link
          * IContextManager#setFramebufferContextInformation} with the handleBlocking parameter
          * set to true.
-         *
+         * <p/>
          * An application that does handle blocking will receive the {@link
          * IContextListener#onFramebufferUnblocked} once the Client stops sending blocking
          * notifications between two consecutive framebuffer update requests.
-         *
+         * <p/>
          * An application may receive repeated {@link IContextListener#onFramebufferBlocked}
          * callbacks, with the same reason, if the Client keeps sending the blocking requests.
          *
@@ -824,15 +853,15 @@ public class Defs {
 
         /**
          * UI not visible on remote display.
-         *
+         * <p/>
          * This notifies the application that the user currently cannot see the application on the
          * MirrorLink Client's display.
-         *
+         * <p/>
          * An application will receive this blocking notification if it has previously set the
          * framebuffer context information via {@link
          * IContextManager#setFramebufferContextInformation} with the handleBlocking parameter
          * set to true.
-         *
+         * <p/>
          * An application that does handle blocking will receive the {@link
          * IContextListener#onFramebufferUnblocked} once the Client starts making framebuffer
          * update requests again.
@@ -841,6 +870,7 @@ public class Defs {
          */
         public static final int DISPLAYBLOCKED_UI_NOT_VISIBLE = 0x0200;
     }
+
     /**
      * 4.9.1, 4.9.3 Framebuffer and Audio Context Information values.
      */
@@ -900,8 +930,8 @@ public class Defs {
      */
     public static final class SubscriptionType {
         public static final int REGULAR_INTERVAL = 0x00;
-        public static final int ON_CHANGE        = 0x01;
-        public static final int AUTOMATIC        = 0x02;
+        public static final int ON_CHANGE = 0x01;
+        public static final int AUTOMATIC = 0x02;
     }
 
     /**
@@ -990,64 +1020,88 @@ public class Defs {
      * </pre>
      * To summarise:
      * <ul>
-     *  <li>the Object is a Bundle.</li>
-     *  <li>each Bundle can have any of the defined types.</li>
-     *  <li>the Bundle for the Object must contain a UID field.</li>
-     *  <li>the Bundle of STRUCTURE type contains other Bundles. The UIDs of the elemts are the keys
-     *  for accessing each inner Bundle.</li>
-     *  <li>the inner Bundles can in their turn have any of the defined type.</li>
-     *  <li>the Bundle of ARRAY type has a COUNT integer key and keys from 0 to COUNT-1, which are in
-     *  turn Bundles.</li>
-     *  <li>only Bundles of simple types (not STRUCTURE, or ARRAY) have a VALUE key.</li>
-     *  <li>the Object (which is the root Bundle) may be of a simple type.</li>
+     * <li>the Object is a Bundle.</li>
+     * <li>each Bundle can have any of the defined types.</li>
+     * <li>the Bundle for the Object must contain a UID field.</li>
+     * <li>the Bundle of STRUCTURE type contains other Bundles. The UIDs of the elemts are the keys
+     * for accessing each inner Bundle.</li>
+     * <li>the inner Bundles can in their turn have any of the defined type.</li>
+     * <li>the Bundle of ARRAY type has a COUNT integer key and keys from 0 to COUNT-1, which are in
+     * turn Bundles.</li>
+     * <li>only Bundles of simple types (not STRUCTURE, or ARRAY) have a VALUE key.</li>
+     * <li>the Object (which is the root Bundle) may be of a simple type.</li>
      * </ul>
      */
     public static final class DataObjectKeys {
-        /** The name of the key that has the type of the object.
-         *  int
-         * */
+        /**
+         * The name of the key that has the type of the object.
+         * int
+         */
         public static final String TYPE = "TYPE";
-        /** The name of the key that has the UID of the element. This is mandatory only for the root
-         *  Bundle, which representes the whole objects, but other elements may have it as well.
-         *  int
-         * */
+        /**
+         * The name of the key that has the UID of the element. This is mandatory only for the root
+         * Bundle, which representes the whole objects, but other elements may have it as well.
+         * int
+         */
         public static final String UID = "UID";
-        /** The name of the key that has the value of the object. */
+        /**
+         * The name of the key that has the value of the object.
+         */
         public static final String VALUE = "VALUE";
-        /** The name of the key where the count of the elements in the array is stored. This will
+        /**
+         * The name of the key where the count of the elements in the array is stored. This will
          * only be found in a Bundle of type {@link #ARRAY_TYPE}.
          * int
-         * */
+         */
         public static final String COUNT = "COUNT";
 
-        /** The bundle represents a BOOLEAN value. Use getBoolean/pubBoolean to access the value in
-         * the Bundle. */
+        /**
+         * The bundle represents a BOOLEAN value. Use getBoolean/pubBoolean to access the value in
+         * the Bundle.
+         */
         public static final int BOOLEAN_TYPE = 0x82;
-        /** The bundle represents a BYTE value. Use getByte/pubByte to access the value in the
-         * Bundle. */
+        /**
+         * The bundle represents a BYTE value. Use getByte/pubByte to access the value in the
+         * Bundle.
+         */
         public static final int BYTE_TYPE = 0x83;
-        /** The bundle represents a SHORT value. Use getShort/pubShort to access the value in
-         * the Bundle. */
+        /**
+         * The bundle represents a SHORT value. Use getShort/pubShort to access the value in
+         * the Bundle.
+         */
         public static final int SHORT_TYPE = 0x84;
-        /** The bundle represents a INT value. Use getInt/pubInt to access the value in the
-         * Bundle. */
+        /**
+         * The bundle represents a INT value. Use getInt/pubInt to access the value in the
+         * Bundle.
+         */
         public static final int INT_TYPE = 0x85;
-        /** The bundle represents a LONG value. Use getLong/pubLong to access the value in the
-         * Bundle. */
+        /**
+         * The bundle represents a LONG value. Use getLong/pubLong to access the value in the
+         * Bundle.
+         */
         public static final int LONG_TYPE = 0x86;
-        /** The bundle represents a FLOAT value. Use getFloat/pubFloat to access the value in
-         * the Bundle. */
+        /**
+         * The bundle represents a FLOAT value. Use getFloat/pubFloat to access the value in
+         * the Bundle.
+         */
         public static final int FLOAT_TYPE = 0x87;
-        /** The bundle represents a DOUBLE value. Use getDouble/pubDouble to access the value in
-         * the Bundle. */
+        /**
+         * The bundle represents a DOUBLE value. Use getDouble/pubDouble to access the value in
+         * the Bundle.
+         */
         public static final int DOUBLE_TYPE = 0x88;
-        /** The bundle represents a BYTES value. Use getByteArray/pubByteArray to access the value in
-         * the Bundle. */
+        /**
+         * The bundle represents a BYTES value. Use getByteArray/pubByteArray to access the value in
+         * the Bundle.
+         */
         public static final int BYTES_TYPE = 0x90;
-        /** The bundle represents a STRING value. Use getString/pubString to access the value in
-         * the Bundle. */
+        /**
+         * The bundle represents a STRING value. Use getString/pubString to access the value in
+         * the Bundle.
+         */
         public static final int STRING_TYPE = 0x91;
-        /** The bundle represents an ARRAY. The number of elements in the array is stored under the
+        /**
+         * The bundle represents an ARRAY. The number of elements in the array is stored under the
          * {@link #COUNT}. Each element of the array will be a Bundle. The element at the i-th
          * position will be stored under the key called "i" (so the first element will be stored
          * under the key "0", the second under the key "1" and so on). Therefore to retrieve the
@@ -1092,6 +1146,7 @@ public class Defs {
         public static final String SPEED_FIELD_UID = "0x23234962";
         public static final String TIMESTAMP_FIELD_UID = "0x59413fd1";
     }
+
     /**
      * Constants used when interacting with the GPS data service.
      */
@@ -1107,7 +1162,7 @@ public class Defs {
         /**
          * NMEA Object Bundle property names.
          */
-        public static final String NMEA_DATA_FIELD_UID      = "0x144a776f";
+        public static final String NMEA_DATA_FIELD_UID = "0x144a776f";
         public static final String NMEA_TIMESTAMP_FIELD_UID = "0x59413fd1";
         /**
          * NMEADescription Object uid.
@@ -1120,13 +1175,13 @@ public class Defs {
         /**
          * GPS supported sentences flags.
          */
-        public static final int SUPPORT_GGA              = 0x01;
-        public static final int SUPPORT_GLL              = 0x02;
-        public static final int SUPPORT_GSA              = 0x04;
-        public static final int SUPPORT_GSV              = 0x08;
-        public static final int SUPPORT_RMC              = 0x10;
-        public static final int SUPPORT_VTG              = 0x20;
-        public static final int SUPPORT_GST              = 0x40;
+        public static final int SUPPORT_GGA = 0x01;
+        public static final int SUPPORT_GLL = 0x02;
+        public static final int SUPPORT_GSA = 0x04;
+        public static final int SUPPORT_GSV = 0x08;
+        public static final int SUPPORT_RMC = 0x10;
+        public static final int SUPPORT_VTG = 0x20;
+        public static final int SUPPORT_GST = 0x40;
     }
 
     /** 4.12 Notifications */

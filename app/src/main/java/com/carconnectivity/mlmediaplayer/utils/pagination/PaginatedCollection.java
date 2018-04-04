@@ -41,9 +41,9 @@ import java.util.List;
  * Created by belickim on 15/05/15.
  */
 public class PaginatedCollection<T> {
+    private final Comparator<T> mOrder;
     private PaginationModel mModel;
     private ArrayList<T> mItems;
-    private final Comparator<T> mOrder;
 
     /**
      * Creates new instance obviously.

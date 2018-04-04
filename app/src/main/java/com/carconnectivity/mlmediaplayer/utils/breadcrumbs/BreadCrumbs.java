@@ -51,14 +51,9 @@ public final class BreadCrumbs {
         mStack = stack;
     }
 
-    /** Brings bread crumbs to the state after creation. */
-    public void reset() {
-        /* pop until you find a root element: */
-        while (mStack.peek().isRoot == false)
-            mStack.pop();
-    }
-
-    /** Create new instance form JSON string. */
+    /**
+     * Create new instance form JSON string.
+     */
     public static BreadCrumbs fromJson(String json) {
         if (json == null) {
             throw new IllegalArgumentException("Json string cannot be null.");
@@ -74,13 +69,26 @@ public final class BreadCrumbs {
         return new BreadCrumbs(stack);
     }
 
-    /** Serialize to JSON string. */
+    /**
+     * Brings bread crumbs to the state after creation.
+     */
+    public void reset() {
+        /* pop until you find a root element: */
+        while (mStack.peek().isRoot == false)
+            mStack.pop();
+    }
+
+    /**
+     * Serialize to JSON string.
+     */
     public String toJson() {
         final Gson gson = new Gson();
         return gson.toJson(mStack);
     }
 
-    /** Push new level to the bread crumbs stack. */
+    /**
+     * Push new level to the bread crumbs stack.
+     */
     public void push(String displayName, String id) {
         if (displayName == null) {
             throw new IllegalArgumentException("Level cannot be null.");
@@ -97,20 +105,26 @@ public final class BreadCrumbs {
         mStack.push(level);
     }
 
-    /** Returns true if popping current level from bread crumbs stack can be performed. */
+    /**
+     * Returns true if popping current level from bread crumbs stack can be performed.
+     */
     public boolean canGoBack() {
         return getTopItem().isRoot == false;
     }
 
-    /** Pops the current level from bread crumbs stack, the popped item is returned. */
+    /**
+     * Pops the current level from bread crumbs stack, the popped item is returned.
+     */
     public NavigatorLevel goBack() {
         if (canGoBack() == false) {
             throw new IllegalStateException("Cannot go back, the current item is root.");
         }
-        return  mStack.pop();
+        return mStack.pop();
     }
 
-    /** Returns current top item without changing the state. */
+    /**
+     * Returns current top item without changing the state.
+     */
     public NavigatorLevel getTopItem() {
         if (mStack.size() == 0) {
             throw new IllegalStateException("The stack is empty.");

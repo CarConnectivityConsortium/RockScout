@@ -38,8 +38,10 @@ public final class NavigatorLevel {
     public final String displayName;
     public final boolean isRoot;
 
-    /** Do not use! This is left available for JSON serializer, use factory methods to create
-     * new instances */
+    /**
+     * Do not use! This is left available for JSON serializer, use factory methods to create
+     * new instances
+     */
     public NavigatorLevel(String parent, String displayName, String id, boolean isRoot) {
         this.parent = parent;
         this.id = id;

@@ -27,36 +27,47 @@
  * in or in connection to any CCC products, software and/or services.
  */
 
-apply plugin: 'com.android.application'
+package com.carconnectivity.mlmediaplayer.mediabrowser.retrofit.model;
 
-android {
-    compileSdkVersion 22
-    buildToolsVersion "23.0.3"
-    defaultConfig {
-        applicationId "com.carconnectivity.mlmediaplayer"
-        minSdkVersion 21
-        targetSdkVersion 22
-        versionCode 39
-        versionName "v1.37"
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.Root;
+
+/**
+ * @author Comarch S.A.
+ */
+@Root(name = "app")
+public class ProviderToDownloadModel {
+
+    @Element(name = "label")
+    String label;
+
+    @Element(name = "iconUrl")
+    String iconUrl;
+
+    @Element(name = "id")
+    String id;
+
+    public String getLabel() {
+        return label;
     }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
+
+    public String getIconUrl() {
+        return iconUrl;
     }
-}
 
-dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.squareup.picasso:picasso:2.5.2'
-    compile 'de.greenrobot:eventbus:2.4.0'
-    compile 'com.google.code.gson:gson:2.3.1'
+    public String getId() {
+        return id;
+    }
 
-    compile 'com.squareup.retrofit2:retrofit:2.3.0'
-    compile('com.squareup.retrofit2:converter-simplexml:2.3.0') {
-        exclude module: 'stax-api'
-        exclude module: 'stax'
-        exclude module: 'xpp3'
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public void setIconUrl(String iconUrl) {
+        this.iconUrl = iconUrl;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }
