@@ -44,16 +44,15 @@ import com.carconnectivity.mlmediaplayer.R;
  * Created by belickim on 15/05/15.
  */
 public class PageButton extends FrameLayout {
+    private final ImageView mBackground;
+    private final ImageView mNextIcon;
+    private final ImageView mPreviousIcon;
+    private final Button mButton;
     private boolean mIsActive = false;
     private boolean mIsNextButton = false;
     private boolean mIsPreviousButton = false;
     private int mPageNumber = 0;
     private int mCurrentActiveColor;
-
-    private final ImageView mBackground;
-    private final ImageView mNextIcon;
-    private final ImageView mPreviousIcon;
-    private final Button mButton;
 
     public PageButton(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);

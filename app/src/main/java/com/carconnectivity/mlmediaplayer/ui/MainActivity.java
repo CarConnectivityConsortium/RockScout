@@ -69,10 +69,9 @@ import java.util.List;
 
 public class MainActivity extends Activity implements InteractionListener {
 
-    private final static String TAG = MainActivity.class.getCanonicalName();
     public final static String ML_TERMINATE_INTENT = "com.mirrorlink.android.app.TERMINATE";
     public final static String ML_LAUNCH_INTENT = "com.mirrorlink.android.app.LAUNCH";
-
+    private final static String TAG = MainActivity.class.getCanonicalName();
     private MediaPlayerFragment mPlayerFragment;
     private NavigatorFragment mNavigatorFragment;
     private LauncherFragment mLauncherFragment;

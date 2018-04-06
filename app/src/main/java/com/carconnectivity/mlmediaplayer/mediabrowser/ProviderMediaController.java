@@ -62,25 +62,33 @@ import java.util.Set;
  */
 public final class ProviderMediaController extends MediaController.Callback {
     private static final String TAG = ProviderMediaController.class.getSimpleName();
-
+    private final Provider mOwner;
     private MediaController mMediaController;
     private ProviderMediaControllerHelper mHelper;
-
     private boolean mIsListening = false;
     private Set<SlotReservation> mReservedSlots = new HashSet<>();
-
     private ProviderPlaybackState mCurrentPlaybackState;
     private TrackMetadata mCurrentMetadata;
-
     private boolean mHandleMediaButtonDataEvents = true;
     private boolean mResumePlaybackOnUnblock = false;
-
-    private final Provider mOwner;
 
     public ProviderMediaController(Provider owner) {
         mOwner = owner;
         mCurrentMetadata = TrackMetadata.createEmpty();
         mCurrentPlaybackState = ProviderPlaybackState.createEmpty(null);
+    }
+
+    private static String getArtistString(MediaMetadata metadata) {
+        if (metadata.containsKey(MediaMetadata.METADATA_KEY_ARTIST)) {
+            return metadata.getString(MediaMetadata.METADATA_KEY_ARTIST);
+        }
+        if (metadata.containsKey(MediaMetadata.METADATA_KEY_ALBUM_ARTIST)) {
+            return metadata.getString(MediaMetadata.METADATA_KEY_ALBUM_ARTIST);
+        }
+        if (metadata.containsKey(MediaMetadata.METADATA_KEY_DISPLAY_SUBTITLE)) {
+            return metadata.getString(MediaMetadata.METADATA_KEY_DISPLAY_SUBTITLE);
+        }
+        return metadata.getString(MediaMetadata.METADATA_KEY_COMPOSER);
     }
 
     public TrackMetadata getCurrentMetadata() {
@@ -160,19 +168,6 @@ public final class ProviderMediaController extends MediaController.Callback {
         Log.d(TAG, "Handle extras changed: " + extras.toString());
         RsEventBus.post(new MediaExtrasChangedEvent(extras));
         updateReservedSlots(extras, true);
-    }
-
-    private static String getArtistString(MediaMetadata metadata) {
-        if (metadata.containsKey(MediaMetadata.METADATA_KEY_ARTIST)) {
-            return metadata.getString(MediaMetadata.METADATA_KEY_ARTIST);
-        }
-        if (metadata.containsKey(MediaMetadata.METADATA_KEY_ALBUM_ARTIST)) {
-            return metadata.getString(MediaMetadata.METADATA_KEY_ALBUM_ARTIST);
-        }
-        if (metadata.containsKey(MediaMetadata.METADATA_KEY_DISPLAY_SUBTITLE)) {
-            return metadata.getString(MediaMetadata.METADATA_KEY_DISPLAY_SUBTITLE);
-        }
-        return metadata.getString(MediaMetadata.METADATA_KEY_COMPOSER);
     }
 
     @Override
@@ -267,7 +262,7 @@ public final class ProviderMediaController extends MediaController.Callback {
     @SuppressWarnings("unused")
     public void onEvent(TerminateEvent event) {
         Log.d(TAG, "Handle TerminateEvent event: " + event.toString());
-        if(isPlayingOrPreparing()){
+        if (isPlayingOrPreparing()) {
             forcePause();
         }
         mOwner.disconnect();

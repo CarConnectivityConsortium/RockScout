@@ -59,13 +59,11 @@ public final class ProviderMediaControllerHelper {
             PlaybackState.ACTION_SKIP_TO_PREVIOUS,
             PlaybackState.ACTION_SKIP_TO_NEXT,
     };
-
-    private Resources mProviderResources;
     private final Context mContext;
     private final String mProviderPackage;
     private final ProviderViewActive mBoundProvider;
-
     private final IconCache mIconCache;
+    private Resources mProviderResources;
 
     public ProviderMediaControllerHelper(Context context, ProviderViewActive provider) {
         this.mContext = context;

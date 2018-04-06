@@ -61,6 +61,10 @@ public class SplashScreenFragment extends Fragment implements BackButtonHandler 
     private boolean mLaunchedAlreadyPlaying = false;
     private boolean mSplashShown = true;
 
+    public SplashScreenFragment() {
+        // Required empty public constructor
+    }
+
     public static SplashScreenFragment newInstance() {
         SplashScreenFragment fragment = new SplashScreenFragment();
 
@@ -70,10 +74,6 @@ public class SplashScreenFragment extends Fragment implements BackButtonHandler 
         RsEventBus.register(fragment);
 
         return fragment;
-    }
-
-    public SplashScreenFragment() {
-        // Required empty public constructor
     }
 
     @Override

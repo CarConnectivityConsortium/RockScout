@@ -63,13 +63,11 @@ final class Provider {
 
     final private ProvidersManager mManager;
     final private ComponentName mName;
-
+    private final ProviderMediaController mMediaController;
     private boolean mConnected;
     private boolean mCanConnect;
     private boolean mCanPlayOffline; /* offline = without ML session */
-
     private ConnectionCallback mActiveConnectionCallback;
-    private final ProviderMediaController mMediaController;
 
     public Provider(ProvidersManager manager, ResolveInfo packageInfo, boolean canPlayOffline) {
         if (manager == null) {
@@ -175,6 +173,17 @@ final class Provider {
         return new MediaBrowser(mManager.getContext(), mName, callback, null);
     }
 
+    private ArrayList<MediaItemView> convertToViews(List<MediaBrowser.MediaItem> children) {
+        ArrayList<MediaItemView> views = new ArrayList<>();
+        for (MediaBrowser.MediaItem mediaItem : children
+                ) {
+            if (mediaItem != null) {
+                views.add(new MediaItemView(mediaItem));
+            }
+        }
+        return views;
+    }
+
     private abstract class ConnectionCallbackBase extends MediaBrowser.ConnectionCallback {
         private final int MAX_RECONNECT = 20;
         private final int TIME_BEFORE_RECONNECT = 250;
@@ -189,20 +198,20 @@ final class Provider {
             mCountReconnect = 0;
         }
 
-        public void setBrowser(MediaBrowser browser) {
-            mBrowser = browser;
-        }
-
         public MediaBrowser getBrowser() {
             return mBrowser;
         }
 
-        public void setProvider(Provider browser) {
-            mProvider = browser;
+        public void setBrowser(MediaBrowser browser) {
+            mBrowser = browser;
         }
 
         public Provider getProvider() {
             return mProvider;
+        }
+
+        public void setProvider(Provider browser) {
+            mProvider = browser;
         }
 
         private void reconnect() {
@@ -215,7 +224,7 @@ final class Provider {
                 if (mTestConnection) {
                     mManager.addTestedProvider(mName, false, false);
                 } else {
-                    RsEventBus.postSticky(new ProviderConnectErrorEvent(mName.toString()));
+                    RsEventBus.post(new ProviderConnectErrorEvent(mName.toString()));
                 }
 
             } else {
@@ -240,7 +249,14 @@ final class Provider {
         public void onConnected() {
             Log.d(TAG, "TestConnectionCallback onConnected: " + mName);
             final MediaBrowser browser = getBrowser();
-            final MediaSession.Token token = browser.getSessionToken();
+
+            MediaSession.Token token = null;
+            try {
+                token = browser.getSessionToken();
+            } catch (IllegalStateException e) {
+                Log.e(TAG, "Lost connection with provider: ", e);
+            }
+
             if (token != null) {
                 mCanConnect = true;
                 mConnected = true;
@@ -276,14 +292,6 @@ final class Provider {
         public void onConnectionSuspended() {
             Log.d(TAG, "TestConnectionCallback onConnectionSuspended: " + mName);
         }
-    }
-
-    private ArrayList<MediaItemView> convertToViews(List<MediaBrowser.MediaItem> children) {
-        ArrayList<MediaItemView> views = new ArrayList<>(children.size());
-        for (int i = 0; i < children.size(); i++) {
-            views.add(new MediaItemView(children.get(i)));
-        }
-        return views;
     }
 
     private class ConnectionCallback extends ConnectionCallbackBase {
@@ -323,22 +331,28 @@ final class Provider {
                     deezerFirstSubscription = false;
                     deezerSubscribeCount = 0;
 
-                    RsEventBus.postSticky(event);
+                    RsEventBus.post(event);
                 }
             }
 
             @Override
             public void onError(String id) {
                 Log.d(TAG, "Browsing failed: " + id);
-                RsEventBus.postSticky(new ProviderBrowseErrorEvent(id));
+                RsEventBus.post(new ProviderBrowseErrorEvent(id));
             }
         };
 
+        public ConnectionCallback(boolean showPlayer) {
+            super(false);
+            mShowPlayer = showPlayer;
+        }
+
         /**
          * Deezer not full children list -- workaround
-         *
+         * <p>
          * Check internet connection improve exit from workaround as soon as possible, because
          * offline Deezer show only two children.
+         *
          * @return
          */
         private boolean isDeezerAndFirstSubscription() {
@@ -350,11 +364,6 @@ final class Provider {
                 }
             }
             return false;
-        }
-
-        public ConnectionCallback(boolean showPlayer) {
-            super(false);
-            mShowPlayer = showPlayer;
         }
 
         public void disconnect() {
@@ -371,7 +380,14 @@ final class Provider {
         @Override
         public void onConnected() {
             final MediaBrowser browser = getBrowser();
-            final MediaSession.Token token = browser.getSessionToken();
+
+            MediaSession.Token token = null;
+            try {
+                token = browser.getSessionToken();
+            } catch (IllegalStateException e) {
+                Log.e(TAG, "Lost connection with provider: ", e);
+            }
+
             if (token != null) {
                 mController = new MediaController(mManager.getContext(), token);
                 mMediaController.startListening(mManager.getContext(), mController);

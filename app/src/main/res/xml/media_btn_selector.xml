@@ -27,14 +27,13 @@
   ~ in or in connection to any CCC products, software and/or services.
   -->
 
-<selector
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:drawable="@color/player_background"
         android:state_focused="true"
-        android:state_pressed="true"/>
+        android:state_pressed="true" />
     <item
         android:drawable="@drawable/c4_button_focus"
         android:state_focused="true"
-        android:state_pressed="false"/>
+        android:state_pressed="false" />
 </selector>

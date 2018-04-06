@@ -59,37 +59,91 @@ import com.mirrorlink.android.commonapi.IDeviceStatusManager;
 
 public final class MirrorLinkConnectionManager {
     public final static String TAG = MirrorLinkConnectionManager.class.getSimpleName();
-
-    private final int currentCategory = Defs.ContextInformation.APPLICATION_CATEGORY_MEDIA_MUSIC;
-    private MirrorLinkApplicationContext mMirrorLinkApplicationContext;
-
-    private Handler mHandler;
-
-    private volatile boolean mMirrorLinkActive = false;
-    private volatile boolean mPlaybackStatus = false;
-    private volatile boolean mInDriveMode = false;
     public static volatile boolean mIsMirrorLinkSupported = false;
-
-    private enum States {
-        STATE_STOP(1),
-        STATE_PLAY(3),
-        STATE_PAUSE(2);
-        private final int value;
-
-        States(int value) {
-            this.value = value;
-        }
-
-        public final int getValue() {
-            return value;
-        }
-    }
-
     final SparseArray<States> STATES = new SparseArray<States>() {{
         put(1, States.STATE_STOP);
         put(2, States.STATE_PAUSE);
         put(3, States.STATE_PLAY);
     }};
+    private final int currentCategory = Defs.ContextInformation.APPLICATION_CATEGORY_MEDIA_MUSIC;
+    private MirrorLinkApplicationContext mMirrorLinkApplicationContext;
+    private Handler mHandler;
+    IContextListener mContextListener = new IContextListener.Stub() {
+        @Override
+        public void onAudioBlocked(final int reason) throws RemoteException {
+            Log.d(TAG, "onAudioBlocked");
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    RsEventBus.postSticky(new AudioBlockingEvent(true));
+                }
+            });
+        }
+
+        @Override
+        public void onFramebufferBlocked(int reason, Bundle framebufferArea) throws RemoteException {
+        }
+
+        @Override
+        public void onFramebufferUnblocked() throws RemoteException {
+        }
+
+        @Override
+        public void onAudioUnblocked() throws RemoteException {
+            Log.d(TAG, "onAudioUnblocked");
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    RsEventBus.postSticky(new AudioBlockingEvent(false));
+                }
+            });
+        }
+    };
+    private volatile boolean mMirrorLinkActive = false;
+    private volatile boolean mPlaybackStatus = false;
+    IConnectionListener mConnectionListener = new IConnectionListener.Stub() {
+        @Override
+        public void onRemoteDisplayConnectionChanged(int remoteDisplayConnection) throws RemoteException {
+        }
+
+        @Override
+        public void onMirrorLinkSessionChanged(final boolean mirrorLinkSessionIsEstablished) throws RemoteException {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    setMirrorLinkConnected(mirrorLinkSessionIsEstablished);
+                }
+            });
+
+            setAudioContext(mPlaybackStatus);
+        }
+
+        @Override
+        public void onAudioConnectionsChanged(Bundle audioConnections) throws RemoteException {
+        }
+    };
+    private volatile boolean mInDriveMode = false;
+    IDeviceStatusListener mDeviceStatusListener = new IDeviceStatusListener.Stub() {
+        @Override
+        public void onDriveModeChange(boolean driveMode) throws RemoteException {
+            mInDriveMode = driveMode;
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    RsEventBus.postSticky(new DriveModeStatusChangedEvent(mInDriveMode));
+                }
+            });
+
+        }
+
+        @Override
+        public void onNightModeChanged(boolean nightMode) throws RemoteException {
+        }
+
+        @Override
+        public void onMicrophoneStatusChanged(boolean micInput) throws RemoteException {
+        }
+    };
 
     public MirrorLinkConnectionManager(MirrorLinkApplicationContext applicationContext, Handler handler) {
         mHandler = handler;
@@ -216,84 +270,24 @@ public final class MirrorLinkConnectionManager {
         }
     }
 
-    IConnectionListener mConnectionListener = new IConnectionListener.Stub() {
-        @Override
-        public void onRemoteDisplayConnectionChanged(int remoteDisplayConnection) throws RemoteException {
-        }
-
-        @Override
-        public void onMirrorLinkSessionChanged(final boolean mirrorLinkSessionIsEstablished) throws RemoteException {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    setMirrorLinkConnected(mirrorLinkSessionIsEstablished);
-                }
-            });
-
-            setAudioContext(mPlaybackStatus);
-        }
-
-        @Override
-        public void onAudioConnectionsChanged(Bundle audioConnections) throws RemoteException {
-        }
-    };
-
-    IDeviceStatusListener mDeviceStatusListener = new IDeviceStatusListener.Stub() {
-        @Override
-        public void onDriveModeChange(boolean driveMode) throws RemoteException {
-            mInDriveMode = driveMode;
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    RsEventBus.postSticky(new DriveModeStatusChangedEvent(mInDriveMode));
-                }
-            });
-
-        }
-
-        @Override
-        public void onNightModeChanged(boolean nightMode) throws RemoteException {
-        }
-
-        @Override
-        public void onMicrophoneStatusChanged(boolean micInput) throws RemoteException {
-        }
-    };
-    IContextListener mContextListener = new IContextListener.Stub() {
-        @Override
-        public void onAudioBlocked(final int reason) throws RemoteException {
-            Log.d(TAG, "onAudioBlocked");
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    RsEventBus.postSticky(new AudioBlockingEvent(true));
-                }
-            });
-        }
-
-        @Override
-        public void onFramebufferBlocked(int reason, Bundle framebufferArea) throws RemoteException {
-        }
-
-        @Override
-        public void onFramebufferUnblocked() throws RemoteException {
-        }
-
-        @Override
-        public void onAudioUnblocked() throws RemoteException {
-            Log.d(TAG, "onAudioUnblocked");
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    RsEventBus.postSticky(new AudioBlockingEvent(false));
-                }
-            });
-        }
-    };
-
     private void updatePlaybackStatus(boolean playbackStatus) {
         Log.d(TAG, "updatePlaybackStatus playbackStatus:" + playbackStatus);
         mPlaybackStatus = playbackStatus;
         setAudioContext(playbackStatus);
+    }
+
+    private enum States {
+        STATE_STOP(1),
+        STATE_PLAY(3),
+        STATE_PAUSE(2);
+        private final int value;
+
+        States(int value) {
+            this.value = value;
+        }
+
+        public final int getValue() {
+            return value;
+        }
     }
 }

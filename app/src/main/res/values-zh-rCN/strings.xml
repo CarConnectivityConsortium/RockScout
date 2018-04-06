@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
   ~ Copyright Car Connectivity Consortium
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,36 +28,36 @@
   -->
 
 <resources>
-  <string name="ml_unsupported">您的手机不支持Mirrorlink，请访问www.mirrorlink.com查询详情。</string>
-  <string name="ml_not_connected">您的手机尚未连接Mirrorlink车机。</string>
-  <string name="notification_access">本应用需要启动通知栏权限选项。您现在就来启动吗？</string>
-  <string name="items_missing">找不到媒体文件。</string>
-  <string name="play">播放</string>
-  <string name="pause">暂停</string>
-  <string name="next">下一个</string>
-  <string name="previous">前一个</string>
-  <string name="playlist">播放列表</string>
-  <string name="more">更多</string>
-  <string name="menu">菜单</string>
-  <string name="listenNow">马上听</string>
-  <string name="active">活跃</string>
-  <string name="inactive">待用</string>
-  <string name="disabled">已禁止</string>
-  <string name="track">曲目</string>
-  <string name="artist">作者</string>
-  <string name="album">专辑</string>
-  <string name="browse">浏览器</string>
-  <string name="back">返回</string>
-  <string name="providers_list">来源列表</string>
-  <string name="open_navigator">打开浏览器</string>
-  <string name="now_playing">正在播放</string>
-  <string name="mirrorlink_dialog_title">警告</string>
-  <string name="mirrorlink_dialog_message">您的手机不支持Mirrorlink。您可以在手机上继续使用本应用，但是无法在汽车车机上使用。</string>
-  <string name="no_auto_compatible_app">未安装支持\'Android Media Browse Service\'的应用。请按照应用后再启动本应用。</string>
-  <string name="press_play_to_start">按播放键</string>
-  <string name="select_track_to_start">选择开始曲目</string>
-  <string name="launcher">回手机主界面</string>
-  <string name="top_level">最上层</string>
-  <string name="select_source_hint">选择播放音源</string>
-  <string name="splash_subtitle">powered by MirrorLink</string>
+    <string name="ml_unsupported">您的手机不支持Mirrorlink，请访问www.mirrorlink.com查询详情。</string>
+    <string name="ml_not_connected">您的手机尚未连接Mirrorlink车机。</string>
+    <string name="notification_access">本应用需要启动通知栏权限选项。您现在就来启动吗？</string>
+    <string name="items_missing">找不到媒体文件。</string>
+    <string name="play">播放</string>
+    <string name="pause">暂停</string>
+    <string name="next">下一个</string>
+    <string name="previous">前一个</string>
+    <string name="playlist">播放列表</string>
+    <string name="more">更多</string>
+    <string name="menu">菜单</string>
+    <string name="listenNow">马上听</string>
+    <string name="active">活跃</string>
+    <string name="inactive">待用</string>
+    <string name="disabled">已禁止</string>
+    <string name="track">曲目</string>
+    <string name="artist">作者</string>
+    <string name="album">专辑</string>
+    <string name="browse">浏览器</string>
+    <string name="back">返回</string>
+    <string name="providers_list">来源列表</string>
+    <string name="open_navigator">打开浏览器</string>
+    <string name="now_playing">正在播放</string>
+    <string name="mirrorlink_dialog_title">警告</string>
+    <string name="mirrorlink_dialog_message">您的手机不支持Mirrorlink。您可以在手机上继续使用本应用，但是无法在汽车车机上使用。</string>
+    <string name="no_auto_compatible_app">未安装支持\'Android Media Browse Service\'的应用。请按照应用后再启动本应用。</string>
+    <string name="press_play_to_start">按播放键</string>
+    <string name="select_track_to_start">选择开始曲目</string>
+    <string name="launcher">回手机主界面</string>
+    <string name="top_level">最上层</string>
+    <string name="select_source_hint">选择播放音源</string>
+    <string name="splash_subtitle">powered by MirrorLink</string>
 </resources>

@@ -30,10 +30,8 @@
 package com.carconnectivity.mlmediaplayer.utils;
 
 import android.util.Log;
-
 import com.carconnectivity.mlmediaplayer.mediabrowser.events.ProgressUpdateEvent;
 import com.carconnectivity.mlmediaplayer.utils.event.RockScoutEvent;
-
 import de.greenrobot.event.EventBus;
 
 public class RsEventBus {
@@ -76,5 +74,10 @@ public class RsEventBus {
     public static void removeAllStickyEvents() {
         Log.d(TAG, "removeAllStickyEvents");
         mBus.removeAllStickyEvents();
+    }
+
+    public static <T> T getStickyEvent(Class<T> event) {
+        Log.d(TAG, "Get sticky event: " + event.getClass().getSimpleName() + " - " + event);
+        return mBus.getStickyEvent(event);
     }
 }

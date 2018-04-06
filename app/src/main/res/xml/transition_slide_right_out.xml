@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright Car Connectivity Consortium
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,9 +29,9 @@
 
 <set>
     <objectAnimator xmlns:android="http://schemas.android.com/apk/res/android"
+        android:duration="@integer/transitionTimeSlide"
         android:propertyName="xFraction"
-        android:valueType="floatType"
         android:valueFrom="0"
         android:valueTo="1"
-        android:duration="@integer/transitionTimeSlide"/>
+        android:valueType="floatType" />
 </set>

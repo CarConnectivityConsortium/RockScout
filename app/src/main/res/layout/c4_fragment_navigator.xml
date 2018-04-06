@@ -28,7 +28,8 @@
   -->
 
 <com.carconnectivity.mlmediaplayer.ui.TransitionFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.carconnectivity.mlmediaplayer.ui.navigator.NavigatorFragment">
 
@@ -36,144 +37,134 @@
         android:id="@+id/drawer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        >
+        android:orientation="vertical">
 
         <RelativeLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1.5"
             android:background="@color/c4_list_header_background"
-            android:baselineAligned="false" >
+            android:baselineAligned="false"
+            android:orientation="horizontal">
 
             <ImageButton
+                android:id="@+id/navigator_back_button"
                 android:layout_width="104dp"
                 android:layout_height="match_parent"
-                android:id="@+id/navigator_back_button"
                 android:background="@xml/action_bar_btn_selector"
-                android:src="@drawable/ic_btn_back"
                 android:scaleType="fitCenter"
-                />
+                android:src="@drawable/ic_btn_back" />
 
             <TextView
+                android:id="@+id/parent_directory"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:padding="4dp"
-                android:textSize="32dp"
-                android:textColor="#ffffffff"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:id="@+id/parent_directory"
-                android:gravity="center_vertical|left"
-                android:layout_toRightOf="@id/navigator_back_button"
                 android:layout_toLeftOf="@id/buttonLauncher"
-                tools:ignore="SpUsage"
-                />
+                android:layout_toRightOf="@id/navigator_back_button"
+                android:ellipsize="end"
+                android:gravity="center_vertical|left"
+                android:maxLines="1"
+                android:padding="4dp"
+                android:textColor="#ffffffff"
+                android:textSize="32dp"
+                tools:ignore="SpUsage" />
 
             <Button
+                android:id="@+id/buttonLauncher"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:id="@+id/buttonLauncher"
-                android:text="@string/now_playing"
-                android:textSize="32dp"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textColor="#fff"
+                android:layout_alignParentRight="true"
                 android:background="@xml/action_bar_btn_selector"
                 android:padding="8dp"
-                android:layout_alignParentRight="true"
-                tools:ignore="SpUsage"
-                />
+                android:text="@string/now_playing"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="#fff"
+                android:textSize="32dp"
+                tools:ignore="SpUsage" />
 
         </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="7"
-            >
+            android:layout_weight="7">
             <!-- The linear layout is a hack to have proper look of the scrollbar
                  with margins on both sides -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="horizontal"
-                >
+                android:orientation="horizontal">
                 <!-- The TextView is just a placeholder to position the ListView -->
                 <TextView
                     android:layout_width="50dp"
                     android:layout_height="match_parent"
-                    android:background="@color/c4_list_background"
-                    />
+                    android:background="@color/c4_list_background" />
+
                 <com.carconnectivity.mlmediaplayer.ui.widgets.NavigableListView
+                    android:id="@+id/navigator_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:id="@+id/navigator_list"
-                    android:verticalScrollbarPosition="left"
-                    android:scrollbarThumbVertical="@drawable/c4_scrollbar"
-                    android:fadeScrollbars="false"
-                    android:drawSelectorOnTop="true"
-                    android:scrollbarStyle="outsideOverlay"
-                    android:paddingLeft="54dp"
                     android:background="@color/c4_list_background"
+                    android:drawSelectorOnTop="true"
+                    android:fadeScrollbars="false"
                     android:listSelector="@drawable/grid_selector"
-                    />
+                    android:paddingLeft="54dp"
+                    android:scrollbarStyle="outsideOverlay"
+                    android:scrollbarThumbVertical="@drawable/c4_scrollbar"
+                    android:verticalScrollbarPosition="left" />
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/launcher_pagination"
                 android:layout_width="104dp"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:id="@+id/launcher_pagination"
                 android:background="@color/c4_list_background"
-                >
+                android:orientation="vertical">
+
                 <view
-                    class="com.carconnectivity.mlmediaplayer.ui.widgets.PageButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
                     android:id="@+id/page_button_previous"
-                    />
-                <view
                     class="com.carconnectivity.mlmediaplayer.ui.widgets.PageButton"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="1"
+                    android:layout_weight="1" />
+
+                <view
                     android:id="@+id/page_button_current"
-                    />
-                <view
                     class="com.carconnectivity.mlmediaplayer.ui.widgets.PageButton"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="1"
+                    android:layout_weight="1" />
+
+                <view
                     android:id="@+id/page_button_next"
-                    />
+                    class="com.carconnectivity.mlmediaplayer.ui.widgets.PageButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
             </LinearLayout>
 
             <TextView
+                android:id="@+id/no_results_notification"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/no_results_notification"
-                android:text="@string/items_missing"
-                android:textSize="30dp"
+                android:gravity="center"
+                android:paddingBottom="20dp"
                 android:paddingLeft="104dp"
                 android:paddingRight="20dp"
                 android:paddingTop="20dp"
-                android:paddingBottom="20dp"
-                android:gravity="center"
+                android:text="@string/items_missing"
                 android:textColor="#fff"
-                tools:ignore="SpUsage"
+                android:textSize="30dp"
                 android:visibility="invisible"
-                />
+                tools:ignore="SpUsage" />
 
             <ProgressBar
+                android:id="@+id/waitIndicator"
                 style="@android:style/Widget.Material.ProgressBar.Large"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/waitIndicator"
                 android:layout_centerInParent="true"
-                android:visibility="visible"
-                />
+                android:visibility="visible" />
 
         </RelativeLayout>
     </LinearLayout>

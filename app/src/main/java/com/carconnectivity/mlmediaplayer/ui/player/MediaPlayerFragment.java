@@ -79,25 +79,22 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
 
     private static final int WAIT_INDICATOR_ANIMATION_TIME_SPIN = 1000;
     private static final int WAIT_INDICATOR_ANIMATION_TIME_FADE = 200;
-
+    private static final int MAX_LEVEL_VALUE = 10000;
     private TextView mProviderName;
     private ImageView mAlbumArt;
     private TextView mSongTitle;
     private TextView mSongArtist;
     private ImageButton mLauncherButton;
     private ImageButton mNavigatorButton;
-
     private MediaButton mMediaButton1;
     private MediaButton mMediaButton2;
     private MediaButton mMediaButton3;
     private MediaButton mMediaButton3Sec;
     private MediaButton mMediaButton4;
     private MediaButton mMediaButton5;
-
     private ImageView mWaitIndicatorFront;
     private ImageView mWaitIndicatorSpin;
     private ImageView mWaitIndicatorBack;
-
     private ColorStateList mSecondaryToolbarColor;
     private ImageView mToolbarTopImage;
     private ColorStateList mToolbarTopImageColorState;
@@ -105,14 +102,13 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
     private ColorStateList mToolbarBottomImageColorState;
     private ImageView mProgressBar;
     private ProgressTimer mProgressTimer;
-
     private ProviderPlaybackState mCurrentPlaybackState;
     private long mCurrentTrackDuration;
     private boolean mSecondaryToolbarShown;
     private View mRootView;
-
     private ProviderViewActive mNowPlayingProvider;
     private boolean mCustomTitle = false;
+    private boolean mWaitIndicatorEnabled = false;
 
     public static MediaPlayerFragment newInstance() {
         MediaPlayerFragment fragment = new MediaPlayerFragment();
@@ -282,7 +278,7 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
         }
     }
 
-    private void setTitle(String title){
+    private void setTitle(String title) {
         mSongTitle.setText(UiUtilities.trimLabelText(title));
     }
 
@@ -555,8 +551,6 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
         }
     }
 
-    private static final int MAX_LEVEL_VALUE = 10000;
-
     private void setProgress(float progress) {
         Drawable bar = mProgressBar.getDrawable();
         if (bar == null) return;
@@ -569,8 +563,6 @@ public final class MediaPlayerFragment extends Fragment implements BackButtonHan
             bar.setLevel((int) (progress * MAX_LEVEL_VALUE));
         }
     }
-
-    private boolean mWaitIndicatorEnabled = false;
 
     private void enableWaitIndicator(boolean enable) {
         Log.d(TAG, "enableWaitIndicator: enable=" + enable);

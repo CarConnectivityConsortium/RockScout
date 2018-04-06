@@ -40,57 +40,11 @@ import com.carconnectivity.mlmediaplayer.mediabrowser.ProviderViewActive;
  */
 public class MediaButtonData {
 
-    /**
-     * Relates to available, supported actions that can be set in
-     * PlaybackState.Builder setActions (long actions)
-     */
-    public enum Type {
-        EMPTY(0),
-        QUEUE(0),
-        SKIP_TO_PREVIOUS(PlaybackState.ACTION_SKIP_TO_PREVIOUS),
-        REWIND(PlaybackState.ACTION_REWIND),
-        PLAY(PlaybackState.ACTION_PLAY),
-        PAUSE(PlaybackState.ACTION_PAUSE),
-        STOP(PlaybackState.ACTION_STOP),
-        FAST_FORWARD(PlaybackState.ACTION_FAST_FORWARD),
-        SKIP_TO_NEXT(PlaybackState.ACTION_SKIP_TO_NEXT),
-        CUSTOM(0),
-        MORE_ACTIONS_ON(0),
-        MORE_ACTIONS_OFF(0);
-
-        private long mActionId;
-
-        Type(long actionId) {
-            this.mActionId = actionId;
-        }
-
-        public long getActionId() {
-            return mActionId;
-        }
-
-        /**
-         * Returns type based on the provided actionId
-         *
-         * @param actionId must be greater than 0
-         */
-        public static Type fromActionId(long actionId) {
-            if (actionId != 0) {
-                for (Type type : values()) {
-                    if (type.getActionId() == actionId) {
-                        return type;
-                    }
-                }
-            }
-            return null;
-        }
-    }
-
     public final ProviderViewActive provider;
     public final Type type;
     public final String action;
     public final Drawable icon;
     public final Bundle extras;
-
     public MediaButtonData
             (ProviderViewActive provider
                     , Type type
@@ -117,5 +71,50 @@ public class MediaButtonData {
                 ", icon=" + icon +
                 ", extras=" + extras +
                 '}';
+    }
+
+    /**
+     * Relates to available, supported actions that can be set in
+     * PlaybackState.Builder setActions (long actions)
+     */
+    public enum Type {
+        EMPTY(0),
+        QUEUE(0),
+        SKIP_TO_PREVIOUS(PlaybackState.ACTION_SKIP_TO_PREVIOUS),
+        REWIND(PlaybackState.ACTION_REWIND),
+        PLAY(PlaybackState.ACTION_PLAY),
+        PAUSE(PlaybackState.ACTION_PAUSE),
+        STOP(PlaybackState.ACTION_STOP),
+        FAST_FORWARD(PlaybackState.ACTION_FAST_FORWARD),
+        SKIP_TO_NEXT(PlaybackState.ACTION_SKIP_TO_NEXT),
+        CUSTOM(0),
+        MORE_ACTIONS_ON(0),
+        MORE_ACTIONS_OFF(0);
+
+        private long mActionId;
+
+        Type(long actionId) {
+            this.mActionId = actionId;
+        }
+
+        /**
+         * Returns type based on the provided actionId
+         *
+         * @param actionId must be greater than 0
+         */
+        public static Type fromActionId(long actionId) {
+            if (actionId != 0) {
+                for (Type type : values()) {
+                    if (type.getActionId() == actionId) {
+                        return type;
+                    }
+                }
+            }
+            return null;
+        }
+
+        public long getActionId() {
+            return mActionId;
+        }
     }
 }

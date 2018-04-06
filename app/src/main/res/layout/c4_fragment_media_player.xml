@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright Car Connectivity Consortium
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,81 +33,81 @@
     android:background="@color/player_background">
 
     <ImageView
+        android:id="@+id/album_art"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:id="@+id/album_art"
-        android:scaleType="centerCrop"
         android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
         android:src="@drawable/c4_player_background" />
 
     <ImageView
+        android:id="@+id/album_art_dim"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:id="@+id/album_art_dim"
-        android:background="@android:color/black"
-        android:alpha="0.7"/>
+        android:alpha="0.7"
+        android:background="@android:color/black" />
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1.5"
             android:background="@drawable/c4_actionbar"
-            android:baselineAligned="false">
+            android:baselineAligned="false"
+            android:orientation="horizontal">
 
             <ImageButton
+                android:id="@+id/buttonLauncher"
                 android:layout_width="104dp"
                 android:layout_height="match_parent"
-                android:id="@+id/buttonLauncher"
                 android:background="@xml/action_bar_btn_selector"
-                android:src="@drawable/ic_btn_launcher"
+                android:padding="12dp"
                 android:scaleType="fitCenter"
-                android:padding="12dp" />
+                android:src="@drawable/ic_btn_launcher" />
 
             <TextView
+                android:id="@+id/textTitle"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:id="@+id/textTitle"
+                android:layout_marginLeft="5dp"
                 android:layout_weight="3"
                 android:gravity="center_vertical|left"
-                android:layout_marginLeft="5dp" />
+                android:textAppearance="?android:attr/textAppearanceLarge" />
 
             <TextView
+                android:id="@+id/textProviderName"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:id="@+id/textProviderName"
-                android:layout_weight="3"
-                android:gravity="center_vertical|right"
                 android:layout_marginRight="5dp"
+                android:layout_weight="3"
+                android:ellipsize="end"
+                android:gravity="center_vertical|right"
                 android:singleLine="true"
-                android:ellipsize="end" />
+                android:textAppearance="?android:attr/textAppearanceLarge" />
 
             <FrameLayout
                 android:layout_width="104dp"
                 android:layout_height="match_parent">
+
                 <ImageView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/c4_provider_border"
-                    android:scaleType="fitCenter"
                     android:padding="10dp"
-                    />
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/c4_provider_border" />
 
                 <ImageButton
+                    android:id="@+id/buttonNavigator"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:id="@+id/buttonNavigator"
                     android:background="@xml/action_bar_btn_selector"
-                    android:src="@drawable/ic_btn_navigator"
+                    android:padding="14dp"
                     android:scaleType="fitCenter"
-                    android:padding="14dp" />
+                    android:src="@drawable/ic_btn_navigator" />
 
             </FrameLayout>
 
@@ -120,9 +119,9 @@
             android:layout_weight="7">
 
             <LinearLayout
-                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
                 <ImageView
                     android:layout_width="match_parent"
@@ -135,18 +134,18 @@
                     android:layout_weight="1">
 
                     <ImageView
+                        android:id="@+id/toolbar_top"
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
-                        android:id="@+id/toolbar_top"
-                        android:src="@drawable/c4_toolbar_top"
-                        android:scaleType="fitXY" />
+                        android:scaleType="fitXY"
+                        android:src="@drawable/c4_toolbar_top" />
 
                     <ImageView
+                        android:id="@+id/toolbar_progress"
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
-                        android:id="@+id/toolbar_progress"
-                        android:src="@drawable/progress_bar_clip"
-                        android:scaleType="fitXY" />
+                        android:scaleType="fitXY"
+                        android:src="@drawable/progress_bar_clip" />
 
                 </FrameLayout>
 
@@ -156,16 +155,16 @@
                     android:layout_weight="2">
 
                     <ImageView
+                        android:id="@+id/toolbar_bottom"
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
-                        android:id="@+id/toolbar_bottom"
-                        android:src="@drawable/c4_toolbar_bottom"
-                        android:scaleType="fitXY" />
+                        android:scaleType="fitXY"
+                        android:src="@drawable/c4_toolbar_bottom" />
 
                     <LinearLayout
-                        android:orientation="horizontal"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal">
 
                         <ImageView
                             android:layout_width="0dp"
@@ -179,19 +178,19 @@
                             android:layout_weight="1">
 
                             <ImageView
+                                android:id="@+id/mediaButton3SecBackground"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:id="@+id/mediaButton3SecBackground"
                                 android:src="@drawable/c4_media_button" />
 
                             <com.carconnectivity.mlmediaplayer.ui.player.MediaButton
+                                android:id="@+id/mediaButton3Sec"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:id="@+id/mediaButton3Sec"
                                 android:background="@xml/media_btn_selector"
-                                android:tint="#fff"
                                 android:focusable="false"
-                                android:padding="16dp" />
+                                android:padding="16dp"
+                                android:tint="#fff" />
                         </FrameLayout>
 
                         <ImageView
@@ -206,10 +205,10 @@
             </LinearLayout>
 
             <LinearLayout
-                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@android:color/transparent">
+                android:background="@android:color/transparent"
+                android:orientation="vertical">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -217,39 +216,39 @@
                     android:layout_weight="4">
 
                     <TextView
+                        android:id="@+id/song_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceLarge"
-                        android:textSize="32sp"
-                        android:id="@+id/song_title"
-                        android:gravity="center_vertical|center_horizontal"
+                        android:layout_centerInParent="true"
                         android:layout_gravity="center_horizontal"
-                        android:layout_centerInParent="true" />
+                        android:gravity="center_vertical|center_horizontal"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:textSize="32sp" />
 
                     <TextView
+                        android:id="@+id/song_artist"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceLarge"
-                        android:id="@+id/song_artist"
-                        android:layout_gravity="center_horizontal"
-                        android:gravity="center_horizontal"
                         android:layout_below="@+id/song_title"
+                        android:layout_gravity="center_horizontal"
                         android:layout_marginTop="5dp"
-                        android:textSize="22dp"
-                        android:textIsSelectable="false" />
+                        android:gravity="center_horizontal"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:textIsSelectable="false"
+                        android:textSize="22dp" />
                 </RelativeLayout>
 
                 <LinearLayout
-                    android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="3">
+                    android:layout_weight="3"
+                    android:orientation="horizontal">
 
                     <LinearLayout
-                        android:orientation="vertical"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_weight="4">
+                        android:layout_weight="4"
+                        android:orientation="vertical">
 
                         <ImageView
                             android:layout_width="match_parent"
@@ -257,12 +256,11 @@
                             android:layout_weight="1" />
 
                         <LinearLayout
-                            android:orientation="horizontal"
                             android:layout_width="match_parent"
                             android:layout_height="0dp"
-                            android:layout_weight="2"
                             android:layout_marginBottom="10dp"
-                            >
+                            android:layout_weight="2"
+                            android:orientation="horizontal">
 
                             <FrameLayout
                                 android:layout_width="0dp"
@@ -270,21 +268,21 @@
                                 android:layout_weight="1">
 
                                 <ImageView
+                                    android:id="@+id/mediaButton1Background"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
-                                    android:id="@+id/mediaButton1Background"
-                                    android:src="@drawable/c4_media_button"
-                                    android:scaleType="fitCenter" />
+                                    android:scaleType="fitCenter"
+                                    android:src="@drawable/c4_media_button" />
 
                                 <com.carconnectivity.mlmediaplayer.ui.player.MediaButton
+                                    android:id="@+id/mediaButton1"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
-                                    android:id="@+id/mediaButton1"
                                     android:background="@xml/media_btn_selector"
-                                    android:scaleType="fitCenter"
-                                    android:tint="#fff"
                                     android:focusable="true"
-                                    android:padding="16dp" />
+                                    android:padding="16dp"
+                                    android:scaleType="fitCenter"
+                                    android:tint="#fff" />
 
                             </FrameLayout>
 
@@ -294,21 +292,21 @@
                                 android:layout_weight="1">
 
                                 <ImageView
+                                    android:id="@+id/mediaButton2Background"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
-                                    android:id="@+id/mediaButton2Background"
-                                    android:src="@drawable/c4_media_button"
-                                    android:scaleType="fitCenter" />
+                                    android:scaleType="fitCenter"
+                                    android:src="@drawable/c4_media_button" />
 
                                 <com.carconnectivity.mlmediaplayer.ui.player.MediaButton
+                                    android:id="@+id/mediaButton2"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
-                                    android:id="@+id/mediaButton2"
                                     android:background="@xml/media_btn_selector"
-                                    android:scaleType="fitCenter"
-                                    android:tint="#fff"
                                     android:focusable="false"
-                                    android:padding="16dp" />
+                                    android:padding="16dp"
+                                    android:scaleType="fitCenter"
+                                    android:tint="#fff" />
 
                             </FrameLayout>
 
@@ -321,70 +319,63 @@
                         android:layout_weight="2">
 
                         <ImageView
+                            android:id="@+id/waitIndicatorSpin"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:id="@+id/waitIndicatorSpin"
-                            android:src="@drawable/c4_wait_indicator_spin"
-                            android:scaleType="fitCenter"
                             android:layout_gravity="bottom"
                             android:padding="11dp"
-                            android:layout_marginBottom="-10dp" />
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/c4_wait_indicator_spin" />
 
                         <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
                             android:id="@+id/waitIndicatorBack"
-                            android:src="@drawable/c4_wait_indicator_back"
-                            android:scaleType="fitCenter"
-                            android:layout_gravity="bottom"
-                            android:padding="10dp"
-                            android:layout_marginBottom="-10dp" />
-
-                        <ImageView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
+                            android:layout_gravity="bottom"
+                            android:padding="10dp"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/c4_wait_indicator_back" />
+
+                        <ImageView
                             android:id="@+id/waitIndicatorFront"
-                            android:src="@drawable/c4_wait_indicator_front"
-                            android:scaleType="fitCenter"
-                            android:layout_gravity="bottom"
-                            android:padding="10dp"
-                            android:layout_marginBottom="-10dp" />
-
-                        <ImageView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:id="@+id/mediaButton3Background"
-                            android:src="@drawable/c4_playback_button"
-                            android:scaleType="fitCenter"
                             android:layout_gravity="bottom"
                             android:padding="10dp"
-                            android:layout_marginBottom="-10dp"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/c4_wait_indicator_front" />
+
+                        <ImageView
+                            android:id="@+id/mediaButton3Background"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="bottom"
+                            android:padding="10dp"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/c4_playback_button"
                             android:tint="@color/c4_active_button_color"
-                            android:tintMode="multiply"
-                            />
+                            android:tintMode="multiply" />
 
                         <!-- this is the main play/pause button -->
                         <com.carconnectivity.mlmediaplayer.ui.player.MediaButton
+                            android:id="@+id/mediaButton3"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:id="@+id/mediaButton3"
+                            android:layout_gravity="bottom"
                             android:background="@xml/media_btn_selector"
+                            android:focusable="true"
+                            android:padding="10dp"
                             android:scaleType="fitCenter"
                             android:src="@drawable/ic_btn_play"
-                            android:layout_gravity="bottom"
-                            android:padding="10dp"
-                            android:tint="#fff"
-                            android:focusable="true"
-                            android:layout_marginBottom="-10dp"
-                            />
+                            android:tint="#fff" />
 
                     </FrameLayout>
 
                     <LinearLayout
-                        android:orientation="vertical"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_weight="4">
+                        android:layout_weight="4"
+                        android:orientation="vertical">
 
                         <ImageView
                             android:layout_width="wrap_content"
@@ -392,12 +383,11 @@
                             android:layout_weight="1" />
 
                         <LinearLayout
-                            android:orientation="horizontal"
                             android:layout_width="match_parent"
                             android:layout_height="0dp"
-                            android:layout_weight="2"
                             android:layout_marginBottom="10dp"
-                            >
+                            android:layout_weight="2"
+                            android:orientation="horizontal">
 
                             <FrameLayout
                                 android:layout_width="0dp"
@@ -405,27 +395,25 @@
                                 android:layout_weight="1">
 
                                 <ImageView
+                                    android:id="@+id/mediaButton4Background"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
-                                    android:id="@+id/mediaButton4Background"
-                                    android:src="@drawable/c4_media_button"
                                     android:scaleType="fitCenter"
+                                    android:src="@drawable/c4_media_button"
                                     android:tint="@color/c4_active_button_color"
-                                    android:tintMode="multiply"
-                                    />
+                                    android:tintMode="multiply" />
 
                                 <com.carconnectivity.mlmediaplayer.ui.player.MediaButton
+                                    android:id="@+id/mediaButton4"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
-                                    android:id="@+id/mediaButton4"
                                     android:layout_weight="1"
                                     android:background="@xml/media_btn_selector"
-                                    android:scaleType="fitCenter"
-                                    android:tint="#fff"
                                     android:focusable="false"
                                     android:padding="16dp"
+                                    android:scaleType="fitCenter"
                                     android:src="@drawable/ic_btn_skip_to_next"
-                                    />
+                                    android:tint="#fff" />
 
                             </FrameLayout>
 
@@ -435,22 +423,22 @@
                                 android:layout_weight="1">
 
                                 <ImageView
+                                    android:id="@+id/mediaButton5Background"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
-                                    android:id="@+id/mediaButton5Background"
-                                    android:src="@drawable/c4_media_button"
-                                    android:scaleType="fitCenter" />
+                                    android:scaleType="fitCenter"
+                                    android:src="@drawable/c4_media_button" />
 
                                 <com.carconnectivity.mlmediaplayer.ui.player.MediaButton
+                                    android:id="@+id/mediaButton5"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
-                                    android:id="@+id/mediaButton5"
                                     android:layout_weight="1"
                                     android:background="@xml/media_btn_selector"
-                                    android:scaleType="fitCenter"
-                                    android:tint="#fff"
                                     android:focusable="false"
-                                    android:padding="16dp" />
+                                    android:padding="16dp"
+                                    android:scaleType="fitCenter"
+                                    android:tint="#fff" />
 
                             </FrameLayout>
 

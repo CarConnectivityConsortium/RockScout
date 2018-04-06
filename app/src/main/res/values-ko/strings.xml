@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
   ~ Copyright Car Connectivity Consortium
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,36 +28,36 @@
   -->
 
 <resources>
-  <string name="ml_unsupported">미러링크(MirrorLink)와 호환되지 않는 기종의 단말기입니다. 호환기종에 관한 사항은 미러링크 홈페이지 (www.mirrorlink.com)에서 확인하시기 바랍니다.</string>
-  <string name="ml_not_connected">미러링크(MirrorLink) 헤드유닛에 단말기가 연결되어있지 않습니다.</string>
-  <string name="notification_access">정상적인 동작을 위해서는 해당 어플리케이션에 대한 알림 접근 기능이 켜져있어야 합니다.  지금 기능을 켜시겠습니까?</string>
-  <string name="items_missing">미디어 아이템을 찾을 수 없습니다.</string>
-  <string name="play">플레이</string>
-  <string name="pause">중지</string>
-  <string name="next">다음</string>
-  <string name="previous">이전</string>
-  <string name="playlist">플레이리스트</string>
-  <string name="more">더</string>
-  <string name="menu">메뉴</string>
-  <string name="listenNow">지금 듣기</string>
-  <string name="active">활성</string>
-  <string name="inactive">비활성</string>
-  <string name="disabled">꺼짐</string>
-  <string name="track">트랙</string>
-  <string name="artist">아티스트</string>
-  <string name="album">앨범</string>
-  <string name="browse">둘러보기</string>
-  <string name="back">돌아가기</string>
-  <string name="providers_list">미디어 제공자 리스트</string>
-  <string name="open_navigator">내비 열기</string>
-  <string name="now_playing">지금 플레이중</string>
-  <string name="mirrorlink_dialog_title">주의</string>
-  <string name="mirrorlink_dialog_message">휴대전화 단말기가 미러링크 기능을 지원하지 않습니다.  단말기에서 카 뮤직 컨트롤러 (RockScout)는 사용하실 수 있으나, 자동차 헤드유닛에 있는 기능은 사용하실 수 없습니다.</string>
-  <string name="no_auto_compatible_app">휴대전화 단말기에 안드로이드오토(\'Android Media Browse Service\')용 미디어 어플리케이션이 존재하지 않습니다.  카 뮤직 컨트롤러 (RockScout)를 사용하기 위해서, 호환되는 미디어 어플리케이션을 설치해 주시기 바랍니다.</string>
-  <string name="press_play_to_start">시작을 위해 플레이(Play)를 누르세요.</string>
-  <string name="select_track_to_start">재생할 트랙을 선택하세요</string>
-  <string name="launcher">론처</string>
-  <string name="top_level">최상위 레벨</string>
-  <string name="select_source_hint">플레이할 소스를 선택해주세요:</string>
-  <string name="splash_subtitle">파워드 바이MirrorLink</string>
+    <string name="ml_unsupported">미러링크(MirrorLink)와 호환되지 않는 기종의 단말기입니다. 호환기종에 관한 사항은 미러링크 홈페이지 (www.mirrorlink.com)에서 확인하시기 바랍니다.</string>
+    <string name="ml_not_connected">미러링크(MirrorLink) 헤드유닛에 단말기가 연결되어있지 않습니다.</string>
+    <string name="notification_access">정상적인 동작을 위해서는 해당 어플리케이션에 대한 알림 접근 기능이 켜져있어야 합니다.  지금 기능을 켜시겠습니까?</string>
+    <string name="items_missing">미디어 아이템을 찾을 수 없습니다.</string>
+    <string name="play">플레이</string>
+    <string name="pause">중지</string>
+    <string name="next">다음</string>
+    <string name="previous">이전</string>
+    <string name="playlist">플레이리스트</string>
+    <string name="more">더</string>
+    <string name="menu">메뉴</string>
+    <string name="listenNow">지금 듣기</string>
+    <string name="active">활성</string>
+    <string name="inactive">비활성</string>
+    <string name="disabled">꺼짐</string>
+    <string name="track">트랙</string>
+    <string name="artist">아티스트</string>
+    <string name="album">앨범</string>
+    <string name="browse">둘러보기</string>
+    <string name="back">돌아가기</string>
+    <string name="providers_list">미디어 제공자 리스트</string>
+    <string name="open_navigator">내비 열기</string>
+    <string name="now_playing">지금 플레이중</string>
+    <string name="mirrorlink_dialog_title">주의</string>
+    <string name="mirrorlink_dialog_message">휴대전화 단말기가 미러링크 기능을 지원하지 않습니다.  단말기에서 카 뮤직 컨트롤러 (RockScout)는 사용하실 수 있으나, 자동차 헤드유닛에 있는 기능은 사용하실 수 없습니다.</string>
+    <string name="no_auto_compatible_app">휴대전화 단말기에 안드로이드오토(\'Android Media Browse Service\')용 미디어 어플리케이션이 존재하지 않습니다.  카 뮤직 컨트롤러 (RockScout)를 사용하기 위해서, 호환되는 미디어 어플리케이션을 설치해 주시기 바랍니다.</string>
+    <string name="press_play_to_start">시작을 위해 플레이(Play)를 누르세요.</string>
+    <string name="select_track_to_start">재생할 트랙을 선택하세요</string>
+    <string name="launcher">론처</string>
+    <string name="top_level">최상위 레벨</string>
+    <string name="select_source_hint">플레이할 소스를 선택해주세요:</string>
+    <string name="splash_subtitle">파워드 바이MirrorLink</string>
 </resources>
